@@ -26,12 +26,16 @@ package jsattrak.gui;
 
 import java.io.File;
 import java.util.Hashtable;
+
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
+
+import org.orekit.errors.OrekitException;
+
 import jsattrak.utilities.SatBrowserTleDataLoader;
-import jsattrak.utilities.TLE;
 import jsattrak.utilities.TLEDownloader;
+import jsattrak.utilities.TLElements;
 import jsattrak.utilities.TreeTransferHandler;
 
 /**
@@ -46,7 +50,7 @@ public class JSatBrowser extends javax.swing.JDialog implements java.io.Serializ
     DefaultMutableTreeNode topTreeNode; // top node
     
     // hashtable with tle's
-    private Hashtable<String,TLE> tleHash;
+    private Hashtable<String,TLElements> tleHash;
     
     java.awt.Frame parent;
     
@@ -72,7 +76,7 @@ public class JSatBrowser extends javax.swing.JDialog implements java.io.Serializ
         //tree = new JTree(top);
         
         // create a hashmap of TLEs with key as text from tree
-        tleHash = new Hashtable<String,TLE>();
+        tleHash = new Hashtable<String,TLElements>();
         
         treeModel = new DefaultTreeModel(topTreeNode); // create tree model using root node
         satTree.setModel(treeModel); // set the tree's model
@@ -228,9 +232,14 @@ public class JSatBrowser extends javax.swing.JDialog implements java.io.Serializ
         {
             if( tleHash.containsKey(satTree.getLastSelectedPathComponent().toString()) )
             {
-                TLE selectedTLE = tleHash.get(satTree.getLastSelectedPathComponent().toString());
+            	TLElements selectedTLE = tleHash.get(satTree.getLastSelectedPathComponent().toString());
                 
-                tleOutputTextArea.setText( selectedTLE.getLine1() + "\n" + selectedTLE.getLine2() );
+                try {
+					tleOutputTextArea.setText( selectedTLE.getLine1() + "\n" + selectedTLE.getLine2() );
+				} catch (OrekitException e) {
+
+					e.printStackTrace();
+				}
             }
             else // clear text area
             {
@@ -259,7 +268,7 @@ private void jMenu1ActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:ev
 //        });
 //    }
 
-    public Hashtable<String, TLE> getTleHash()
+    public Hashtable<String, TLElements> getTleHash()
     {
         return tleHash;
     }

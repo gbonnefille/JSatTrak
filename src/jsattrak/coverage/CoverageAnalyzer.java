@@ -32,6 +32,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Hashtable;
 import java.util.Vector;
+
 import jsattrak.gui.J2dEarthLabel2;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.GroundStation;
@@ -271,7 +272,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                     
                     aer = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(), 
                         new double[]{getLatPanelMidPoints()[i],getLonPanelMidPoints()[longIndex],0},  // sea level
-                        currentSat.getTEMEPos());
+                        currentSat.getTEMEPos().toArray());
                     
                     if(aer[1] >= elevationLimit)
                     {
@@ -298,7 +299,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                             
                             tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(), 
                                 new double[]{getLatPanelMidPoints()[i],getLonPanelMidPoints()[jWrappedIndex],0},  // sea level
-                                currentSat.getTEMEPos())[1];
+                                currentSat.getTEMEPos().toArray())[1];
                             if(tempElevation2 >= elevationLimit)
                             {
                                 tempAcessArray[i][jWrappedIndex] = true;
@@ -330,7 +331,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                             
                             tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(), 
                                 new double[]{getLatPanelMidPoints()[i],getLonPanelMidPoints()[jWrappedIndex],0},  // sea level
-                                currentSat.getTEMEPos())[1];
+                                currentSat.getTEMEPos().toArray())[1];
                             if(tempElevation2 >= elevationLimit)
                             {
                                 tempAcessArray[i][jWrappedIndex] = true;
@@ -361,7 +362,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                                     getLatPanelMidPoints()[i], getLonPanelMidPoints()[longIndex], 0
                                 
                                 }, // sea level
-                                currentSat.getTEMEPos());
+                                currentSat.getTEMEPos().toArray());
 
                         if (aer[1] >= elevationLimit)
                         {
@@ -389,7 +390,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
 
                                 tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(),
                                         new double[] {getLatPanelMidPoints()[i], getLonPanelMidPoints()[jWrappedIndex], 0}, // sea level
-                                        currentSat.getTEMEPos())[1];
+                                        currentSat.getTEMEPos().toArray())[1];
                                 if (tempElevation2 >= elevationLimit)
                                 {
                                     tempAcessArray[i][jWrappedIndex] = true;
@@ -421,7 +422,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                                 
                                 tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(),
                                         new double[]{getLatPanelMidPoints()[i], getLonPanelMidPoints()[jWrappedIndex], 0}, // sea level
-                                        currentSat.getTEMEPos())[1];
+                                        currentSat.getTEMEPos().toArray())[1];
                                 if (tempElevation2 >= elevationLimit)
                                 {
                                     tempAcessArray[i][jWrappedIndex] = true;

@@ -40,247 +40,235 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 
+import jsattrak.utilities.TLElements;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.errors.OrekitException;
+import org.orekit.propagation.analytical.tle.TLEPropagator;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.utils.PVCoordinates;
+
 /**
- *
+ * 
  * @author Shawn E. Gano, shawn@gano.name
  */
-public class SGP4verification
-{
-    public static void main(String[] args)
-    {
-        // settings
-        char opsmode = SGP4utils.OPSMODE_IMPROVED; // OPSMODE_IMPROVED
-        SGP4unit.Gravconsttype gravconsttype = SGP4unit.Gravconsttype.wgs72;
-        
-        // tle verification file (with extra start, stop, timestep params on line 2)
-        String verTLEfile = "sgp4-ver.tle"; // sgp4-ver.tle shawn_ver.tle
+public class SGP4verification {
+	public static void main(String[] args) {
+		// settings
+		char opsmode = SGP4utils.OPSMODE_IMPROVED; // OPSMODE_IMPROVED
+		SGP4unit.Gravconsttype gravconsttype = SGP4unit.Gravconsttype.wgs72;
 
-        // output results to this file
-        String javaResults = "java_sgp4_ver.out";
+		// tle verification file (with extra start, stop, timestep params on
+		// line 2)
+		String verTLEfile = "sgp4-ver.tle"; // sgp4-ver.tle shawn_ver.tle
 
-        // comparison file, cpp results
-        String cppResultsFile = "tcppver.out";
+		// output results to this file
+		String javaResults = "java_sgp4_ver.out";
 
-        // internal variables -------------------------
-        double[] ro = new double[3];
-        double[] vo = new double[3];
+		// comparison file, cpp results
+		String cppResultsFile = "tcppver.out";
 
-        // get constants -------------------------------
-        double[] gtt = SGP4unit.getgravconst(gravconsttype);//, tumin, mu, radiusearthkm, xke, j2, j3, j4, j3oj2 );
-        double tumin = gtt[0];
-        double mu = gtt[1];
-        double radiusearthkm = gtt[2];
-        double xke = gtt[3];
-        double j2 = gtt[4];
-        double j3 = gtt[5];
-        double j4 = gtt[6];
-        double j3oj2 = gtt[7];
+		// internal variables -------------------------
+		Vector3D ro = Vector3D.ZERO;
+		Vector3D vo = Vector3D.ZERO;
 
-         System.out.println("======  PROPOGATING VERIFICATION TLEs ====== ");
-        // open the TLE file and propogate each TLE --------------------
-        try
-        {
-            // Open the file that is the first
-            // command line parameter
-            FileInputStream fstream = new FileInputStream(verTLEfile);
-            // Get the object of DataInputStream
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		// get constants -------------------------------
+		double[] gtt = SGP4unit.getgravconst(gravconsttype);// , tumin, mu,
+															// radiusearthkm,
+															// xke, j2, j3, j4,
+															// j3oj2 );
+		double tumin = gtt[0];
+		double mu = gtt[1];
+		double radiusearthkm = gtt[2];
+		double xke = gtt[3];
+		double j2 = gtt[4];
+		double j3 = gtt[5];
+		double j4 = gtt[6];
+		double j3oj2 = gtt[7];
 
-            // output file
-            // Create file
-            FileWriter outStream = new FileWriter(javaResults);
-            BufferedWriter out = new BufferedWriter(outStream);
+		System.out.println("======  PROPOGATING VERIFICATION TLEs ====== ");
+		// open the TLE file and propogate each TLE --------------------
+		try {
+			// Open the file that is the first
+			// command line parameter
+			FileInputStream fstream = new FileInputStream(verTLEfile);
+			// Get the object of DataInputStream
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 
-            String strLine1;
-            String strLine2;
-            //Read File Line By Line
-            while((strLine1 = br.readLine()) != null)
-            {
-                if(!strLine1.startsWith("#")) // ignore lines starting with #
-                {
-                    // there should always be a second line
-                    strLine2 = br.readLine();
+			// output file
+			// Create file
+			FileWriter outStream = new FileWriter(javaResults);
+			BufferedWriter out = new BufferedWriter(outStream);
 
-                    // retrive parts of the line that contain start/stop/timestep info
-                    // split on white space after normal line 2 info
-                    String[] sst = strLine2.substring(69).trim().split("\\s+");
+			String strLine1;
+			String strLine2;
+			// Read File Line By Line
+			while ((strLine1 = br.readLine()) != null) {
+				if (!strLine1.startsWith("#")) // ignore lines starting with #
+				{
+					// there should always be a second line
+					strLine2 = br.readLine();
 
-                    double startmfe = Double.parseDouble(sst[0]);
-                    double stopmfe =  Double.parseDouble(sst[1]);
-                    double deltamin = Double.parseDouble(sst[2]);
+					// retrive parts of the line that contain
+					// start/stop/timestep info
+					// split on white space after normal line 2 info
+					String[] sst = strLine2.substring(69).trim().split("\\s+");
 
-                    // convert the char string to sgp4 elements
-                    // includes initialization of sgp4
-                    SGP4SatData satrec = new SGP4SatData();
-                    SGP4utils.readTLEandIniSGP4("", strLine1, strLine2, opsmode, gravconsttype, satrec);
+					double startmfe = Double.parseDouble(sst[0]);
+					double stopmfe = Double.parseDouble(sst[1]);
+					double deltamin = Double.parseDouble(sst[2]);
 
-                    out.write(satrec.satnum + " xx\n");
-                    System.out.println(" "+ satrec.satnum);
-                    // call the propagator to get the initial state vector value
-                    SGP4unit.sgp4(satrec, 0.0, ro, vo);
+					// call the propagator to get the initial state vector value
 
-                    out.write(String.format(" %16.8f %16.8f %16.8f %16.8f %12.9f %12.9f %12.9f\n",
-                        satrec.t,ro[0],ro[1],ro[2],vo[0],vo[1],vo[2]));
+					TLElements tle = null;
+					TLEPropagator orekitTlePropagator = null;
+					try {
+						tle = new TLElements("", strLine1, strLine2);
+						orekitTlePropagator = TLEPropagator
+								.selectExtrapolator(tle);
+					} catch (OrekitException e1) {
 
-                    double tsince = startmfe;
+						e1.printStackTrace();
+					}
 
-                    // check so the first value isn't written twice
-                    if ( Math.abs(tsince) > 1.0e-8 )
-                    {
-                        tsince = tsince - deltamin;
-                    }
+					out.write(tle.getSatelliteNumber() + " xx\n");
+					System.out.println(" " + tle.getSatelliteNumber());
 
-                    // ----------------- loop to perform the propagation ----------------
-                    while((tsince < stopmfe) && (satrec.error == 0))
-                    {
-                        tsince = tsince + deltamin;
+					// modele de propa sgp4 Orekit
 
-                        if(tsince > stopmfe)
-                        {
-                            tsince = stopmfe;
-                        }
+					AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH;
 
-                        SGP4unit.sgp4(satrec, tsince, ro, vo);
+					PVCoordinates posVit = null;
+					try {
+						posVit = orekitTlePropagator
+								.getPVCoordinates(orekitJulDate);
+					} catch (OrekitException e) {
 
-                        if(satrec.error > 0)
-                        {
-                            System.out.print("# *** error: t:= " + satrec.t + " *** code = " + satrec.error + "\n");
-                        }
+						e.printStackTrace();
+					}
 
-                        if(satrec.error == 0)
-                        {
+					Vector3D pos = posVit.getPosition();
+					Vector3D vit = posVit.getVelocity();
 
-                            //double jd = satrec.jdsatepoch + tsince/1440.0;
-                            //invjday( jd, year,mon,day,hr,min, sec );
+					out.write(String
+							.format(" %16.8f %16.8f %16.8f %16.8f %12.9f %12.9f %12.9f\n",
+									0, pos.getX(), pos.getY(), pos.getZ(),
+									vit.getX(), vit.getY(), vit.getZ()));
 
-                            out.write(String.format(" %16.8f %16.8f %16.8f %16.8f %12.9f %12.9f %12.9f",
-                                    tsince, ro[0], ro[1], ro[2], vo[0], vo[1], vo[2]));
+					double tsince = startmfe;
 
-                            double jd = satrec.jdsatepoch + tsince/1440.0;
-                            double[] ymd = SGP4utils.invjday( jd ); //, year,mon,day,hr,min, sec );
-                            int year = (int) ymd[0];
-                            int mon = (int) ymd[1];
-                            int day = (int) ymd[2];
-                            int hr = (int) ymd[3];
-                            int min = (int) ymd[4];
-                            double sec = ymd[5];
+					// check so the first value isn't written twice
+					if (Math.abs(tsince) > 1.0e-8) {
+						tsince = tsince - deltamin;
+					}
 
-                            double[] coe = SGP4utils.rv2coe(ro, vo, mu); // , p, a, ecc, incl, node, argp, nu, m, arglat, truelon, lonper);
-                            double p = coe[0];
-                            double a = coe[1];
-                            double ecc = coe[2];
-                            double incl = coe[3];
-                            double node = coe[4];
-                            double argp = coe[5];
-                            double nu = coe[6];
-                            double m = coe[7];
-                            double arglat = coe[8];
-                            double truelon = coe[9];
-                            double lonper = coe[10];
+					// ----------------- loop to perform the propagation
+					// ----------------
+					while ((tsince < stopmfe)) {
+						tsince = tsince + deltamin;
 
-                            double rad = 180.0 / Math.PI;
+						if (tsince > stopmfe) {
+							tsince = stopmfe;
+						}
 
-                            out.write( String.format(" %14.6f %8.6f %10.5f %10.5f %10.5f %10.5f %10.5f %5d%3d%3d %2d:%2d:%9.6f\n",
-                                    a, ecc, incl * rad, node * rad, argp * rad, nu * rad,
-                                    m * rad, year, mon, day, hr, min, sec));
-                            out.flush(); // make sure the write is caught up
+						try {
+							posVit = orekitTlePropagator
+									.getPVCoordinates(orekitJulDate
+											.shiftedBy(tsince * 86400));
+						} catch (OrekitException e) {
 
-                        } // if satrec.error == 0
+							e.printStackTrace();
+						}
 
-                    } // while propagating the orbit
-                    
-                } // ignore lines starting with #
-            }
-            //Close the input stream
-            in.close();
-            outStream.close();
-        }
-        catch(Exception e)
-        {//Catch exception if any
-            System.err.println("Error: " + e.getMessage());
-        }
-        // -- end main prop loop -------------------------------------------
+						pos = posVit.getPosition();
+						vit = posVit.getVelocity();
 
+					} // while propagating the orbit
 
-        System.out.println("======  RUNNNING COMPARISON ====== ");
-        // now compare ------------------------------------------------
-        try
-        {
-            // Open the results files
-            FileInputStream fstream = new FileInputStream(javaResults);
-            DataInputStream in = new DataInputStream(fstream);
-            BufferedReader javaResultsBR = new BufferedReader(new InputStreamReader(in));
+				} // ignore lines starting with #
+			}
+			// Close the input stream
+			in.close();
+			outStream.close();
+		} catch (Exception e) {// Catch exception if any
+			System.err.println("Error: " + e.getMessage());
+		}
+		// -- end main prop loop -------------------------------------------
 
-            FileInputStream fstream2 = new FileInputStream(cppResultsFile);
-            DataInputStream in2 = new DataInputStream(fstream2);
-            BufferedReader cppResultsBR = new BufferedReader(new InputStreamReader(in2));
+		System.out.println("======  RUNNNING COMPARISON ====== ");
+		// now compare ------------------------------------------------
+		try {
+			// Open the results files
+			FileInputStream fstream = new FileInputStream(javaResults);
+			DataInputStream in = new DataInputStream(fstream);
+			BufferedReader javaResultsBR = new BufferedReader(
+					new InputStreamReader(in));
 
-            String cppLine = javaResultsBR.readLine();
-            String javaLine = cppResultsBR.readLine();
+			FileInputStream fstream2 = new FileInputStream(cppResultsFile);
+			DataInputStream in2 = new DataInputStream(fstream2);
+			BufferedReader cppResultsBR = new BufferedReader(
+					new InputStreamReader(in2));
 
-            int line = 1;
-            int lineMismatches = 0;
-            do
-            {
-                if( !cppLine.equals(javaLine))
-                {
-                    lineMismatches++;
+			String cppLine = javaResultsBR.readLine();
+			String javaLine = cppResultsBR.readLine();
 
-                    // line not equal
-                    System.out.print("Line " + line + " doesn't match:  ");
+			int line = 1;
+			int lineMismatches = 0;
+			do {
+				if (!cppLine.equals(javaLine)) {
+					lineMismatches++;
 
-                    // figure out how many chars are different
-                    int charMismatch = 0;
-                    System.out.print("pos=[");
-                    try
-                    {
-                        for (int i = 0; i < cppLine.length(); i++)
-                        {
-                            if (cppLine.charAt(i) != javaLine.charAt(i))
-                            {
-                                charMismatch++;
-                                System.out.print((i+1) + " ");
-                            }
-                        }
+					// line not equal
+					System.out.print("Line " + line + " doesn't match:  ");
 
-                    } catch (Exception e)
-                    {
-                        System.out.print("(Error checking line details) ");
-                    }
-                    System.out.print("] ");
+					// figure out how many chars are different
+					int charMismatch = 0;
+					System.out.print("pos=[");
+					try {
+						for (int i = 0; i < cppLine.length(); i++) {
+							if (cppLine.charAt(i) != javaLine.charAt(i)) {
+								charMismatch++;
+								System.out.print((i + 1) + " ");
+							}
+						}
 
-                    //
-                    System.out.print(charMismatch + " of " +cppLine.length() +  " mismatched characters\n");
-                }
+					} catch (Exception e) {
+						System.out.print("(Error checking line details) ");
+					}
+					System.out.print("] ");
 
-                cppLine = javaResultsBR.readLine();
-                javaLine = cppResultsBR.readLine();
-                line++;
-            }while(cppLine != null && javaLine != null);
+					//
+					System.out.print(charMismatch + " of " + cppLine.length()
+							+ " mismatched characters\n");
+				}
 
-            System.out.println("---------------------");
+				cppLine = javaResultsBR.readLine();
+				javaLine = cppResultsBR.readLine();
+				line++;
+			} while (cppLine != null && javaLine != null);
 
-            if(cppLine == null && javaLine == null)
-            {
-                System.out.println("** Files have the same number of lines **");
-            }
-            else
-            {
-                System.out.println("** Files have DIFFERENT number of lines **");
-            }
-            
-            System.out.println("Total lines that don't match: " + lineMismatches);
-            System.out.println("Total number of lines in shortest file: " + (line-1));
+			System.out.println("---------------------");
 
-            in.close();
-            in2.close();
+			if (cppLine == null && javaLine == null) {
+				System.out.println("** Files have the same number of lines **");
+			} else {
+				System.out
+						.println("** Files have DIFFERENT number of lines **");
+			}
 
-        }
-        catch(Exception e)
-        {
-            System.out.println("Error in comparing verification results:\n" + e.toString());
-        }
+			System.out.println("Total lines that don't match: "
+					+ lineMismatches);
+			System.out.println("Total number of lines in shortest file: "
+					+ (line - 1));
 
-    }
+			in.close();
+			in2.close();
+
+		} catch (Exception e) {
+			System.out.println("Error in comparing verification results:\n"
+					+ e.toString());
+		}
+
+	}
 }

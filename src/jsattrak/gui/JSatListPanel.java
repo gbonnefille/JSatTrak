@@ -80,7 +80,7 @@ public class JSatListPanel extends javax.swing.JPanel
             if(satHash.containsKey(nameSelected))
             {
                 SatelliteTleSGP4 prop = satHash.get(nameSelected);
-                double[] pos = prop.getJ2000Position();
+                double[] pos = prop.getJ2000Position().toArray();
                 //tleEpochText.setText( "" + prop.getSatTleEpochJulDate() + ", Pos= " + pos[0] +"," + pos[1] +"," + pos[2]);
             }
             else

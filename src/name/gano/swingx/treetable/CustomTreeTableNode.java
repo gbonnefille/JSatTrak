@@ -21,14 +21,21 @@
 
 package name.gano.swingx.treetable;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Vector;
 import javax.swing.Icon;
 import jsattrak.customsat.GoalParameter;
 import jsattrak.customsat.InputVariable;
+import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.StateVector;
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
+import org.orekit.errors.OrekitException;
+import org.orekit.frames.Frame;
+import org.orekit.propagation.BoundedPropagator;
+import org.orekit.time.AbsoluteDate;
 
 /**
  *
@@ -43,7 +50,7 @@ public class CustomTreeTableNode extends DefaultMutableTreeTableNode implements 
     
     Object[] userObject;
         
-    private double startTTjulDate = -1; // save julian date when this node starts (-1) if not set yet.
+    private AbsoluteDate startTTjulDate = AbsoluteDate.PAST_INFINITY; // save julian date when this node starts (-infinity) if not set yet.
     
     
     public CustomTreeTableNode(Object[] userObject) 
@@ -152,13 +159,15 @@ public class CustomTreeTableNode extends DefaultMutableTreeTableNode implements 
     }
     
     // meant to be overridden by implementing classes
-    public void execute(Vector<StateVector> ephemeris)
+    public void execute(MissionDesignPropagator missionDesign) throws IOException, ParseException, OrekitException
     {
          // dummy but should do something based on input ephemeris
         //System.out.println("Executing : " + getValueAt(0) );
         
         // save initial time of the node ( TT)
-        this.setStartTTjulDate(ephemeris.lastElement().state[0]);
+
+    	this.setStartTTjulDate(missionDesign.getEphemeris().getMaxDate());
+//        this.setStartTTjulDate(ephemeris.lastElement().state[0]);
         
     }// execute
 
@@ -192,12 +201,12 @@ public class CustomTreeTableNode extends DefaultMutableTreeTableNode implements 
         return new Vector<GoalParameter>(1);
     }
 
-    public double getStartTTjulDate()
+    public AbsoluteDate getStartTTjulDate()
     {
         return startTTjulDate;
     }
 
-    public void setStartTTjulDate(double startTTjulDate)
+    public void setStartTTjulDate(AbsoluteDate startTTjulDate)
     {
         this.startTTjulDate = startTTjulDate;
     }

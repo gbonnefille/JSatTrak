@@ -266,17 +266,17 @@ public class SatPropertyPanel extends javax.swing.JPanel implements java.io.Seri
         switch(cartComboBox.getSelectedIndex())
         {
             case 0: // J2000.0
-                copyArray(satProp.getJ2000Position(), pos);
-                copyArray(satProp.getJ2000Velocity(), vel);
+                copyArray(satProp.getJ2000Position().toArray(), pos);
+                copyArray(satProp.getJ2000Velocity().toArray(), vel);
                 break;
             case 1: // TEME
-                copyArray(satProp.getTEMEPos(), pos);
-                copyArray(satProp.getTEMEVelocity(), vel);
+                copyArray(satProp.getTEMEPos().toArray(), pos);
+                copyArray(satProp.getTEMEVelocity().toArray(), vel);
                 break;
             case 2: // MOD
                 // get J2k first
-                double[] j2kpos = satProp.getJ2000Position();
-                double[] j2kvel = satProp.getJ2000Velocity();
+                double[] j2kpos = satProp.getJ2000Position().toArray();
+                double[] j2kvel = satProp.getJ2000Velocity().toArray();
                 double[] temp1 = new double[3];
                 double[] temp2 = new double[3];
                 // find transform
@@ -287,8 +287,8 @@ public class SatPropertyPanel extends javax.swing.JPanel implements java.io.Seri
                 break;
             case 3: // TOD
                 // get J2k first
-                j2kpos = satProp.getJ2000Position();
-                j2kvel = satProp.getJ2000Velocity();
+                j2kpos = satProp.getJ2000Position().toArray();
+                j2kvel = satProp.getJ2000Velocity().toArray();
                 temp1 = new double[3];
                 temp2 = new double[3];
                 // find transform
@@ -298,8 +298,8 @@ public class SatPropertyPanel extends javax.swing.JPanel implements java.io.Seri
                 copyArray(temp2, vel);
                 break;
             default: // J2000.0
-                copyArray(satProp.getJ2000Position(), pos);
-                copyArray(satProp.getJ2000Velocity(), vel);
+                copyArray(satProp.getJ2000Position().toArray(), pos);
+                copyArray(satProp.getJ2000Velocity().toArray(), vel);
                 break;
         }
     } // getSelectedPosVel

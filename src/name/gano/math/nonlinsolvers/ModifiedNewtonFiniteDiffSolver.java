@@ -26,6 +26,11 @@
 
 package name.gano.math.nonlinsolvers;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.orekit.errors.OrekitException;
+
 import Jama.Matrix;
 import name.gano.astro.MathUtils;
 
@@ -78,7 +83,7 @@ public class ModifiedNewtonFiniteDiffSolver extends NonLinearEquationSystemSolve
     }
     
     //  returns if converged -- might want to eval F at the end.. to see if it is a better point (and half step to see if that is better etc.)
-    public boolean solve()
+    public boolean solve() throws IOException, ParseException, OrekitException
     {
         solverConverged = false; // reset 
         

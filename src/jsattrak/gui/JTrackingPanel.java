@@ -36,6 +36,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JTable.PrintMode;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.utilities.CustomFileFilter;
 import name.gano.astro.AER;
@@ -166,9 +169,9 @@ public class JTrackingPanel extends javax.swing.JPanel
         
         // calculate AER
         //double[] aer = gs.calculate_AER( sat.getJ2000Position() ); // in J2k position - incorrect
-        if(sat.getTEMEPos() != null && !nanDbl.equals(sat.getTEMEPos()[0])) // check for NAN
+        if(sat.getTEMEPos() != null && !nanDbl.equals(sat.getTEMEPos().getX())) // check for NAN
         {
-            double[] aer = gs.calculate_AER(sat.getTEMEPos());  // MOD
+            double[] aer = gs.calculate_AER(sat.getTEMEPos().toArray());  // MOD
 
             // add text AER and string
             aerTextArea.setText(timeAsString + "\n\n" + "Azimuth [deg]: " + aer[0] + "\nElevation [deg]: " + aer[1] + "\nRange [m]: " + aer[2]);
@@ -933,12 +936,12 @@ public class JTrackingPanel extends javax.swing.JPanel
                     internalSun.setCurrentMJD( julDateVizCalc - AstroConst.JDminusMJD );
                     
                     // MOD - sun dot site positions to determine if station is in sunlight
-                    double[] gsECI = AER.calculateECIposition(julDateVizCalc, gs.getLla_deg_m());
-                    double sunDotSite = MathUtils.dot(internalSun.getCurrentPositionTEME(),gsECI );
+                    Vector3D gsECI = AER.calculateECIposition(julDateVizCalc, gs.getLla_deg_m());
+                    double sunDotSite = internalSun.getCurrentPositionTEME().dotProduct(gsECI);
                     
                     // TEST - find angle between sun -> center of Earth -> Ground Station
-                    double sinFinalSigmaGS = MathUtils.norm( MathUtils.cross(internalSun.getCurrentPositionTEME(), gsECI) )
-                             / ( MathUtils.norm(internalSun.getCurrentPositionTEME()) * MathUtils.norm(gsECI)  );
+                    double sinFinalSigmaGS =  internalSun.getCurrentPositionTEME().crossProduct(gsECI).getNorm() 
+                             / ( internalSun.getCurrentPositionTEME().getNorm() * gsECI.getNorm()  );
                     double finalSigmaGS = Math.asin(sinFinalSigmaGS)*180.0/Math.PI; // in degrees
                     
                     if(sunDotSite > 0 || (90.0-finalSigmaGS) < twilightOffset )
@@ -949,11 +952,11 @@ public class JTrackingPanel extends javax.swing.JPanel
                     {
                         // now we know the site is in darkness - need to figure out if the satelite is in light
                         // use predict algorithm from Vallado 2nd ed.
-                        double[] satMOD = sat.calculateTemePositionFromUT(julDateVizCalc);
-                        double sinFinalSigma = MathUtils.norm( MathUtils.cross(internalSun.getCurrentPositionTEME(), satMOD) )
-                                / ( MathUtils.norm(internalSun.getCurrentPositionTEME()) * MathUtils.norm(satMOD)  );
+                        Vector3D satMOD = sat.calculateTemePositionFromUT(julDateVizCalc);
+                        double sinFinalSigma =  internalSun.getCurrentPositionTEME().crossProduct(satMOD).getNorm()
+                                / ( internalSun.getCurrentPositionTEME().getNorm() * satMOD.getNorm()  );
                         double finalSigma = Math.asin(sinFinalSigma);
-                        double dist = MathUtils.norm(satMOD) * Math.cos( finalSigma - Math.PI/2.0);
+                        double dist = satMOD.getNorm() * Math.cos( finalSigma - Math.PI/2.0);
                         
                         if(dist > AstroConst.R_Earth_mean) // changed to mean 30/March/2009 SEG
                         {

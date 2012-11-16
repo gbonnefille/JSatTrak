@@ -7,8 +7,14 @@
 //crosbyb@spawar-chas.navy.smil.mil
 
 
+import java.io.File;
+
 import jsattrak.objects.SatelliteTleSGP4;
-import jsattrak.utilities.TLE;
+import jsattrak.utilities.TLElements;
+
+import org.orekit.data.DataProvidersManager;
+import org.orekit.data.ZipJarCrawler;
+import org.orekit.errors.OrekitException;
 
 
 /**
@@ -17,11 +23,31 @@ import jsattrak.utilities.TLE;
  */
 public class TestSGP4
 {
-    public static void main(String[] args)
+    public static void main(String[] args) 
     {
-        // create TLE object
+        
+    	   // create TLE object
         // TLE = name, line 1, line 2
-        TLE newTLE = new TLE("ISS","1 25544U 98067A   09160.12255947  .00017740  00000-0  12823-3 0    24","2 25544  51.6405 348.2892 0009223  92.2562   9.3141 15.73542580604683");
+    	TLElements newTLE = null;
+    	
+    	//Initialisation d'OREKIT
+		try {
+
+			// change this if your orekit data is not located in your home directory
+            File zipFile = new File("data/orekit-data.zip");
+            if (zipFile.exists()) {
+                DataProvidersManager.getInstance().addProvider(new ZipJarCrawler(zipFile));
+            } else {
+                System.err.println(zipFile.getAbsolutePath() +
+                        " zip file found, aborting");
+                System.exit(1);
+            }
+				
+			newTLE = new TLElements("ISS","1 25544U 98067A   09160.12255947  .00017740  00000-0  12823-3 0    24","2 25544  51.6405 348.2892 0009223  92.2562   9.3141 15.73542580604683");
+		} catch (OrekitException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
         // Julian Date we are interested in
         double julianDate = 2454992.0; // 09 Jun 2009 12:00:00.000 UTC

@@ -22,6 +22,8 @@
 
 package name.gano.astro.bodies;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+
 import name.gano.astro.AstroConst;
 import name.gano.astro.GeoFunctions;
 import name.gano.astro.MathUtils;
@@ -37,7 +39,7 @@ public class Sun
     private double[] currentPosition; // current J2000 position of the Sun
     private double currentMJD; // current Modified Julian Date - UT
     //private double[] lla; // lat, lon, alt (in radians,radians,meters)
-    private double[] currentPositionTEME; // TEME of date position
+    private Vector3D currentPositionTEME; // TEME of date position
     //private double[] lla; // lat and long
     private double[] darkCenterLLA; // center Lat/Long of darkness
     private double[] sunCenterLLA;
@@ -171,9 +173,9 @@ public class Sun
      * returns opposite position from the sun TEME
      * @return TEME of date position [m]
      */
-    public double[] getOpositeSunPositionTEME()
+    public Vector3D getOpositeSunPositionTEME()
     {
-        return new double[] {-currentPositionTEME[0],-currentPositionTEME[1],-currentPositionTEME[2]};
+        return currentPositionTEME.negate();
     }
 
     /**
@@ -181,7 +183,7 @@ public class Sun
      *  (ECI) 
      * @return TEME of date position [m]
      */
-    public double[] getCurrentPositionTEME()
+    public Vector3D getCurrentPositionTEME()
     {
         return currentPositionTEME;
     }

@@ -22,6 +22,11 @@
 
 package name.gano.math.nonlinsolvers;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.orekit.errors.OrekitException;
+
 /**
  *
  * @author sgano
@@ -31,6 +36,6 @@ public interface  NonLinearEquationSystemProblem
        
     // function to be over written
     // returns vector of functions evaluated at x
-    public abstract double[] evaluateSystemOfEquations(double[] x);
+    public abstract double[] evaluateSystemOfEquations(double[] x) throws IOException, ParseException, OrekitException;
     
 }

@@ -28,6 +28,9 @@ import java.util.List;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+
+import org.orekit.errors.OrekitException;
+
 import jsattrak.utilities.ProgressStatus;
 import jsattrak.utilities.TLEDownloader;
 
@@ -320,7 +323,12 @@ private void tleStartDowloadButtonActionPerformed(java.awt.event.ActionEvent evt
             if (result) // success
             {
                 // update TLE data in JSatTrak list
-                app.updateTleDataInCurrentList();
+                try {
+					app.updateTleDataInCurrentList();
+				} catch (OrekitException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
                 // let user know everything went well
                 String message = "Satellite TLE data was successfully updated!";

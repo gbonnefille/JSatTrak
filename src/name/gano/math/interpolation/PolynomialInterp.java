@@ -68,7 +68,7 @@ public class PolynomialInterp
                 ns = i;
                 dif = dift;
             }
-            c[i - 1] = ya[i - 1]; //and initialize the tableau of c’s and d’s.
+            c[i - 1] = ya[i - 1]; //and initialize the tableau of cs and ds.
             d[i - 1] = ya[i - 1];
         }
 
@@ -77,12 +77,12 @@ public class PolynomialInterp
         for (int m = 1; m < n; m++)
         { //For each column of the tableau,
             for (int i = 1; i <= n - m; i++)
-            { //we loop over the current c’s and d’s and update them. 
+            { //we loop over the current cs and ds and update them. 
                 ho = xa[i - 1] - x;
                 hp = xa[i + m - 1] - x;
                 w = c[i + 1 - 1] - d[i - 1];
 
-                // This error can occur only if two input xa’s are (to within roundoff) identical.
+                // This error can occur only if two input xas are (to within roundoff) identical.
                 if ((den = ho - hp) == 0.0)
                 {
                     System.out.println("Error in routine PolynomialInterp.polint");
@@ -91,7 +91,7 @@ public class PolynomialInterp
                 }
 
                 den = w / den;
-                d[i - 1] = hp * den;// Here the c’s and d’s are updated.
+                d[i - 1] = hp * den;// Here the cs and ds are updated.
                 c[i - 1] = ho * den;
             }
 
@@ -100,8 +100,8 @@ public class PolynomialInterp
 
         /*After each column in the tableau is completed, we decide which correction, c or d,
         we want to add to our accumulating value of y, i.e., which path to take through the
-        tableau—forking up or down. We do this in such a way as to take the most “straight
-        line” route through the tableau to its apex, updating ns accordingly to keep track of
+        tableauforking up or down. We do this in such a way as to take the most straight
+        line route through the tableau to its apex, updating ns accordingly to keep track of
         where we are. This route keeps the partial approximations centered (insofar as possible)
         on the target x. The last dy added is thus the error indication.*/
         }// for

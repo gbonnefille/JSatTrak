@@ -51,6 +51,8 @@ import name.gano.swingx.treetable.IconTreeTableNodeRenderer;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.orekit.propagation.BoundedPropagator;
+import org.orekit.time.AbsoluteDate;
 
 /**
  *
@@ -62,11 +64,12 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel
     DefaultTreeTableModel treeTableModel; // any TreeTableModel
     CustomTreeTableNode rootNode; // root node in mission designer treetable
     CustomSatellite sat;
-    private Vector<StateVector> ephemeris;
+//    private Vector<StateVector> ephemeris;
+    private BoundedPropagator ephemeris;
     JSatTrak app; // used to add message etc.
 
     /** Creates new form JCustomSatConfigPanel */
-    public JCustomSatConfigPanel(CustomSatellite sat, Vector<StateVector> ephemeris, JSatTrak app)
+    public JCustomSatConfigPanel(CustomSatellite sat, BoundedPropagator ephemeris, JSatTrak app)
     {
         this.treeTableModel = sat.getMissionTableModel(); //treeTableModel;
         this.ephemeris = ephemeris;
@@ -467,7 +470,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel
     }// </editor-fold>//GEN-END:initComponents
     private void addPropButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_addPropButtonActionPerformed
     {//GEN-HEADEREND:event_addPropButtonActionPerformed
-        addNode2MissionDesigner(new PropogatorNode(null));
+        addNode2MissionDesigner(new PropogatorNode(null,sat.getInitNode()));
 }//GEN-LAST:event_addPropButtonActionPerformed
 
     private void addBurnButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_addBurnButtonActionPerformed
@@ -633,7 +636,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel
             // get selected object                  
             CustomTreeTableNode selectedNode = (CustomTreeTableNode) missionDesignJXTreeTable.getTreeSelectionModel().getSelectionPath().getLastPathComponent();
 
-            double nodeStartTime = selectedNode.getStartTTjulDate();
+            double nodeStartTime = selectedNode.getStartTTjulDate().durationFrom(AbsoluteDate.JULIAN_EPOCH)/86400;
 
             if (nodeStartTime > 0) // if it has a valid value
             {
@@ -730,7 +733,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel
         // create scenario epoch time in STK format
         // scenario epoch using Gregorian UTC time (dd mmm yyyy hh:mm:ss.s)
         String stkEpoch = "";
-        if(ephemeris.size() > 0)
+        if(ephemeris!=null)
         {
             double deltaTT2UTC = Time.deltaT(ephemeris.firstElement().state[0] - AstroConst.JDminusMJD); // = TT - UTC
             GregorianCalendar cal = Time.convertJD2Calendar(ephemeris.firstElement().state[0] - deltaTT2UTC);

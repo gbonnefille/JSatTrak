@@ -28,7 +28,11 @@ import java.awt.Toolkit;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+
+import org.orekit.propagation.BoundedPropagator;
+
 import jsattrak.customsat.gui.EphemerisFromFilePanel;
+import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.StateVector;
 import name.gano.file.StkEphemerisReader;
@@ -61,7 +65,7 @@ public class EphemerisFromFileNode extends CustomTreeTableNode
 
      // meant to be overridden by implementing classes
     @Override
-    public void execute(Vector<StateVector> ephemeris)
+    public void execute(MissionDesignPropagator missionDesign)
     {
          // try to read from file -- if error report to log!  and continue!
         StkEphemerisReader r = new StkEphemerisReader();

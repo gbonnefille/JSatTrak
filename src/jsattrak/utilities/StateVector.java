@@ -24,6 +24,8 @@ package jsattrak.utilities;
 
 import java.io.Serializable;
 
+import org.orekit.utils.PVCoordinates;
+
 public class StateVector implements Serializable
 {
 	public double[] state; // t,x,y,z,dx,dy,dz - seven elements
@@ -53,6 +55,14 @@ public class StateVector implements Serializable
 			state[i] = newState[i-1];
 		}
 	}
+        
+        // constructor given a new state that doesn't include time (x,y,z,dx,dy,dz), and time
+        public StateVector(PVCoordinates newState, double time)
+	{
+		state = new double[]{time,newState.getPosition().getX(),newState.getPosition().getY(),newState.getPosition().getZ(),newState.getVelocity().getX(),newState.getVelocity().getY(),newState.getVelocity().getZ()};
+
+	}
+	
 	
 	public StateVector(double t, double x, double y, double z, double dx, double dy, double dz)
 	{

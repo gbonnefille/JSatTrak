@@ -21,6 +21,11 @@
 
 package name.gano.math.nonlinsolvers;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.orekit.errors.OrekitException;
+
 /**
  *
  * @author Shawn
@@ -28,7 +33,7 @@ package name.gano.math.nonlinsolvers;
 public class TestDC implements NonLinearEquationSystemProblem
 {
     // main function
-    public static void main(String args[])
+    public static void main(String args[]) throws IOException, ParseException, OrekitException
     {
         TestDC prob = new TestDC();
         

@@ -21,6 +21,11 @@
 
 package name.gano.math.nonlinsolvers;
 
+import java.io.IOException;
+import java.text.ParseException;
+
+import org.orekit.errors.OrekitException;
+
 /**
  *
  * @author sgano
@@ -59,6 +64,6 @@ public abstract class NonLinearEquationSystemSolver {
 
     public abstract void setX(double[] X);
 
-    public abstract boolean solve();
+    public abstract boolean solve() throws IOException, ParseException, OrekitException;
 
 }

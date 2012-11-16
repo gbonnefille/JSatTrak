@@ -27,16 +27,18 @@ import java.util.Hashtable;
 import javax.swing.*;
 import javax.swing.tree.TreePath;
 
+import org.orekit.errors.OrekitException;
+
 public class TreeTransferHandler extends StringTransferHandler implements java.io.Serializable
 {
     private int[] indices = null;
     private int addIndex = -1; //Location where items were added
     private int addCount = 0;  //Number of items added.
     
-    private Hashtable<String,TLE> tleHash;
+    private Hashtable<String,TLElements> tleHash;
     
     // constructor
-    public TreeTransferHandler(Hashtable<String,TLE> tleHash)
+    public TreeTransferHandler(Hashtable<String,TLElements> tleHash)
     {
         this.tleHash = tleHash;
     }
@@ -68,10 +70,16 @@ public class TreeTransferHandler extends StringTransferHandler implements java.i
                 // get the name part of the string with type SAT added to the front
                 returnString += "SAT###" + currentSatName;
                 
-                TLE selectedTLE = tleHash.get(currentSatName);
+                TLElements selectedTLE = tleHash.get(currentSatName);
                 
-                returnString += ( "###" + selectedTLE.getLine1() );
-                returnString += ( "###" + selectedTLE.getLine2() + "\n" );
+                try {
+					returnString += ( "###" + selectedTLE.getLine1() );
+					returnString += ( "###" + selectedTLE.getLine2() + "\n" );
+				} catch (OrekitException e) {
+
+					e.printStackTrace();
+				}
+                
                 
                 //tleOutputTextArea.setText( selectedTLE.getLine1() + "\n" + selectedTLE.getLine2() );
             }

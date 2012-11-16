@@ -23,9 +23,14 @@
 package jsattrak.customsat;
 
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+
+import org.orekit.errors.OrekitException;
+
 import jsattrak.customsat.gui.SolverPanel;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.StateVector;
@@ -116,7 +121,7 @@ public class SolverNode extends CustomTreeTableNode implements NonLinearEquation
     // =  EXE NODE ===============================================
     
    
-    public void execute(Vector<StateVector> ephemeris)
+    public void execute(Vector<StateVector> ephemeris) throws IOException, ParseException, OrekitException
     {
          // dummy but should do something based on input ephemeris
         //System.out.println("Executing : " + getValueAt(0) );
@@ -187,7 +192,7 @@ public class SolverNode extends CustomTreeTableNode implements NonLinearEquation
     }// execute
     
     
-    private void executeChildren(Vector<StateVector> ephemeris)
+    private void executeChildren(Vector<StateVector> ephemeris) throws IOException, ParseException, OrekitException
     {
         
         for (int i = 0; i <  this.getChildCount(); i++)
@@ -201,7 +206,7 @@ public class SolverNode extends CustomTreeTableNode implements NonLinearEquation
     }
     
     // SOLVERS - function to be evaluated!
-    public double[] evaluateSystemOfEquations(double[] x)
+    public double[] evaluateSystemOfEquations(double[] x) throws IOException, ParseException, OrekitException
      {
         ephemerisInternal.clear(); // clear the internal epemeris
         ephemerisInternal.add(new StateVector(lastStateFromEphemerisExternal.state)); // add inital state

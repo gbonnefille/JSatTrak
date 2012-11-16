@@ -26,8 +26,6 @@
 
 package jsattrak.utilities;
 
-import jsattrak.gui.JProgressDialog;
-import jsattrak.gui.LoadTleDirectDialog;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -38,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
@@ -46,7 +45,10 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+import jsattrak.gui.JProgressDialog;
 import jsattrak.gui.JSatTrak;
+import jsattrak.gui.LoadTleDirectDialog;
 import name.gano.file.IOFileFilter;
 
 /**
@@ -64,7 +66,7 @@ public class SatBrowserTleDataLoader extends SwingWorker<Boolean,ProgressStatus>
     
     //
     DefaultMutableTreeNode topTreeNode;
-    private Hashtable<String,TLE> tleHash;
+    private Hashtable<String,TLElements> tleHash;
     JSatTrak parentComponent;
     JTextArea tleOutputTextArea;
     JTree satTree;
@@ -91,7 +93,7 @@ public class SatBrowserTleDataLoader extends SwingWorker<Boolean,ProgressStatus>
      * @param tleOutputTextArea
      * @param satTree 
      */
-    public SatBrowserTleDataLoader(JSatTrak parentComponent, DefaultMutableTreeNode topTreeNode, Hashtable<String,TLE> tleHash, JTextArea tleOutputTextArea, JTree satTree)
+    public SatBrowserTleDataLoader(JSatTrak parentComponent, DefaultMutableTreeNode topTreeNode, Hashtable<String,TLElements> tleHash, JTextArea tleOutputTextArea, JTree satTree)
     {
         this.topTreeNode = topTreeNode;
         this.tleHash = tleHash;
@@ -178,7 +180,7 @@ public class SatBrowserTleDataLoader extends SwingWorker<Boolean,ProgressStatus>
         DefaultMutableTreeNode currentSecondaryNode;
         
         // current TLE
-        TLE currentTLE = null;
+        TLElements currentTLE = null;
         
         satCount = 0;
         
@@ -258,7 +260,7 @@ public class SatBrowserTleDataLoader extends SwingWorker<Boolean,ProgressStatus>
                 while( (nextLine = tleReader.readLine()) != null)
                 {
                     // needs three lines
-                    currentTLE = new TLE(nextLine,tleReader.readLine(),tleReader.readLine());
+                    currentTLE = new TLElements(nextLine,tleReader.readLine(),tleReader.readLine());
                     
                     // save TLE
                     tleHash.put(currentTLE.getSatName(),currentTLE);
@@ -402,7 +404,7 @@ public class SatBrowserTleDataLoader extends SwingWorker<Boolean,ProgressStatus>
         boolean customCategoriesInFile = false; // default if they are found this is set to true
 
         // current TLE
-        TLE currentTLE = null;
+        TLElements currentTLE = null;
 
         // check if file has a custom primary and secondary category listed in the file
         // if it does it will overwrite the given categories
@@ -512,7 +514,7 @@ public class SatBrowserTleDataLoader extends SwingWorker<Boolean,ProgressStatus>
             while((nextLine = tleReader.readLine()) != null)
             {
                 // needs three lines
-                currentTLE = new TLE(nextLine, tleReader.readLine(), tleReader.readLine());
+                currentTLE = new TLElements(nextLine, tleReader.readLine(), tleReader.readLine());
 
                 // save TLE
                 tleHash.put(currentTLE.getSatName(), currentTLE);

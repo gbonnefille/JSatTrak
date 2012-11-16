@@ -23,11 +23,16 @@
 
 package jsattrak.customsat;
 
+import gov.nasa.worldwind.render.FrameFactory;
+
 import java.awt.Toolkit;
 import java.util.Vector;
+
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+
 import jsattrak.customsat.gui.ManeuverPanel;
+import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.StateVector;
 import name.gano.astro.AstroConst;
@@ -37,6 +42,9 @@ import name.gano.astro.MathUtils;
 import name.gano.astro.coordinates.CoordinateConversion;
 import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.propagation.BoundedPropagator;
 
 /**
  *
@@ -98,18 +106,20 @@ public class ManeuverNode  extends CustomTreeTableNode
     
      // meant to be overridden by implementing classes
     @Override
-    public void execute(Vector<StateVector> ephemeris)
+    public void execute(MissionDesignPropagator missionDesign)
     {
          // dummy but should do something based on input ephemeris
         //System.out.println("Executing : " + getValueAt(0) );
         
         // get last stat vector (we are going to change it - impulse burn)
-        StateVector lastState = ephemeris.lastElement();
+    	
+    	BoundedPropagator ephemeris = missionDesign.getEphemeris();
+        StateVector lastState = new StateVector(ephemeris.getPVCoordinates(ephemeris.getMaxDate(), ephemeris.getFrame()).getPosition(), time);
         
         // for VNC system see: http://www.stk.com/resources/help/stk613/helpSystem/extfile/gator/eq-coordsys.htm
         
         // set inial time of the node ( TT)
-        this.setStartTTjulDate(lastState.state[0]);
+        this.setStartTTjulDate(ephemeris.getMaxDate());
         
         // get r and v vectors
         double[] r = new double[] {lastState.state[1],lastState.state[2],lastState.state[3]};
@@ -299,7 +309,7 @@ public class ManeuverNode  extends CustomTreeTableNode
                     // mod pos
                     //double[] modPos = CoordinateConversion.EquatorialEquinoxFromJ2K(lastStateVector.state[0] - AstroConst.JDminusMJD, currentJ2kPos)
                     // teme pos
-                    double[] temePos = CoordinateConversion.J2000toTEME(lastStateVector.state[0] - AstroConst.JDminusMJD, currentJ2kPos);
+                    Vector3D temePos = CoordinateConversion.J2000toTEME(lastStateVector.state[0] - AstroConst.JDminusMJD, currentJ2kPos);
                     // lla  (submit time in UTC)
                     double deltaTT2UTC = Time.deltaT(lastStateVector.state[0] - AstroConst.JDminusMJD); // = TT - UTC
                     double[] lla = GeoFunctions.GeodeticLLA(temePos, lastStateVector.state[0] - AstroConst.JDminusMJD - deltaTT2UTC); // tt-UTC = deltaTT2UTC
