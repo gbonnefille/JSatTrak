@@ -74,7 +74,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel
         this.treeTableModel = sat.getMissionTableModel(); //treeTableModel;
         this.ephemeris = ephemeris;
         this.app = app;
-        this.sat = sat;
+        this.sat = sat; 
 
         initComponents();
 
