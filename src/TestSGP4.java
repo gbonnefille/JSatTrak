@@ -66,7 +66,12 @@ public class TestSGP4
         }
 
         // prop to the desired time
-        prop.propogate2JulDate(julianDate);
+        try {
+			prop.propogate2JulDate(julianDate);
+		} catch (OrekitException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
         // get the lat/long/altitude [radians, radians, meters]
         double[] lla = prop.getLLA();

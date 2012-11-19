@@ -2242,12 +2242,19 @@ public class JSatTrak extends javax.swing.JFrame implements
 
 		// update date box:
 		dateTextField.setText(currentJulianDate.getDateTimeStr());// String.format("%tc",cal)
-																	// );
+		try { // );
 
-		// now propogate all satellites to the current time
-		for (AbstractSatellite sat : satHash.values()) {
-			sat.propogate2JulDate(currentJulianDate.getJulianDate());
-		} // propgate each sat
+			// now propogate all satellites to the current time
+			for (AbstractSatellite sat : satHash.values()) {
+
+				sat.propogate2JulDate(currentJulianDate.getJulianDate());
+
+			} // propgate each sat
+
+		} catch (OrekitException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(),
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
 
 		// update ground stations to the current time
 		for (GroundStation gs : gsHash.values()) {
@@ -3876,10 +3883,15 @@ public class JSatTrak extends javax.swing.JFrame implements
 		stopStatusAnimation();
 
 		// call overloaded function with name
-		addCustomSat(name);
+		try {
+			addCustomSat(name);
+		} catch (OrekitException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
-	public void addCustomSat(String name) {
+	public void addCustomSat(String name) throws OrekitException {
 		// add new custom sat to the list
 		// is not already in list
 		// add to hashTable
@@ -3891,10 +3903,8 @@ public class JSatTrak extends javax.swing.JFrame implements
 			return;
 		}
 
-		try{
 		CustomSatellite prop = new CustomSatellite(name,
 				this.getScenarioEpochDate());
-		
 
 		satHash.put(name, prop);
 
@@ -3920,10 +3930,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		this.setStatusMessage("Custom Satellite Added: " + name);
 		// open properties panel
 		objListPanel.openCurrentOptions(prop);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+
 	}
 
 	public// 3D windows

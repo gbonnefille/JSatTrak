@@ -33,10 +33,14 @@ import java.util.Hashtable;
 import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
+import javax.swing.JOptionPane;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
+import org.orekit.errors.OrekitException;
+
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.IconTreeNode;
@@ -410,7 +414,7 @@ private void objectTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:
     {
         // add sat to hash
         satHash.put( prop.getName() ,  prop);
-        
+        try{
         // propogate satellite to current date
         prop.propogate2JulDate( parentApp.getCurrentJulTime() );
         
@@ -431,6 +435,10 @@ private void objectTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:
 
         //System.out.println("node added: " + name);
         objectTree.scrollPathToVisible(getPath(newNode));
+        } catch (OrekitException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(),
+					"Error", JOptionPane.ERROR_MESSAGE);
+		}
         
         
     } // addSat2List

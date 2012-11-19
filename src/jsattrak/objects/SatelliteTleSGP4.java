@@ -232,7 +232,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	}
 
 	@Override
-	public void propogate2JulDate(double julDate) {
+	public void propogate2JulDate(double julDate) throws OrekitException {
 		// save date
 		this.currentJulianDate = julDate;
 
@@ -245,12 +245,9 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 				.shiftedBy(julDate * 86400);
 
 		PVCoordinates posVit = null;
-		try {
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
-		} catch (OrekitException e) {
 
-			e.printStackTrace();
-		}
+			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
+	
 
 		posTEME = posVit.getPosition();
 		velTEME = posVit.getVelocity();
@@ -314,7 +311,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// lla = GeoFunctions
 		// .GeodeticLLA(posTEME, julDate - AstroConst.JDminusMJD); // j2kPos
 
-		try {
+
 
 			OneAxisEllipsoid orbit = new OneAxisEllipsoid(
 					Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
@@ -328,10 +325,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 			this.lla = new double[]{geodeticPoint.getLatitude(),geodeticPoint.getLongitude(),geodeticPoint.getAltitude()};
 
-		} catch (OrekitException e) {
 
-			e.printStackTrace();
-		}
 
 		// Check to see if the ascending node has been passed
 		if (showGroundTrack == true) {
@@ -356,7 +350,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	// initalize the ground track from any starting point, as long as Juldate
 	// !=-1
-	private void initializeGroundTrack() {
+	private void initializeGroundTrack() throws OrekitException {
 		if (currentJulianDate == -1) {
 			// nothing to do yet, we haven't been given an initial time
 			return;
@@ -447,7 +441,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	// fill in the Ground Track given Jul Dates for
 	//
 	private void fillGroundTrack(double lastAscendingNodeTime,
-			double leadEndTime, double lagEndTime) {
+			double leadEndTime, double lagEndTime) throws OrekitException {
 		// points in the lead direction
 		int ptsLead = (int) Math.ceil(grnTrkPointsPerPeriod
 				* groundTrackLeadPeriodMultiplier);
@@ -501,7 +495,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	} // fillGroundTrack
 
 	// takes in JulDate, returns lla and teme position
-	private double[] calculateLatLongAltXyz(double ptTime) {
+	private double[] calculateLatLongAltXyz(double ptTime) throws OrekitException {
 		Vector3D ptPos = calculateTemePositionFromUT(ptTime);
 
 		// get lat and long
@@ -542,9 +536,10 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	 * @param julDate
 	 *            - julian date
 	 * @return j2k position of satellite in meters
+	 * @throws OrekitException 
 	 */
 	@Override
-	public Vector3D calculateJ2KPositionFromUT(double julDate) {
+	public Vector3D calculateJ2KPositionFromUT(double julDate) throws OrekitException {
 		Vector3D ptPos = calculateTemePositionFromUT(julDate);
 
 		double mjd = julDate - AstroConst.JDminusMJD;
@@ -570,9 +565,10 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	 * @param julDate
 	 *            - julian date
 	 * @return j2k position of satellite in meters
+	 * @throws OrekitException 
 	 */
 	@Override
-	public Vector3D calculateTemePositionFromUT(double julDate) {
+	public Vector3D calculateTemePositionFromUT(double julDate) throws OrekitException {
 		Vector3D ptPos = Vector3D.ZERO;
 
 		// using JulDate because function uses time diff between jultDate of
@@ -584,12 +580,9 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 				.shiftedBy(julDate * 86400);
 
 		PVCoordinates posVit = null;
-		try {
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
-		} catch (OrekitException e) {
 
-			e.printStackTrace();
-		}
+			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
+
 
 		ptPos = posVit.getPosition();
 
@@ -605,7 +598,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	// tol = convergence tolerance
 	// maxIter = maximum iterations allowed
 	// RETURNS: double = julian date of crossing
-	private double secantMethod(double xn_1, double xn, double tol, int maxIter) {
+	private double secantMethod(double xn_1, double xn, double tol, int maxIter) throws OrekitException {
 
 		double d;
 
@@ -636,7 +629,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		return xn;
 	} // secantMethod
 
-	private double latitudeGivenJulianDate(double julDate) {
+	private double latitudeGivenJulianDate(double julDate) throws OrekitException {
 		// computer latiude of the spacecraft at a given date
 		Vector3D ptPos = calculateTemePositionFromUT(julDate);
 
@@ -668,7 +661,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	// --------------------------------------
 
-	public void setShowGroundTrack(boolean showGrndTrk) {
+	public void setShowGroundTrack(boolean showGrndTrk) throws OrekitException {
 		showGroundTrack = showGrndTrk;
 
 		if (showGrndTrk == false) {

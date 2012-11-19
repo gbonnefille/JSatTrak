@@ -33,11 +33,13 @@ import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.Hashtable;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTable.PrintMode;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.errors.OrekitException;
 
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.utilities.CustomFileFilter;
@@ -755,10 +757,16 @@ public class JTrackingPanel extends javax.swing.JPanel
 
     private void runPassPredictionButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_runPassPredictionButtonActionPerformed
     {//GEN-HEADEREND:event_runPassPredictionButtonActionPerformed
-        runPassPrediction();
+       
+    	try {
+			runPassPrediction();
+    	} catch (OrekitException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(),
+					"Error", JOptionPane.ERROR_MESSAGE);
+		} 
     }//GEN-LAST:event_runPassPredictionButtonActionPerformed
 
-    public void runPassPrediction()
+    public void runPassPrediction() throws OrekitException
     {
         // get info:
         double timeSpanDays = Double.parseDouble( timeSpanTextField.getText() );
@@ -1175,7 +1183,7 @@ public class JTrackingPanel extends javax.swing.JPanel
     } // go2pass
     
     // bisection method, crossing time should be bracketed by time0 and time1
-    private double findSatRiseSetRoot(AbstractSatellite sat, GroundStation gs, double time0, double time1, double f0, double f1)
+    private double findSatRiseSetRoot(AbstractSatellite sat, GroundStation gs, double time0, double time1, double f0, double f1) throws OrekitException
     {
         double tol = (1.157407E-5)/4; // 1/4 a sec (in units of a day)
         

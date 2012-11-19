@@ -44,8 +44,9 @@ public abstract class AbstractSatellite implements Serializable {
 	 * @param julDate
 	 *            - julian date
 	 * @return j2k position of satellite in meters
+	 * @throws OrekitException 
 	 */
-	public abstract Vector3D calculateJ2KPositionFromUT(double julDate);
+	public abstract Vector3D calculateJ2KPositionFromUT(double julDate) throws OrekitException;
 
 	/**
 	 * Calculate TEME of date position of this sat at a given JulDateTime
@@ -55,8 +56,9 @@ public abstract class AbstractSatellite implements Serializable {
 	 * @param julDate
 	 *            - julian date
 	 * @return j2k position of satellite in meters
+	 * @throws OrekitException 
 	 */
-	public abstract Vector3D calculateTemePositionFromUT(double julDate);
+	public abstract Vector3D calculateTemePositionFromUT(double julDate) throws OrekitException;
 
 	public abstract double getAltitude();
 
@@ -140,7 +142,7 @@ public abstract class AbstractSatellite implements Serializable {
 
 	public abstract boolean isShowName2D();
 
-	public abstract void propogate2JulDate(double julDate);
+	public abstract void propogate2JulDate(double julDate) throws OrekitException;
 
 	public abstract void setFillFootPrint(boolean fillFootPrint);
 
@@ -172,7 +174,7 @@ public abstract class AbstractSatellite implements Serializable {
 
 	public abstract void setShow3DOrbitTraceECI(boolean show3DOrbitTraceECI);
 
-	public abstract void setShowGroundTrack(boolean showGrndTrk);
+	public abstract void setShowGroundTrack(boolean showGrndTrk) throws OrekitException;
 
 	public abstract void setShowGroundTrack3d(boolean showGroundTrack3d);
 

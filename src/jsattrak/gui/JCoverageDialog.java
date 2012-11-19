@@ -37,6 +37,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
+
+import org.orekit.errors.OrekitException;
+
 import jsattrak.coverage.ColorMap;
 import jsattrak.coverage.CoolColorMap;
 import jsattrak.coverage.CoverageAnalyzer;
@@ -966,7 +969,12 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 // update position of satellites
                 for(AbstractSatellite sat : tempSatHash.values())
                 {
-                    sat.propogate2JulDate(currentTime.getJulianDate());
+                    try {
+						sat.propogate2JulDate(currentTime.getJulianDate());
+					} catch (OrekitException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
                 } // propgate each sat
                 
                 // update coverage
