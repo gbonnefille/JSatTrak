@@ -56,7 +56,7 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 	CustomTreeTableNode rootNode;
 	DefaultTreeTableModel treeTableModel;
 	// private Vector<StateVector> ephemeris;
-	private BoundedPropagator ephemeris;
+	private BoundedPropagator ephemeris = null;
 
 	// /** Frame in which are defined the orbital parameters. */
 	// private Frame frame;
@@ -75,12 +75,11 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 	boolean debug = false;
 
 	public MissionDesignPropagator(CustomTreeTableNode rootNode,
-			DefaultTreeTableModel treeTableModel, BoundedPropagator ephemeris,
+			DefaultTreeTableModel treeTableModel,
 			CustomSatellite sat, JSatTrak app) {
 		// transfer in needed objects to run
 		this.rootNode = rootNode;
 		this.treeTableModel = treeTableModel;
-		this.ephemeris = ephemeris;
 		// this.frame = sat.getFrame();
 		this.sat = sat;
 		this.app = app;
@@ -111,10 +110,10 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 		//Calcul de propagation
 		try {
 			propMissionTree(rootNode);
-		} catch (Exception e) {
+		} catch (OrekitException e) {
 			// Recupération de l'erreur et affichage dans le log
+			System.out.println(e.getMessage());
 			e.printStackTrace();
-			System.out.println("Error during propagation.\n");
 		}
 
 		totalExeTime = System.currentTimeMillis() - startTime;
@@ -336,7 +335,7 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 	} // save all vars
 
 	// debug function to print epeheris
-	private void printEphemeris() {
+	private void printEphemeris() throws OrekitException {
 		System.out.println("t, x, y, z, dx, dy, dz");
 		System.out.println("===============================");
 
@@ -350,16 +349,13 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 
 		while (absoluteT.compareTo(ephemeris.getMaxDate()) < 0) {
 
-			try {
+
 				pv = ephemeris.getPVCoordinates(absoluteT, frame);
-			} catch (OrekitException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
 			pos = pv.getPosition();
 			vel = pv.getVelocity();
 
-			t = absoluteT.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 3600 / 24;
+			t = absoluteT.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 86400;
 
 			System.out.println(t + ", " + pos.getX() + ", " + pos.getY() + ", "
 					+ pos.getZ() + ", " + vel.getX() + ", " + vel.getY() + ", "

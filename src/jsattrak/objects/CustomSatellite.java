@@ -35,7 +35,6 @@ import jsattrak.customsat.PropogatorNode;
 import jsattrak.customsat.StopNode;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
-import name.gano.astro.GeoFunctions;
 import name.gano.astro.Kepler;
 import name.gano.astro.coordinates.J2kCoordinateConversion;
 import name.gano.astro.time.Time;
@@ -50,7 +49,6 @@ import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
-import org.orekit.orbits.Orbit;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
@@ -70,15 +68,15 @@ public class CustomSatellite extends AbstractSatellite {
 	// private Vector<StateVector> ephemeris = new Vector<StateVector>(
 	// ephemerisIncrement, ephemerisIncrement); // array to store ephemeris
 	private BoundedPropagator ephemeris = null;
-	
+
 	private InitialConditionsNode initNode = null;
-	
+
 	private PropogatorNode propNode = null;
-	
-	//Frame ITRF2005
+
+	// Frame ITRF2005
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
-	
-	//Modele de la terre
+
+	// Modele de la terre
 	private final OneAxisEllipsoid earth = new OneAxisEllipsoid(
 			Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
 			Constants.WGS84_EARTH_FLATTENING, this.ITRF2005);
@@ -200,8 +198,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 		// must add Initial conditions
 		// Initial Node
-		this.initNode = new InitialConditionsNode(rootNode,
-				scenarioEpochDate);
+		this.initNode = new InitialConditionsNode(rootNode, scenarioEpochDate);
 
 		// by default also add a propogator node
 		// Propogator Node
@@ -231,7 +228,7 @@ public class CustomSatellite extends AbstractSatellite {
 	// this function is basically given time update all current info and update
 	// lead/lag data if needed
 	@Override
-	public void propogate2JulDate(double julDate) throws OrekitException{
+	public void propogate2JulDate(double julDate) throws OrekitException {
 		// save date
 		this.currentJulianDate = julDate; // UTC
 		AbsoluteDate maxTime;
@@ -263,26 +260,20 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
-				int nSteps = (int) Math.ceil(this.propNode.getPopogateTimeLen() / this.propNode.getStepSize()); // number
-																					// of
-																					// steps
-				ephemeris=null;
-				
+				// Number of step
+				int nSteps = (int) Math.ceil(this.propNode.getPopogateTimeLen()
+						/ this.propNode.getStepSize());
 
-				PVCoordinates pvCoordinateInertialFrame = ephemeris.getPVCoordinates(orekitJulDate,
-							this.initNode.getFrame());
-					
-				PVCoordinates pvCoordinateEarthFrame = ephemeris.getPVCoordinates(orekitJulDate,
-							ITRF2005);
-				
+				PVCoordinates pvCoordinateInertialFrame = ephemeris
+						.getPVCoordinates(orekitJulDate,
+								this.initNode.getFrame());
 
-					
+				PVCoordinates pvCoordinateEarthFrame = ephemeris
+						.getPVCoordinates(orekitJulDate, ITRF2005);
 
-				GeodeticPoint geodeticPoint = this.earth.transform(pvCoordinateEarthFrame.getPosition(),
-							this.ITRF2005, orekitJulDate);
-
-				
-
+				GeodeticPoint geodeticPoint = this.earth.transform(
+						pvCoordinateEarthFrame.getPosition(), this.ITRF2005,
+						orekitJulDate);
 
 				// See SatelliteTleSGP$.java explination of MOD/TEME for
 				// calculating lat/long as TLE coordinate systems
@@ -296,9 +287,7 @@ public class CustomSatellite extends AbstractSatellite {
 				// Satellite trace
 				j2kPos = pvCoordinateInertialFrame.getPosition();
 				j2kVel = pvCoordinateInertialFrame.getVelocity();
-				
-				
-				
+
 				//
 				// // rotate position and velocity
 				// posTEME = new Vector3D(J2kCoordinateConversion.matvecmult(A,
@@ -309,14 +298,12 @@ public class CustomSatellite extends AbstractSatellite {
 				// Current position point
 				posTEME = pvCoordinateInertialFrame.getPosition();
 				velTEME = pvCoordinateInertialFrame.getVelocity();
-				
-				
+
 				j2kPos = new Vector3D(J2kCoordinateConversion.matvecmult(A,
 						posTEME.toArray()));
-				
+
 				j2kVel = new Vector3D(J2kCoordinateConversion.matvecmult(A,
 						velTEME.toArray()));
-				
 
 				// save old lat/long for ascending node check
 				double[] oldLLA = new double[3];
@@ -383,10 +370,6 @@ public class CustomSatellite extends AbstractSatellite {
 				// System.out.println("false1");
 			}
 
-		} else // no ephermeris
-		{
-			// isInTime = false;
-			// System.out.println("false2");
 		}
 
 	} // propogate2JulDate
@@ -406,11 +389,12 @@ public class CustomSatellite extends AbstractSatellite {
 	 * @param julDate
 	 *            - julian date
 	 * @return j2k position of satellite in meters
-	 * @throws OrekitException 
+	 * @throws OrekitException
 	 */
-	public Vector3D calculateTemePositionFromUT(double julDate) throws OrekitException {
+	public Vector3D calculateTemePositionFromUT(double julDate)
+			throws OrekitException {
 		Vector3D j2kPosTemp = calculateJ2KPositionFromUT(julDate);
-				
+
 		Vector3D ptPos = Vector3D.ZERO;
 
 		if (j2kPosTemp != null) {
@@ -441,10 +425,11 @@ public class CustomSatellite extends AbstractSatellite {
 	 * @param julDate
 	 *            - julian date
 	 * @return j2k position of satellite in meters
-	 * @throws OrekitException 
+	 * @throws OrekitException
 	 */
 	@Override
-	public Vector3D calculateJ2KPositionFromUT(double julDate) throws OrekitException {
+	public Vector3D calculateJ2KPositionFromUT(double julDate)
+			throws OrekitException {
 		Vector3D ptPos = Vector3D.ZERO;
 
 		AbsoluteDate maxTime, minTime;
@@ -465,10 +450,8 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
-
-					ptPos = ephemeris.getPVCoordinates(orekitJulDate, this.initNode.getFrame())
-							.getPosition();
-
+				ptPos = ephemeris.getPVCoordinates(orekitJulDate,
+						this.initNode.getFrame()).getPosition();
 
 			} else {
 				// not in time
@@ -658,9 +641,10 @@ public class CustomSatellite extends AbstractSatellite {
 	} // fillGroundTrack
 
 	// takes in JulDate
-	private double[] calculateLatLongAltXyz(double julDate) throws OrekitException {
+	private double[] calculateLatLongAltXyz(double julDate)
+			throws OrekitException {
 
-		 Vector3D ptPos = calculateJ2KPositionFromUT(julDate);
+		Vector3D ptPos = calculateJ2KPositionFromUT(julDate);
 
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
@@ -690,15 +674,14 @@ public class CustomSatellite extends AbstractSatellite {
 		} // if epeheris contains anything
 
 		// get lat and long
-//		double[] ptLla = GeoFunctions.GeodeticLLA(ptPos, julDate
-//				- AstroConst.JDminusMJD);
-
+		// double[] ptLla = GeoFunctions.GeodeticLLA(ptPos, julDate
+		// - AstroConst.JDminusMJD);
 
 		GeodeticPoint geodeticPoint = null;
 		try {
 
-			geodeticPoint = this.earth
-					.transform(pos, this.ITRF2005, orekitJulDate);
+			geodeticPoint = this.earth.transform(pos, this.ITRF2005,
+					orekitJulDate);
 		} catch (OrekitException e) {
 			e.printStackTrace();
 		}
@@ -1084,7 +1067,8 @@ public class CustomSatellite extends AbstractSatellite {
 	// tol = convergence tolerance
 	// maxIter = maximum iterations allowed
 	// RETURNS: double = julian date of crossing
-	private double secantMethod(double xn_1, double xn, double tol, int maxIter) throws OrekitException {
+	private double secantMethod(double xn_1, double xn, double tol, int maxIter)
+			throws OrekitException {
 
 		double d;
 

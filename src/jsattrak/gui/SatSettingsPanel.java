@@ -26,9 +26,11 @@ package jsattrak.gui;
 
 import java.awt.Color;
 import java.io.File;
+
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
@@ -72,7 +74,7 @@ public class SatSettingsPanel extends javax.swing.JPanel implements java.io.Seri
         {
             CustomSatellite satProp = (CustomSatellite) satProps;
             
-            JCustomSatConfigPanel configPanel = new JCustomSatConfigPanel(satProp,satProp.getEphemeris(), app);
+			JCustomSatConfigPanel configPanel = new JCustomSatConfigPanel(satProp, app);
             int tabIndex = 0;
             jTabbedPane1.add(configPanel,tabIndex);
             jTabbedPane1.setTitleAt(tabIndex, "Custom Satellite Settings");

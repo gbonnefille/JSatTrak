@@ -30,26 +30,17 @@ import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 
 import jsattrak.customsat.gui.PropogatorPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.StateVector;
 import name.gano.astro.AstroConst;
-import name.gano.astro.Atmosphere;
 import name.gano.astro.GeoFunctions;
-import name.gano.astro.GravityField;
 import name.gano.astro.Kepler;
 import name.gano.astro.MathUtils;
-import name.gano.astro.bodies.Moon;
-import name.gano.astro.bodies.Sun;
 import name.gano.astro.coordinates.CoordinateConversion;
-import name.gano.astro.propogators.solvers.ApsisStopCond;
 import name.gano.astro.propogators.solvers.OrbitProblem;
-import name.gano.astro.propogators.solvers.RungeKutta4;
-import name.gano.astro.propogators.solvers.RungeKutta78;
-import name.gano.astro.propogators.solvers.StoppingCondition;
 import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
@@ -59,7 +50,6 @@ import org.orekit.bodies.CelestialBodyFactory;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.errors.OrekitException;
-import org.orekit.errors.PropagationException;
 import org.orekit.forces.ForceModel;
 import org.orekit.forces.SphericalSpacecraft;
 import org.orekit.forces.drag.DTM2000;
@@ -71,7 +61,6 @@ import org.orekit.forces.gravity.ThirdBodyAttraction;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
 import org.orekit.forces.gravity.potential.PotentialCoefficientsProvider;
 import org.orekit.forces.radiation.SolarRadiationPressure;
-import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.Orbit;
 import org.orekit.propagation.BoundedPropagator;
@@ -100,7 +89,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 	// Orbit
 	private Orbit orbitOrekit = null;
-	
+
 	private InitialConditionsNode initNode = null;
 
 	// Central attraction coefficient
@@ -122,6 +111,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 	private double CR = 1.3; // Solar radiation pressure coefficient
 	private double CD = 1.5; // spacecraft drag coefficient
 	private double stepSize = 60.0; // seconds (ini step for Hprop 7-8)
+
 	// Hprop 7-8 unique
 	private double minStepSize = 1.0; // 1 second
 	private double maxStepSize = 600.0; // 10 minutes
@@ -131,6 +121,8 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 	private double popogateTimeLen = 86400; // in seconds
 
+	private int numberOfStep = (int) Math.ceil(popogateTimeLen / this.stepSize);
+
 	// stopping conditions used
 	private boolean stopOnApogee = false;
 	private boolean stopOnPerigee = false;
@@ -138,8 +130,6 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 	// private variables used internally only
 	private AbsoluteDate JD_TT0; // JD_TT at initial time (Julian Date)
 	// Vector<StateVector> ephemeris;
-
-
 
 	// USED FOR GOAL CALCULATIONS
 	StateVector lastStateVector = null; // last state -- to calculate goal
@@ -166,13 +156,11 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 	// ========================================
 
-	public PropogatorNode(CustomTreeTableNode parentNode, InitialConditionsNode initNode) {
+	public PropogatorNode(CustomTreeTableNode parentNode,
+			InitialConditionsNode initNode) {
 		super(new String[] { "Propogate", "", "" }); // initialize node, default
 														// values
 		this.initNode = initNode;
-		
-		// Set the orbit
-		this.orbitOrekit = initNode.getOrbitOrekit();
 
 		// set icon for this type
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
@@ -190,8 +178,8 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 	public void execute(MissionDesignPropagator missionDesign)
 			throws IOException, ParseException, OrekitException,
 			IllegalArgumentException, IllegalStateException {
-				
-		
+
+		// Set the orbit
 		this.orbitOrekit = initNode.getOrbitOrekit();
 
 		// dummy but should do something based on input ephemeris
@@ -213,7 +201,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 		// time parameters that are shared
 		// JD_TT0 = lastState.state[0]; // last time !!!! IS THIS TT
-		JD_TT0 = orbitOrekit.getDate();
+		this.JD_TT0 = this.orbitOrekit.getDate();
 
 		// Begin date of simulation
 		// AbsoluteDate BeginOfSimulation = AbsoluteDate.JULIAN_EPOCH
@@ -222,12 +210,9 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// End date of simulation
 		AbsoluteDate EndOfSimulation = BeginOfSimulation
 				.shiftedBy(this.popogateTimeLen);
+		// Number of steps for ephemeris file
+		this.numberOfStep = (int) Math.ceil(popogateTimeLen / this.stepSize);
 
-		double dt = stepSize; // in seconds
-
-		int nSteps = (int) Math.ceil(popogateTimeLen / dt); // number of steps
-															// to integrate		
-		
 		// run correct propogator
 
 		// ///////////////////////
@@ -324,7 +309,6 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			
 			missionDesign.setEphemeris(prop.getGeneratedEphemeris());
 
 			// // use seconds as integration time (start at 0.0)
@@ -389,12 +373,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// Activate the ephemeris mode
 			prop.setEphemerisMode();
 
-			try {
-				prop.propagate(EndOfSimulation);
-			} catch (PropagationException e) {
-				JOptionPane.showMessageDialog(null, "Not implemented yet",
-						"Warning", JOptionPane.WARNING_MESSAGE);
-			}
+			prop.propagate(EndOfSimulation);
 
 			missionDesign.setEphemeris(prop.getGeneratedEphemeris());
 
@@ -414,17 +393,15 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// copy final ephemeris state:
 		// lastStateVector = ephemeris.lastElement();
 		// ephemerisOrekit
-		
-		
+
 		BoundedPropagator ephemeris = missionDesign.getEphemeris();
-		
+
 		PVCoordinates lastPvCoord = ephemeris.getPVCoordinates(
 				ephemeris.getMaxDate(), this.orbitOrekit.getFrame());
 		double lastTime = ephemeris.getMaxDate().durationFrom(
 				AbsoluteDate.JULIAN_EPOCH) / 86400;
 
 		lastStateVector = new StateVector(lastPvCoord, lastTime);
-
 
 		// copy internal ephemeris to the external ephemeris, making conversion
 		// from TT to UT??
@@ -905,6 +882,10 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 	public void setZonalCoefficients(double c20, double c30, double c40,
 			double c50, double c60) {
 		this.zonalCoefficients = new double[] { c20, c30, c40, c50, c60 };
+	}
+
+	public int getNumberOfStep() {
+		return numberOfStep;
 	}
 
 }

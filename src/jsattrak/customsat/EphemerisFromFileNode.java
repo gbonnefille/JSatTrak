@@ -29,7 +29,12 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.orbits.CartesianOrbit;
 import org.orekit.propagation.BoundedPropagator;
+import org.orekit.propagation.SpacecraftState;
+import org.orekit.time.AbsoluteDate;
+import org.orekit.utils.PVCoordinates;
 
 import jsattrak.customsat.gui.EphemerisFromFilePanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
@@ -72,15 +77,30 @@ public class EphemerisFromFileNode extends CustomTreeTableNode
         try
         {
             Vector<StateVector> e = r.readStkEphemeris(filename);
+            BoundedPropagator ephemeris = null;
+            CartesianOrbit cartesianOrbit = null;
+            Vector3D pos = Vector3D.ZERO;
+            Vector3D vit = Vector3D.ZERO;
+            AbsoluteDate date = null;
            
             for(StateVector sv : e)
             {
                 // add state to ephemeris
+            	pos = new Vector3D(sv.state[1],sv.state[2],sv.state[3]);
+            	vit = new Vector3D(sv.state[4],sv.state[5],sv.state[6]);
+            	
+            	PVCoordinates pvCoordinate = new PVCoordinates(pos, vit);
+            	cartesianOrbit = new CartesianOrbit(pvCoordinate, this.frame,
+        				this.date, this.mu) 
+            	SpacecraftState spacecraftState = new SpacecraftState(cartesianOrbit);
+            	ephemeris.
                 ephemeris.add(sv);
             }
 
             // set inital time for this node
-            this.setStartTTjulDate(e.get(0).state[0]);
+            date = AbsoluteDate.JULIAN_EPOCH
+    				.shiftedBy(e.get(0).state[0] * 86400);
+            this.setStartTTjulDate(date);
 
             System.out.println( " - Node:" + getValueAt(0) + ", Ephemeris Points Read: " + e.size() );
 
