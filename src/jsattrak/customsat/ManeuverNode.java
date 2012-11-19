@@ -45,6 +45,7 @@ import name.gano.swingx.treetable.CustomTreeTableNode;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.propagation.BoundedPropagator;
+import org.orekit.time.AbsoluteDate;
 
 /**
  *
@@ -114,7 +115,10 @@ public class ManeuverNode  extends CustomTreeTableNode
         // get last stat vector (we are going to change it - impulse burn)
     	
     	BoundedPropagator ephemeris = missionDesign.getEphemeris();
-        StateVector lastState = new StateVector(ephemeris.getPVCoordinates(ephemeris.getMaxDate(), ephemeris.getFrame()).getPosition(), time);
+    	
+    	double lastTime = ephemeris.getMaxDate().durationFrom(
+				AbsoluteDate.JULIAN_EPOCH) / 86400;
+        StateVector lastState = new StateVector(ephemeris.getPVCoordinates(ephemeris.getMaxDate(), ephemeris.getFrame()), lastTime);
         
         // for VNC system see: http://www.stk.com/resources/help/stk613/helpSystem/extfile/gator/eq-coordsys.htm
         

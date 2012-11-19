@@ -480,7 +480,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel
 
     private void addSolverButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_addSolverButtonActionPerformed
     {//GEN-HEADEREND:event_addSolverButtonActionPerformed
-        addNode2MissionDesigner(new SolverNode(null, true)); // add default objects
+        addNode2MissionDesigner(new SolverNode(this.rootNode, true)); // add default objects
     }//GEN-LAST:event_addSolverButtonActionPerformed
 
     private void deleteNodeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_deleteNodeButtonActionPerformed
