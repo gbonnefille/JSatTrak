@@ -153,7 +153,7 @@ public class OrbitModelRenderable implements Renderable {
 			} // show orbit trace
 
 			// plot position
-			double[] xyz = sat.getTEMEPos().toArray();
+			double[] xyz = sat.getJ2000Position().toArray();
 			if (xyz != null) {
 				// 3D model is rendered Here
 				if (sat.isUse3dModel()) {
@@ -286,14 +286,14 @@ public class OrbitModelRenderable implements Renderable {
 					// aligned)
 
 					// calculate TEME velocity and set rotation angles and axis
-					if (sat.getTEMEPos() != null) {
+					if (sat.getJ2000Position() != null) {
 						sat.getThreeDModel().setMainRotationAngleAxis(
-								sat.getTEMEVelocity().toArray(),
-								sat.getTEMEPos().toArray());
+								sat.getJ2000Velocity().toArray(),
+								sat.getJ2000Position().toArray());
 
 						// set velcoity for test plotting
 						sat.getThreeDModel().velUnitVec = MathUtils
-								.UnitVector(sat.getTEMEVelocity().toArray());
+								.UnitVector(sat.getJ2000Velocity().toArray());
 					}
 
 					// Set ECI angle

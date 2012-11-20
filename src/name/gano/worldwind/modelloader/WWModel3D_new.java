@@ -466,11 +466,11 @@ public class WWModel3D_new implements Renderable {
 		// set roll pitch yaw (assume user wants LVLH, velcorty aligned)
 
 		// calculate TEME velocity and set rotation angles and axis
-		setMainRotationAngleAxis(sat.getTEMEVelocity().toArray(), sat
-				.getTEMEPos().toArray());
+		setMainRotationAngleAxis(sat.getJ2000Velocity().toArray(), sat
+				.getJ2000Position().toArray());
 
 		// set velcoity for test plotting
-		this.velUnitVec = MathUtils.UnitVector(sat.getTEMEVelocity().toArray());
+		this.velUnitVec = MathUtils.UnitVector(sat.getJ2000Velocity().toArray());
 
 		// Set ECI angle
 		double T = (MJD - 51544.5) / 36525.0; // centuries since J2000.0

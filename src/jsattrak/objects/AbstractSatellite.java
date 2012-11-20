@@ -46,19 +46,7 @@ public abstract class AbstractSatellite implements Serializable {
 	 * @return j2k position of satellite in meters
 	 * @throws OrekitException 
 	 */
-	public abstract Vector3D calculateJ2KPositionFromUT(double julDate) throws OrekitException;
-
-	/**
-	 * Calculate TEME of date position of this sat at a given JulDateTime
-	 * (doesn't save the time) - can be useful for event searches or
-	 * optimization
-	 * 
-	 * @param julDate
-	 *            - julian date
-	 * @return j2k position of satellite in meters
-	 * @throws OrekitException 
-	 */
-	public abstract Vector3D calculateTemePositionFromUT(double julDate) throws OrekitException;
+	public abstract Vector3D calculatePositionFromUT(double julDate) throws OrekitException;
 
 	public abstract double getAltitude();
 
@@ -109,8 +97,6 @@ public abstract class AbstractSatellite implements Serializable {
 	public abstract boolean getPlot2D();
 
 	public abstract boolean getPlot2DFootPrint();
-
-	public abstract Vector3D getTEMEPos();
 
 	public abstract Color getSatColor();
 
@@ -192,8 +178,6 @@ public abstract class AbstractSatellite implements Serializable {
 	public abstract void setThreeDModelPath(String path);
 
 	public abstract WWModel3D_new getThreeDModel();
-
-	public abstract Vector3D getTEMEVelocity();
 
 	public abstract double getThreeDModelSizeFactor();
 

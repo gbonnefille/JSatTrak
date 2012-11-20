@@ -96,14 +96,10 @@ public class CustomSatellite extends AbstractSatellite {
 	double tleEpochJD = -1; // no age
 
 	// current J2000 position and velocity vectors
-	private Vector3D j2kPos = Vector3D.ZERO;// = new double[3];
-	private Vector3D j2kVel = Vector3D.ZERO;// = new double[3];
-	// true-equator, mean equinox TEME of date
-	private Vector3D posTEME = Vector3D.ZERO;// = new double[3]; //
-												// true-equator, mean equinox
-												// TEME of date position for LLA
-												// calcs
-	private Vector3D velTEME = Vector3D.ZERO;
+
+	// Position & velocity
+	private Vector3D position = Vector3D.ZERO;
+	private Vector3D velocity = Vector3D.ZERO;
 
 	// current lat,long,alt [radians, radians, km/m ?]
 	private double[] lla;// = new double[3];
@@ -234,12 +230,6 @@ public class CustomSatellite extends AbstractSatellite {
 		AbsoluteDate maxTime;
 		AbsoluteDate minTime;
 
-		double currentMJDtime = julDate - AstroConst.JDminusMJD;
-
-		// CAREFUL ON TIMES... TIME IN EPHMERIS IN TT NOT UTC!!
-
-		double deltaTT2UTC = Time.deltaT(currentMJDtime); // = TT - UTC
-
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -260,9 +250,6 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
-				// Number of step
-				int nSteps = (int) Math.ceil(this.propNode.getPopogateTimeLen()
-						/ this.propNode.getStepSize());
 
 				PVCoordinates pvCoordinateInertialFrame = ephemeris
 						.getPVCoordinates(orekitJulDate,
@@ -275,35 +262,13 @@ public class CustomSatellite extends AbstractSatellite {
 						pvCoordinateEarthFrame.getPosition(), this.ITRF2005,
 						orekitJulDate);
 
-				// See SatelliteTleSGP$.java explination of MOD/TEME for
-				// calculating lat/long as TLE coordinate systems
-				// revised calculations:
-				double mjd = julDate - AstroConst.JDminusMJD;
-				double ttt = (mjd - AstroConst.MJD_J2000) / 36525.0;
-				double[][] A = J2kCoordinateConversion
-						.teme_j2k(J2kCoordinateConversion.Direction.from, ttt,
-								24, 2, 'a');
 
 				// Satellite trace
-				j2kPos = pvCoordinateInertialFrame.getPosition();
-				j2kVel = pvCoordinateInertialFrame.getVelocity();
-
-				//
-				// // rotate position and velocity
-				// posTEME = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-				// j2kPos.toArray()));
-				// velTEME = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-				// j2kVel.toArray()));
 
 				// Current position point
-				posTEME = pvCoordinateInertialFrame.getPosition();
-				velTEME = pvCoordinateInertialFrame.getVelocity();
+				position = pvCoordinateInertialFrame.getPosition();
+				velocity = pvCoordinateInertialFrame.getVelocity();
 
-				j2kPos = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-						posTEME.toArray()));
-
-				j2kVel = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-						velTEME.toArray()));
 
 				// save old lat/long for ascending node check
 				double[] oldLLA = new double[3];
@@ -350,10 +315,9 @@ public class CustomSatellite extends AbstractSatellite {
 			} else // not in the timeFrame
 			{
 				// only set to null if they aren't already
-				if (j2kPos != null) {
+				if (position != null) {
 					// set current arrays to null;
-					j2kPos = null;
-					posTEME = null;
+					position = null;
 					lla = null;
 
 					// clear ground track
@@ -382,53 +346,19 @@ public class CustomSatellite extends AbstractSatellite {
 		// }
 	}
 
+	
+
 	/**
-	 * Calculate MOD position of this sat at a given JulDateTime (doesn't save
+	 * Calculate position of this sat at a given JulDateTime (doesn't save
 	 * the time) - can be useful for event searches or optimization
 	 * 
 	 * @param julDate
 	 *            - julian date
-	 * @return j2k position of satellite in meters
-	 * @throws OrekitException
-	 */
-	public Vector3D calculateTemePositionFromUT(double julDate)
-			throws OrekitException {
-		Vector3D j2kPosTemp = calculateJ2KPositionFromUT(julDate);
-
-		Vector3D ptPos = Vector3D.ZERO;
-
-		if (j2kPosTemp != null) {
-			// convert to LLA -- time in days since J2000
-			// ptPos = CoordinateConversion.EquatorialEquinoxFromJ2K( julDate -
-			// AstroConst.JDminusMJD , j2kPosTemp);
-			// See SatelliteTleSGP$.java explination of MOD/TEME for calculating
-			// lat/long as TLE coordinate systems
-			// revised calculations:
-			double mjd = julDate - AstroConst.JDminusMJD;
-			double ttt = (mjd - AstroConst.MJD_J2000) / 36525.0;
-			double[][] A = J2kCoordinateConversion.teme_j2k(
-					J2kCoordinateConversion.Direction.from, ttt, 24, 2, 'a');
-			// rotate position and velocity
-			ptPos = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-					j2kPosTemp.toArray()));
-
-		} // if in time and ephemeris is generated
-
-		return ptPos;
-
-	} // calculatePositionFromUT
-
-	/**
-	 * Calculate J2K position of this sat at a given JulDateTime (doesn't save
-	 * the time) - can be useful for event searches or optimization
-	 * 
-	 * @param julDate
-	 *            - julian date
-	 * @return j2k position of satellite in meters
+	 * @return position of satellite in meters
 	 * @throws OrekitException
 	 */
 	@Override
-	public Vector3D calculateJ2KPositionFromUT(double julDate)
+	public Vector3D calculatePositionFromUT(double julDate)
 			throws OrekitException {
 		Vector3D ptPos = Vector3D.ZERO;
 
@@ -453,9 +383,7 @@ public class CustomSatellite extends AbstractSatellite {
 				ptPos = ephemeris.getPVCoordinates(orekitJulDate,
 						this.initNode.getFrame()).getPosition();
 
-			} else {
-				// not in time
-			}
+			} 
 		} // if epeheris contains anything
 
 		return ptPos;
@@ -477,7 +405,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 		// calculate period - in minutes
 		double periodMin = Kepler.CalculatePeriod(AstroConst.GM_Earth,
-				j2kPos.toArray(), j2kVel.toArray()) / (60.0);
+				position.toArray(), velocity.toArray()) / (60.0);
 
 		// update times: Trust Period Calculations for how far in the future and
 		// past to calculate out to
@@ -644,7 +572,7 @@ public class CustomSatellite extends AbstractSatellite {
 	private double[] calculateLatLongAltXyz(double julDate)
 			throws OrekitException {
 
-		Vector3D ptPos = calculateJ2KPositionFromUT(julDate);
+		Vector3D ptPos = calculatePositionFromUT(julDate);
 
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
@@ -660,17 +588,12 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
-				try {
+
 					pos = ephemeris.getPVCoordinates(orekitJulDate,
 							this.ITRF2005).getPosition();
-				} catch (OrekitException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 
-			} else {
-				// not in time
-			}
+
+			} 
 		} // if epeheris contains anything
 
 		// get lat and long
@@ -704,9 +627,9 @@ public class CustomSatellite extends AbstractSatellite {
 
 	// returns satellite's current perdiod based on current pos/vel in Minutes
 	public double getPeriod() {
-		if (j2kPos != null) {
+		if (position != null) {
 			return Kepler.CalculatePeriod(AstroConst.GM_Earth,
-					j2kPos.toArray(), j2kVel.toArray()) / (60.0);
+					position.toArray(), velocity.toArray()) / (60.0);
 		} else {
 			return 0;
 		}
@@ -714,7 +637,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 	public double[] getKeplarianElements() {
 		return Kepler.SingularOsculatingElements(AstroConst.GM_Earth,
-				j2kPos.toArray(), j2kVel.toArray());
+				position.toArray(), velocity.toArray());
 	}
 
 	// GET SET methods =================
@@ -773,19 +696,7 @@ public class CustomSatellite extends AbstractSatellite {
 		return currentJulianDate;
 	}
 
-	public Vector3D getJ2000Position() {
-		if (j2kPos == null) {
-			return null;
-		}
-		return j2kPos;
-	}
 
-	public Vector3D getJ2000Velocity() {
-		if (j2kVel == null) {
-			return null;
-		}
-		return j2kVel;
-	}
 
 	public boolean getPlot2D() {
 		return plot2d;
@@ -917,12 +828,13 @@ public class CustomSatellite extends AbstractSatellite {
 		this.plot2DFootPrint = plot2DFootPrint;
 	}
 
-	public Vector3D getTEMEPos() {
-		if (posTEME == null) {
+	@Override
+	public Vector3D getJ2000Position() {
+		if (position == null) {
 			return null;
 		}
 
-		return posTEME;
+		return position;
 	}
 
 	public boolean isShow3DOrbitTrace() {
@@ -1162,11 +1074,12 @@ public class CustomSatellite extends AbstractSatellite {
 		return threeDModel;
 	}
 
-	public Vector3D getTEMEVelocity() {
-		if (velTEME == null) {
+	@Override
+	public Vector3D getJ2000Velocity() {
+		if (velocity == null) {
 			return null;
 		}
-		return velTEME;
+		return velocity;
 	}
 
 	public double getThreeDModelSizeFactor() {
@@ -1198,4 +1111,5 @@ public class CustomSatellite extends AbstractSatellite {
 	public String toString() {
 		return this.getName();
 	}
+
 }

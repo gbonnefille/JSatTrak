@@ -270,8 +270,8 @@ public class SatPropertyPanel extends javax.swing.JPanel implements java.io.Seri
                 copyArray(satProp.getJ2000Velocity().toArray(), vel);
                 break;
             case 1: // TEME
-                copyArray(satProp.getTEMEPos().toArray(), pos);
-                copyArray(satProp.getTEMEVelocity().toArray(), vel);
+                copyArray(satProp.getJ2000Position().toArray(), pos);
+                copyArray(satProp.getJ2000Velocity().toArray(), vel);
                 break;
             case 2: // MOD
                 // get J2k first

@@ -67,14 +67,9 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	// TLE epoch -- used to calculate how old is TLE - Julian Date
 	double tleEpochJD = -1; // no age
 
-	// J2000 position and velocity vectors
-	private Vector3D j2kPos = Vector3D.ZERO; // meters
-	private Vector3D j2kVel = Vector3D.ZERO; // meters/sec
-	// true-equator, mean equinox TEME of date
-	private Vector3D posTEME = Vector3D.ZERO; // true-equator, mean equinox TEME
-												// of date position for LLA
-												// calcs, meters
-	private Vector3D velTEME = Vector3D.ZERO; // meters/sec
+	// Position/velocity
+	private Vector3D position = Vector3D.ZERO;
+	private Vector3D velocity = Vector3D.ZERO;
 
 	// lat,long,alt [radians, radians, m ]
 	private double[] lla = new double[3];
@@ -220,7 +215,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// modele de propa sgp4 Orekit
 		orekitTlePropagator = TLEPropagator.selectExtrapolator(tle);
 
-		// read TLE		
+		// read TLE
 
 		// TLE age since AJD
 		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 3600 / 24;
@@ -244,13 +239,11 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
-		PVCoordinates posVit = null;
+		PVCoordinates posVit = orekitTlePropagator
+				.getPVCoordinates(orekitJulDate);
 
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
-	
-
-		posTEME = posVit.getPosition();
-		velTEME = posVit.getVelocity();
+		position = posVit.getPosition();
+		velocity = posVit.getVelocity();
 
 		// print differene TT-UT
 		// System.out.println("TT-UT [days]= " +
@@ -296,11 +289,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 				J2kCoordinateConversion.Direction.to, ttt, 24, 2, 'a');
 		// rotate position and velocity
 
-		j2kPos = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-				posTEME.toArray()));
-		j2kVel = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-				velTEME.toArray()));
-
 		// System.out.println("Date: " + julDate +", Pos: " + sdp4Prop.itsR[0] +
 		// ", " + sdp4Prop.itsR[1] + ", " + sdp4Prop.itsR[2]);
 
@@ -311,21 +299,18 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// lla = GeoFunctions
 		// .GeodeticLLA(posTEME, julDate - AstroConst.JDminusMJD); // j2kPos
 
+		OneAxisEllipsoid orbit = new OneAxisEllipsoid(
+				Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+				Constants.WGS84_EARTH_FLATTENING, ITRF2005);
 
+		posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
+				this.ITRF2005);
 
-			OneAxisEllipsoid orbit = new OneAxisEllipsoid(
-					Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
-					Constants.WGS84_EARTH_FLATTENING, ITRF2005);
+		GeodeticPoint geodeticPoint = orbit.transform(posVit.getPosition(),
+				this.ITRF2005, orekitJulDate);
 
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
-					this.ITRF2005);
-
-			GeodeticPoint geodeticPoint = orbit.transform(posVit.getPosition(),
-					this.ITRF2005, orekitJulDate);
-
-			this.lla = new double[]{geodeticPoint.getLatitude(),geodeticPoint.getLongitude(),geodeticPoint.getAltitude()};
-
-
+		this.lla = new double[] { geodeticPoint.getLatitude(),
+				geodeticPoint.getLongitude(), geodeticPoint.getAltitude() };
 
 		// Check to see if the ascending node has been passed
 		if (showGroundTrack == true) {
@@ -365,7 +350,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 		// calculate period - in minutes
 		double periodMin = Kepler.CalculatePeriod(AstroConst.GM_Earth,
-				j2kPos.toArray(), j2kVel.toArray()) / (60.0);
+				position.toArray(), velocity.toArray()) / (60.0);
 		// System.out.println("period [min] = "+periodMin);
 
 		// time step divisions (in fractions of a day)
@@ -495,8 +480,9 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	} // fillGroundTrack
 
 	// takes in JulDate, returns lla and teme position
-	private double[] calculateLatLongAltXyz(double ptTime) throws OrekitException {
-		Vector3D ptPos = calculateTemePositionFromUT(ptTime);
+	private double[] calculateLatLongAltXyz(double ptTime)
+			throws OrekitException {
+		Vector3D ptPos = calculatePositionFromUT(ptTime);
 
 		// get lat and long
 
@@ -510,15 +496,13 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		PVCoordinates posVit;
 		GeodeticPoint geodeticPoint = null;
 		try {
-			posVit = orekitTlePropagator.getPVCoordinates(
-					orekitJulDate, ITRF2005);
-			geodeticPoint = orbit.transform(posVit.getPosition(),
-					ITRF2005, orekitJulDate);
+			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
+					ITRF2005);
+			geodeticPoint = orbit.transform(posVit.getPosition(), ITRF2005,
+					orekitJulDate);
 		} catch (OrekitException e) {
 			e.printStackTrace();
 		}
-
-		 
 
 		double[] ptLlaXyz = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude(),
@@ -530,45 +514,18 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	//
 
 	/**
-	 * Calculate J2K position of this sat at a given JulDateTime (doesn't save
-	 * the time) - can be useful for event searches or optimization
-	 * 
-	 * @param julDate
-	 *            - julian date
-	 * @return j2k position of satellite in meters
-	 * @throws OrekitException 
-	 */
-	@Override
-	public Vector3D calculateJ2KPositionFromUT(double julDate) throws OrekitException {
-		Vector3D ptPos = calculateTemePositionFromUT(julDate);
-
-		double mjd = julDate - AstroConst.JDminusMJD;
-
-		// get position information back out - convert to J2000
-		// precession from rk5 -> mod
-		double ttt = (mjd - AstroConst.MJD_J2000) / 36525.0;
-		double[][] A = J2kCoordinateConversion.teme_j2k(
-				J2kCoordinateConversion.Direction.to, ttt, 24, 2, 'a');
-		// rotate position
-		Vector3D j2kPosI = new Vector3D(J2kCoordinateConversion.matvecmult(A,
-				ptPos.toArray()));
-
-		return j2kPosI;
-
-	} // calculatePositionFromUT
-
-	/**
-	 * Calculate true-equator, mean equinox (TEME) of date position of this sat
+	 * Calculate  position of this sat
 	 * at a given JulDateTime (doesn't save the time) - can be useful for event
 	 * searches or optimization
 	 * 
 	 * @param julDate
 	 *            - julian date
-	 * @return j2k position of satellite in meters
-	 * @throws OrekitException 
+	 * @return position of satellite in meters
+	 * @throws OrekitException
 	 */
 	@Override
-	public Vector3D calculateTemePositionFromUT(double julDate) throws OrekitException {
+	public Vector3D calculatePositionFromUT(double julDate)
+			throws OrekitException {
 		Vector3D ptPos = Vector3D.ZERO;
 
 		// using JulDate because function uses time diff between jultDate of
@@ -581,8 +538,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 		PVCoordinates posVit = null;
 
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
-
+		posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
 
 		ptPos = posVit.getPosition();
 
@@ -598,7 +554,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	// tol = convergence tolerance
 	// maxIter = maximum iterations allowed
 	// RETURNS: double = julian date of crossing
-	private double secantMethod(double xn_1, double xn, double tol, int maxIter) throws OrekitException {
+	private double secantMethod(double xn_1, double xn, double tol, int maxIter)
+			throws OrekitException {
 
 		double d;
 
@@ -629,12 +586,13 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		return xn;
 	} // secantMethod
 
-	private double latitudeGivenJulianDate(double julDate) throws OrekitException {
+	private double latitudeGivenJulianDate(double julDate)
+			throws OrekitException {
 		// computer latiude of the spacecraft at a given date
-		Vector3D ptPos = calculateTemePositionFromUT(julDate);
+		Vector3D ptPos = calculatePositionFromUT(julDate);
 
 		// get lat and long
-		
+
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -645,15 +603,13 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		PVCoordinates posVit;
 		GeodeticPoint geodeticPoint = null;
 		try {
-			posVit = orekitTlePropagator.getPVCoordinates(
-					orekitJulDate, ITRF2005);
-			geodeticPoint = orbit.transform(posVit.getPosition(),
-					ITRF2005, orekitJulDate);
+			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
+					ITRF2005);
+			geodeticPoint = orbit.transform(posVit.getPosition(), ITRF2005,
+					orekitJulDate);
 		} catch (OrekitException e) {
 			e.printStackTrace();
 		}
-		
-		
 
 		return geodeticPoint.getLatitude(); // pass back latitude
 
@@ -707,14 +663,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		return currentJulianDate;
 	}
 
-	public Vector3D getJ2000Position() {
-		return j2kPos;
-	}
-
-	public Vector3D getJ2000Velocity() {
-		return j2kVel;
-	}
-
 	public boolean getPlot2D() {
 		return plot2d;
 	}
@@ -766,8 +714,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	// returns satellite's current perdiod based on current pos/vel in Minutes
 	public double getPeriod() {
-		return Kepler.CalculatePeriod(AstroConst.GM_Earth, j2kPos.toArray(),
-				j2kVel.toArray()) / (60.0);
+		return Kepler.CalculatePeriod(AstroConst.GM_Earth, position.toArray(),
+				velocity.toArray()) / (60.0);
 	}
 
 	public String getName() {
@@ -776,7 +724,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	public double[] getKeplarianElements() {
 		return Kepler.SingularOsculatingElements(AstroConst.GM_Earth,
-				j2kPos.toArray(), j2kVel.toArray());
+				position.toArray(), velocity.toArray());
 	}
 
 	public double getTleEpochJD() {
@@ -849,8 +797,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		this.plot2DFootPrint = plot2DFootPrint;
 	}
 
-	public Vector3D getTEMEPos() {
-		return posTEME;
+	public Vector3D getJ2000Position() {
+		return position;
 	}
 
 	public boolean isShow3DOrbitTrace() {
@@ -984,8 +932,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		return threeDModel;
 	}
 
-	public Vector3D getTEMEVelocity() {
-		return velTEME;
+	public Vector3D getJ2000Velocity() {
+		return velocity;
 	}
 
 	public double getThreeDModelSizeFactor() {
