@@ -27,6 +27,7 @@
 package jsattrak.gui;
 
 import javax.swing.table.DefaultTableModel;
+
 import jsattrak.objects.AbstractSatellite;
 import name.gano.astro.AstroConst;
 import name.gano.astro.coordinates.CoordinateConversion;

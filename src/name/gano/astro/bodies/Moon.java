@@ -23,7 +23,6 @@
 package name.gano.astro.bodies;
 
 import name.gano.astro.AstroConst;
-import name.gano.astro.Kepler;
 import name.gano.astro.MathUtils;
 
 /**

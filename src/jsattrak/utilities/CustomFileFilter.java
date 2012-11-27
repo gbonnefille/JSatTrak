@@ -21,7 +21,8 @@
 package jsattrak.utilities;
 
 import java.io.File;
-import javax.swing.filechooser.*;
+
+import javax.swing.filechooser.FileFilter;
 
 /* ImageFilter.java  is used to filter out only image files in Save As dialog */
 public class CustomFileFilter extends FileFilter  implements java.io.Serializable

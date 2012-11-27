@@ -24,10 +24,13 @@
 
 package jsattrak.gui;
 
-import java.beans.*;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
-import java.awt.*;
-import javax.swing.*;
+
+import javax.swing.JLabel;
 
 
 /**

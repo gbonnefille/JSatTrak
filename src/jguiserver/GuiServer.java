@@ -27,7 +27,6 @@
 
 package jguiserver;
 
-import bsh.Interpreter;
 import java.awt.Color;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -36,11 +35,15 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Vector;
+
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
+
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
+
+import bsh.Interpreter;
 
 /**
  *

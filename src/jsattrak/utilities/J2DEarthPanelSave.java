@@ -26,13 +26,15 @@
 
 package jsattrak.utilities;
 
-import jsattrak.gui.J2DEarthPanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.Vector;
+
 import javax.swing.JInternalFrame;
+
 import jsattrak.coverage.JSatTrakRenderable;
+import jsattrak.gui.J2DEarthPanel;
 
 /**
  *

@@ -24,7 +24,9 @@
 package jsattrak.customsat;
 
 import java.awt.Toolkit;
+
 import javax.swing.ImageIcon;
+
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
 /**

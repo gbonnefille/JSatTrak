@@ -76,7 +76,6 @@
  *       ----------------------------------------------------------------      */
 package name.gano.astro.propogators.sgp4_cssi;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  * 

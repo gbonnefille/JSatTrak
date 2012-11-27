@@ -25,14 +25,15 @@
 package jsattrak.gui;
 
 import java.util.List;
+
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 
-import org.orekit.errors.OrekitException;
-
 import jsattrak.utilities.ProgressStatus;
 import jsattrak.utilities.TLEDownloader;
+
+import org.orekit.errors.OrekitException;
 
 /**
  *

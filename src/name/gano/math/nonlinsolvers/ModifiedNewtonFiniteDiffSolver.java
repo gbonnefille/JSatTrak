@@ -29,10 +29,11 @@ package name.gano.math.nonlinsolvers;
 import java.io.IOException;
 import java.text.ParseException;
 
+import name.gano.astro.MathUtils;
+
 import org.orekit.errors.OrekitException;
 
 import Jama.Matrix;
-import name.gano.astro.MathUtils;
 
 /**
  *

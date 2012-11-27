@@ -32,13 +32,12 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
-
-import org.orekit.errors.OrekitException;
 
 import jsattrak.coverage.ColorMap;
 import jsattrak.coverage.CoolColorMap;
@@ -47,9 +46,10 @@ import jsattrak.coverage.GrayColorMap;
 import jsattrak.coverage.HotColorMap;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.utilities.CustomFileFilter;
-import jsattrak.utilities.ProgressStatus;
 import jsattrak.utilities.UnoptimizedDeepCopy;
 import name.gano.astro.time.Time;
+
+import org.orekit.errors.OrekitException;
 
 /**
  *

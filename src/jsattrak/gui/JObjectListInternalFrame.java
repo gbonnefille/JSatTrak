@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -41,8 +42,6 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.orekit.errors.OrekitException;
-
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
@@ -50,6 +49,8 @@ import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.IconTreeNode;
 import jsattrak.utilities.IconTreeNodeRenderer;
 import jsattrak.utilities.ObjectTreeTransferHandler;
+
+import org.orekit.errors.OrekitException;
 
 /**
  * 

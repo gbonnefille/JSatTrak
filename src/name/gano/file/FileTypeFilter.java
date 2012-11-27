@@ -22,8 +22,8 @@
  */
 package name.gano.file;
 
-import java.io.FilenameFilter;
 import java.io.File;
+import java.io.FilenameFilter;
 
 public class FileTypeFilter implements FilenameFilter
 {

@@ -23,8 +23,6 @@
 
 package jsattrak.customsat;
 
-import gov.nasa.worldwind.render.FrameFactory;
-
 import java.awt.Toolkit;
 import java.util.Vector;
 

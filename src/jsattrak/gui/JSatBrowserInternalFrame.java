@@ -32,13 +32,13 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.orekit.errors.OrekitException;
-
 import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.SatBrowserTleDataLoader;
 import jsattrak.utilities.TLEDownloader;
 import jsattrak.utilities.TLElements;
 import jsattrak.utilities.TreeTransferHandler;
+
+import org.orekit.errors.OrekitException;
 
 /**
  * 

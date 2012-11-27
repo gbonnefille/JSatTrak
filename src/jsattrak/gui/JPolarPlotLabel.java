@@ -32,7 +32,9 @@ import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterJob;
+
 import javax.swing.JLabel;
+
 import name.gano.astro.coordinates.CoordinateConversion;
 
 /**

@@ -24,6 +24,7 @@ package jsattrak.objects;
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.Random;
+
 import name.gano.astro.AstroConst;
 import name.gano.astro.MathUtils;
 import name.gano.astro.Sidereal;

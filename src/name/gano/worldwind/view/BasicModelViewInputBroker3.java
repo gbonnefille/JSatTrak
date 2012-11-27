@@ -35,10 +35,10 @@ import gov.nasa.worldwind.geom.Intersection;
 import gov.nasa.worldwind.geom.Line;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.globes.Globe;
-import gov.nasa.worldwind.pick.PickedObject;
 import gov.nasa.worldwind.pick.PickedObjectList;
 import gov.nasa.worldwind.view.OrbitView;
 import gov.nasa.worldwind.view.ScheduledOrbitViewStateIterator;
+
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionEvent;

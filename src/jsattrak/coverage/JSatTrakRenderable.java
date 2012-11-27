@@ -27,6 +27,7 @@
 package jsattrak.coverage;
 
 import java.awt.Graphics2D;
+
 import jsattrak.gui.J2dEarthLabel2;
 
 /**

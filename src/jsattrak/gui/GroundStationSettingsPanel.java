@@ -24,10 +24,12 @@
 
 package jsattrak.gui;
 
-import jsattrak.objects.GroundStation;
 import java.awt.Color;
+
 import javax.swing.JColorChooser;
 import javax.swing.JInternalFrame;
+
+import jsattrak.objects.GroundStation;
 
 /**
  *

@@ -21,16 +21,19 @@
 
 package jsattrak.gui;
 
+import java.awt.Window;
+
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+
+import jsattrak.utilities.LafChanger;
+
 import com.jgoodies.looks.plastic.PlasticLookAndFeel;
 import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
 import com.jgoodies.looks.plastic.theme.ExperienceBlue;
 import com.jgoodies.looks.plastic.theme.ExperienceGreen;
 import com.jgoodies.looks.plastic.theme.Silver;
-import java.awt.Window;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import jsattrak.utilities.LafChanger;
 
 /**
  *

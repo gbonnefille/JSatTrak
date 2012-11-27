@@ -42,8 +42,6 @@ import jsattrak.customsat.StopNode;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
-import name.gano.astro.AstroConst;
-import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 import name.gano.swingx.treetable.IconTreeTableNodeRenderer;
 

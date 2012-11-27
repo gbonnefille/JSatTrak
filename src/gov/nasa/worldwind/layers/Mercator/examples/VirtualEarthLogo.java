@@ -6,15 +6,23 @@ All Rights Reserved.
 */
 package gov.nasa.worldwind.layers.Mercator.examples;
 
-import com.sun.opengl.util.texture.*;
 import gov.nasa.worldwind.exception.WWRuntimeException;
 import gov.nasa.worldwind.geom.Vec4;
-import gov.nasa.worldwind.render.*;
+import gov.nasa.worldwind.render.DrawContext;
+import gov.nasa.worldwind.render.OrderedRenderable;
 import gov.nasa.worldwind.util.Logging;
 
+import java.awt.Point;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import javax.media.opengl.GL;
-import java.awt.*;
-import java.io.*;
+
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureCoords;
+import com.sun.opengl.util.texture.TextureIO;
 
 public class VirtualEarthLogo implements OrderedRenderable
 {

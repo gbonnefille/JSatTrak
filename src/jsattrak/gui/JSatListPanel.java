@@ -26,15 +26,16 @@
 
 package jsattrak.gui;
 
-import jsattrak.objects.SatelliteTleSGP4;
 import java.util.Hashtable;
+
 import javax.swing.DefaultListModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
-import org.orekit.errors.OrekitException;
-
+import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.ListTransferHandler;
+
+import org.orekit.errors.OrekitException;
 
 /**
  * 

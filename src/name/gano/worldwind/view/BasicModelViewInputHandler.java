@@ -32,14 +32,30 @@ All Rights Reserved.
 
 import gov.nasa.worldwind.WWObjectImpl;
 import gov.nasa.worldwind.WorldWindow;
-import gov.nasa.worldwind.avlist.*;
-import gov.nasa.worldwind.event.*;
-import gov.nasa.worldwind.pick.*;
+import gov.nasa.worldwind.avlist.AVKey;
+import gov.nasa.worldwind.event.DragSelectEvent;
+import gov.nasa.worldwind.event.InputHandler;
+import gov.nasa.worldwind.event.SelectEvent;
+import gov.nasa.worldwind.event.SelectListener;
+import gov.nasa.worldwind.pick.PickedObject;
+import gov.nasa.worldwind.pick.PickedObjectList;
 import gov.nasa.worldwind.util.Logging;
 
-import javax.swing.event.*;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+
+import javax.swing.event.EventListenerList;
 
 /**
  * @author tag

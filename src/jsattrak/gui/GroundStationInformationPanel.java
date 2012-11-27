@@ -25,7 +25,6 @@
 package jsattrak.gui;
 
 import jsattrak.objects.GroundStation;
-import java.util.Hashtable;
 
 /**
  *

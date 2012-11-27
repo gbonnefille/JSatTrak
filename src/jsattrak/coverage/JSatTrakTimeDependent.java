@@ -27,6 +27,7 @@
 package jsattrak.coverage;
 
 import java.util.Hashtable;
+
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.time.Time;

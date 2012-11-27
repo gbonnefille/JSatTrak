@@ -30,10 +30,11 @@ the Administrator of the National Aeronautics and Space Administration.
 All Rights Reserved.
 */
 
-import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.util.Logging;
 
-import java.beans.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @author dcollins

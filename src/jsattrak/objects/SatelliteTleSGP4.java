@@ -34,7 +34,6 @@ import java.util.Random;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
 import name.gano.astro.Kepler;
-import name.gano.astro.coordinates.J2kCoordinateConversion;
 import name.gano.astro.propogators.sgp4_cssi.SGP4SatData;
 import name.gano.worldwind.modelloader.WWModel3D_new;
 import net.java.joglutils.model.ModelFactory;

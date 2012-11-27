@@ -29,11 +29,14 @@ import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.layers.AbstractLayer;
 import gov.nasa.worldwind.render.DrawContext;
+
 import java.util.Iterator;
 import java.util.Vector;
+
 import javax.media.opengl.GL;
-import net.java.joglutils.model.examples.DisplayListRenderer;
+
 import net.java.joglutils.model.iModel3DRenderer;
+import net.java.joglutils.model.examples.DisplayListRenderer;
 
 /**
  *

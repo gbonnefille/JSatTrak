@@ -26,12 +26,9 @@ import java.awt.Toolkit;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Vector;
+
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
-
-import org.orekit.errors.OrekitException;
-import org.orekit.propagation.BoundedPropagator;
-import org.orekit.time.AbsoluteDate;
 
 import jsattrak.customsat.gui.SolverPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
@@ -42,6 +39,10 @@ import name.gano.math.nonlinsolvers.ModifiedNewtonFiniteDiffSolver;
 import name.gano.math.nonlinsolvers.NonLinearEquationSystemProblem;
 import name.gano.math.nonlinsolvers.NonLinearEquationSystemSolver;
 import name.gano.swingx.treetable.CustomTreeTableNode;
+
+import org.orekit.errors.OrekitException;
+import org.orekit.propagation.BoundedPropagator;
+import org.orekit.time.AbsoluteDate;
 
 /**
  * 

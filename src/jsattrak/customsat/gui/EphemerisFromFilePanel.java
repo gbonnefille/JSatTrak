@@ -31,8 +31,10 @@
 package jsattrak.customsat.gui;
 
 import java.io.File;
+
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
+
 import jsattrak.customsat.EphemerisFromFileNode;
 import jsattrak.utilities.CustomFileFilter;
 

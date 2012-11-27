@@ -26,6 +26,7 @@ package jsattrak.customsat.gui;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+
 import jsattrak.customsat.ManeuverNode;
 
 /**

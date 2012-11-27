@@ -24,7 +24,9 @@ package jsattrak.utilities;
  * used to transfer data out of the Tree list
  */
 import java.util.Hashtable;
-import javax.swing.*;
+
+import javax.swing.JComponent;
+import javax.swing.JTree;
 import javax.swing.tree.TreePath;
 
 import org.orekit.errors.OrekitException;

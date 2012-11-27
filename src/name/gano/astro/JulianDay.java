@@ -53,8 +53,14 @@
  */
 package name.gano.astro;
 
-import java.util.*;
-import java.text.*;
+import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 /**
  * Routines for calculating and setting Julian day number

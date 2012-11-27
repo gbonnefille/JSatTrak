@@ -34,8 +34,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import jsattrak.customsat.InitialConditionsNode;
-import name.gano.astro.AstroConst;
-import name.gano.astro.Kepler;
 import name.gano.astro.time.Time;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -1368,8 +1366,8 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		try {
 			success = saveSettings();
 		} catch (OrekitException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			JOptionPane.showMessageDialog(this, e1.getMessage(),
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 
 		// close internal frame
@@ -1395,8 +1393,8 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		try {
 			saveSettings();
 		} catch (OrekitException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, e.getMessage(),
+					"Error", JOptionPane.ERROR_MESSAGE);
 		}
 	}// GEN-LAST:event_applyButtonActionPerformed
 

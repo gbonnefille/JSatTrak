@@ -27,9 +27,12 @@ package name.gano.worldwind.objects;
 import gov.nasa.worldwind.geom.LatLon;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Polyline;
+
 import java.awt.Color;
 import java.util.Vector;
+
 import javax.media.opengl.GL;
+
 import jsattrak.gui.J2dEarthLabel2;
 import name.gano.astro.bodies.Sun;
 

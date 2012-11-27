@@ -25,12 +25,17 @@ package name.gano.worldwind.view;
 
 import gov.nasa.worldwind.Configuration;
 import gov.nasa.worldwind.avlist.AVKey;
-import gov.nasa.worldwind.geom.*;
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.Frustum;
+import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.geom.Line;
+import gov.nasa.worldwind.geom.Matrix;
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.util.RestorableSupport;
-
 import gov.nasa.worldwind.view.AbstractView;
 import gov.nasa.worldwind.view.BasicOrbitViewModel;
 import gov.nasa.worldwind.view.OrbitView;
@@ -38,7 +43,9 @@ import gov.nasa.worldwind.view.OrbitViewCollisionSupport;
 import gov.nasa.worldwind.view.OrbitViewLimits;
 import gov.nasa.worldwind.view.OrbitViewModel;
 import gov.nasa.worldwind.view.ViewSupport;
+
 import javax.media.opengl.GL;
+
 import jsattrak.objects.AbstractSatellite;
 
 /**

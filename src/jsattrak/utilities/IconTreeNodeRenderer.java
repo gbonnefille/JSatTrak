@@ -23,8 +23,10 @@ package jsattrak.utilities;
 
 import java.awt.Component;
 import java.util.Hashtable;
+
 import javax.swing.Icon;
 import javax.swing.JTree;
+
 import org.jvnet.substance.api.renderers.SubstanceDefaultTreeCellRenderer;
 
 public class IconTreeNodeRenderer extends SubstanceDefaultTreeCellRenderer //DefaultTreeCellRenderer to work with Substance LAF

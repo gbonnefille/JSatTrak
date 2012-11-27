@@ -26,13 +26,16 @@ package jsattrak.customsat.gui;
 
 import java.awt.Color;
 import java.util.Vector;
+
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 import jsattrak.customsat.GoalParameter;
 import jsattrak.customsat.InputVariable;
 import jsattrak.customsat.SolverNode;
 import jsattrak.gui.JSatTrak;
+
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.renderer.DefaultTableRenderer;

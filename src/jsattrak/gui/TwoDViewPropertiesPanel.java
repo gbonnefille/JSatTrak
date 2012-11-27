@@ -27,10 +27,11 @@ package jsattrak.gui;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
+
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
-import jsattrak.utilities.CustomFileFilter;
+
 import jsattrak.utilities.RelativePath;
 
 /**

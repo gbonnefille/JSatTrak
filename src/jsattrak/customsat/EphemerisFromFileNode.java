@@ -41,7 +41,6 @@ import javax.swing.JInternalFrame;
 import jsattrak.customsat.gui.EphemerisFromFilePanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
-import name.gano.astro.AstroConst;
 import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
@@ -57,7 +56,6 @@ import org.orekit.propagation.precomputed.Ephemeris;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.DateComponents;
 import org.orekit.time.TimeComponents;
-import org.orekit.time.TimeScale;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;

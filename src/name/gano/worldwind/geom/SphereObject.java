@@ -29,8 +29,10 @@ import gov.nasa.worldwind.geom.Intersection;
 import gov.nasa.worldwind.geom.Line;
 import gov.nasa.worldwind.geom.Plane;
 import gov.nasa.worldwind.geom.Vec4;
-import gov.nasa.worldwind.render.*;
+import gov.nasa.worldwind.render.DrawContext;
+import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.util.Logging;
+
 import java.awt.Color;
 
 /**

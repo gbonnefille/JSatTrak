@@ -31,11 +31,14 @@ import gov.nasa.worldwind.render.GlobeAnnotation;
 import gov.nasa.worldwind.render.MultiLineTextRenderer;
 import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.util.Logging;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
 import java.util.Hashtable;
+
 import javax.media.opengl.GL;
+
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.worldwind.geom.SphereObject;

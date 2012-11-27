@@ -24,11 +24,11 @@
 
 package jsattrak.utilities;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class Console extends FilterOutputStream

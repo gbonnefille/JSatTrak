@@ -32,7 +32,9 @@ import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.layers.Layer;
 import gov.nasa.worldwind.layers.placename.PlaceNameLayer;
 import gov.nasa.worldwind.view.BasicOrbitView;
+
 import javax.swing.JOptionPane;
+
 import name.gano.astro.MathUtils;
 import name.gano.worldwind.view.BasicModelView3;
 import name.gano.worldwind.view.BasicModelViewInputHandler3;

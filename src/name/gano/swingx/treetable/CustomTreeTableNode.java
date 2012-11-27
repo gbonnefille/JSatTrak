@@ -25,16 +25,16 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Vector;
+
 import javax.swing.Icon;
+
 import jsattrak.customsat.GoalParameter;
 import jsattrak.customsat.InputVariable;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
-import jsattrak.utilities.StateVector;
+
 import org.jdesktop.swingx.treetable.DefaultMutableTreeTableNode;
 import org.orekit.errors.OrekitException;
-import org.orekit.frames.Frame;
-import org.orekit.propagation.BoundedPropagator;
 import org.orekit.time.AbsoluteDate;
 
 /**

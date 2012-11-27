@@ -23,18 +23,22 @@
 
 package name.gano.worldwind.geom;
 
-import com.sun.opengl.util.j2d.TextRenderer;
 import gov.nasa.worldwind.View;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Renderable;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.geom.Rectangle2D;
+
 import javax.media.opengl.GL;
+
 import jsattrak.coverage.CoverageAnalyzer;
+
+import com.sun.opengl.util.j2d.TextRenderer;
 
 /**
  *

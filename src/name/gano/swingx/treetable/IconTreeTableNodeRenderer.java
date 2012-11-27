@@ -23,8 +23,10 @@ package name.gano.swingx.treetable;
 
 import java.awt.Component;
 import java.util.Hashtable;
+
 import javax.swing.Icon;
 import javax.swing.JTree;
+
 import org.jvnet.substance.api.renderers.SubstanceDefaultTreeCellRenderer;
 
 /**

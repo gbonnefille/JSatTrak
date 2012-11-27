@@ -24,7 +24,6 @@
 
 package jsattrak.gui;
 
-import jsattrak.objects.GroundStation;
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,24 +31,25 @@ import java.io.FileWriter;
 import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.Hashtable;
+
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTable.PrintMode;
 import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.orekit.errors.OrekitException;
-
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.GroundStation;
 import jsattrak.utilities.CustomFileFilter;
 import name.gano.astro.AER;
 import name.gano.astro.AstroConst;
-import name.gano.astro.MathUtils;
 import name.gano.astro.bodies.Sun;
 import name.gano.astro.coordinates.CoordinateConversion;
 import name.gano.astro.time.Time;
 import name.gano.file.FileUtilities;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.errors.OrekitException;
 
 /**
  *

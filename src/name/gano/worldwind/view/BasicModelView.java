@@ -35,6 +35,7 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.view.AbstractView;
 import gov.nasa.worldwind.view.ViewSupport;
+
 import javax.media.opengl.GL;
 
 

@@ -27,11 +27,13 @@ package jsattrak.utilities;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.layers.Layer;
 import gov.nasa.worldwind.view.OrbitView;
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.io.Serializable;
 import java.util.Hashtable;
+
 import javax.swing.JDialog;
 import javax.swing.JInternalFrame;
 

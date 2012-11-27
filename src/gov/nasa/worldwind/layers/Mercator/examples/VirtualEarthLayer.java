@@ -12,11 +12,12 @@ import gov.nasa.worldwind.avlist.AVList;
 import gov.nasa.worldwind.avlist.AVListImpl;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.layers.Mercator.BasicMercatorTiledImageLayer;
+import gov.nasa.worldwind.layers.Mercator.MercatorSector;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.util.LevelSet;
 import gov.nasa.worldwind.util.Tile;
 import gov.nasa.worldwind.util.TileUrlBuilder;
-import gov.nasa.worldwind.layers.Mercator.*;
 
 import java.awt.image.BufferedImage;
 import java.net.MalformedURLException;

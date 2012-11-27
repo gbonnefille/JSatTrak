@@ -23,15 +23,28 @@ package jsattrak.gui;
 
 
 import gov.nasa.worldwind.geom.LatLon;
-import jsattrak.objects.GroundStation;
-import java.awt.*;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Polygon;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
 import java.util.Hashtable;
 import java.util.Vector;
-import javax.swing.*;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.KeyStroke;
+
 import jsattrak.coverage.JSatTrakRenderable;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.GroundStation;
 import name.gano.astro.AstroConst;
 import name.gano.astro.GeoFunctions;
 import name.gano.astro.bodies.Sun;

@@ -26,7 +26,9 @@ package name.gano.worldwind.modelloader;
 import gov.nasa.worldwind.examples.ApplicationTemplate;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.Position;
+
 import java.util.Random;
+
 import net.java.joglutils.model.ModelFactory;
 import net.java.joglutils.model.geometry.Model;
 

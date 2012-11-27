@@ -26,7 +26,6 @@ package name.gano.worldwind.view;
 
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.Frustum;
-import gov.nasa.worldwind.geom.Line;
 import gov.nasa.worldwind.geom.Matrix;
 import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.geom.Vec4;
@@ -35,6 +34,7 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.util.Logging;
 import gov.nasa.worldwind.view.BasicOrbitView;
 import gov.nasa.worldwind.view.ViewSupport;
+
 import javax.media.opengl.GL;
 
 

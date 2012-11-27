@@ -25,10 +25,12 @@
 
 package name.gano.worldwind.texture;
 
+import java.io.File;
+
+import javax.media.opengl.GL;
+
 import com.sun.opengl.util.texture.Texture;
 import com.sun.opengl.util.texture.TextureIO;
-import java.io.File;
-import javax.media.opengl.GL;
 
 /**
  *

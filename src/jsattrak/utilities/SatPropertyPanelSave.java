@@ -25,9 +25,10 @@
 
 package jsattrak.utilities;
 
-import jsattrak.gui.SatPropertyPanel;
 import java.awt.Dimension;
 import java.io.Serializable;
+
+import jsattrak.gui.SatPropertyPanel;
 
 /**
  *

@@ -7,25 +7,47 @@ All Rights Reserved.
 package gov.nasa.worldwind.layers.Mercator;
 
 
-import com.sun.opengl.util.j2d.TextRenderer;
-import gov.nasa.worldwind.*;
-import gov.nasa.worldwind.geom.*;
+import gov.nasa.worldwind.View;
+import gov.nasa.worldwind.WorldWind;
+import gov.nasa.worldwind.geom.Angle;
+import gov.nasa.worldwind.geom.Cylinder;
+import gov.nasa.worldwind.geom.LatLon;
+import gov.nasa.worldwind.geom.Position;
+import gov.nasa.worldwind.geom.Sector;
+import gov.nasa.worldwind.geom.Vec4;
 import gov.nasa.worldwind.globes.Globe;
 import gov.nasa.worldwind.layers.AbstractLayer;
 import gov.nasa.worldwind.render.DrawContext;
-import gov.nasa.worldwind.retrieve.*;
-import gov.nasa.worldwind.util.*;
+import gov.nasa.worldwind.retrieve.HTTPRetriever;
+import gov.nasa.worldwind.retrieve.RetrievalPostProcessor;
+import gov.nasa.worldwind.retrieve.Retriever;
+import gov.nasa.worldwind.retrieve.URLRetriever;
+import gov.nasa.worldwind.util.Level;
+import gov.nasa.worldwind.util.LevelSet;
+import gov.nasa.worldwind.util.Logging;
+import gov.nasa.worldwind.util.PerformanceStatistic;
+import gov.nasa.worldwind.util.Tile;
+import gov.nasa.worldwind.util.TileKey;
+import gov.nasa.worldwind.util.WWIO;
+
+import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.imageio.ImageIO;
 import javax.media.opengl.GL;
-import java.awt.*;
-import java.awt.geom.*;
-import java.awt.image.*;
-import java.io.*;
-import java.net.*;
-import java.nio.ByteBuffer;
-import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
+
+import com.sun.opengl.util.j2d.TextRenderer;
 
 /**
  * TiledImageLayer modified 2009-02-03 to add support for Mercator projections.

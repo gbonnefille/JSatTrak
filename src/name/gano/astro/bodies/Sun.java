@@ -22,12 +22,12 @@
 
 package name.gano.astro.bodies;
 
-import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-
 import name.gano.astro.AstroConst;
 import name.gano.astro.GeoFunctions;
 import name.gano.astro.MathUtils;
 import name.gano.astro.coordinates.CoordinateConversion;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
 /**
  *

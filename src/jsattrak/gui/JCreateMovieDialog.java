@@ -39,11 +39,13 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.Vector;
+
 import javax.media.MediaLocator;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
+
 import jsattrak.utilities.J3DEarthComponent;
 import jsattrak.utilities.JpegImagesToMovie;
 import name.gano.astro.time.Time;

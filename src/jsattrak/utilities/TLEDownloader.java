@@ -33,8 +33,6 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Properties;
-import javax.swing.JLabel;
-import javax.swing.JProgressBar;
 
 public class TLEDownloader implements java.io.Serializable
 {

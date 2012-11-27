@@ -25,7 +25,6 @@
 
 package name.gano.worldwind.geom;
 
-import com.sun.opengl.util.texture.Texture;
 import gov.nasa.worldwind.awt.WorldWindowGLCanvas;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.LatLon;
@@ -34,10 +33,15 @@ import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.render.SurfaceCircle;
 import gov.nasa.worldwind.util.Logging;
+
 import java.awt.Color;
 import java.util.Vector;
+
 import javax.media.opengl.GL;
+
 import name.gano.worldwind.texture.TextureUtils;
+
+import com.sun.opengl.util.texture.Texture;
 
 /**
  *

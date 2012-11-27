@@ -24,10 +24,12 @@
 
 package jsattrak.gui;
 
-import jsattrak.objects.SatelliteTleSGP4;
-import jsattrak.objects.GroundStation;
 import java.util.Hashtable;
+
 import javax.swing.DefaultListModel;
+
+import jsattrak.objects.GroundStation;
+import jsattrak.objects.SatelliteTleSGP4;
 
 /**
  *

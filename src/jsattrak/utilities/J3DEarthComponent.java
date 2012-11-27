@@ -24,7 +24,9 @@ package jsattrak.utilities;
 
 import gov.nasa.worldwind.WorldWindow;
 import gov.nasa.worldwind.layers.LayerList;
+
 import java.awt.Point;
+
 import jsattrak.gui.JSatTrak;
 import name.gano.worldwind.geom.ECIRadialGrid;
 import name.gano.worldwind.layers.Earth.EcefTimeDepRenderableLayer;

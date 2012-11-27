@@ -28,17 +28,19 @@
 package jsattrak.utilities;
 
 import java.awt.Point;
-import jsattrak.gui.J2DEarthPanel;
-import jsattrak.gui.JSatTrak;
-import jsattrak.gui.SatPropertyPanel;
 import java.io.Serializable;
 import java.util.Hashtable;
 import java.util.Vector;
+
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
+
 import jsattrak.coverage.CoverageAnalyzer;
+import jsattrak.gui.J2DEarthPanel;
 import jsattrak.gui.J3DEarthInternalPanel;
 import jsattrak.gui.J3DEarthPanel;
+import jsattrak.gui.JSatTrak;
+import jsattrak.gui.SatPropertyPanel;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.time.Time;

@@ -24,8 +24,11 @@ import gov.nasa.worldwind.geom.Position;
 import gov.nasa.worldwind.render.DrawContext;
 import gov.nasa.worldwind.render.Renderable;
 import gov.nasa.worldwind.view.OrbitView;
+
 import java.awt.Color;
+
 import javax.media.opengl.GL;
+
 import name.gano.astro.AstroConst;
 
 /**

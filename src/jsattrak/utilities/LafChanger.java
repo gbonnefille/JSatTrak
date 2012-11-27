@@ -54,7 +54,12 @@ package jsattrak.utilities;
 
 
 import java.awt.Window;
-import javax.swing.*;
+
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JRootPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 /**
  * @author Shawn E. Gano

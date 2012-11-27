@@ -26,9 +26,12 @@ package jsattrak.gui;
 
 import gov.nasa.worldwind.WorldWindow;
 import gov.nasa.worldwind.geom.Angle;
+
 import java.awt.Color;
+
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
+
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.utilities.J3DEarthComponent;
 

@@ -25,10 +25,14 @@ package jsattrak.utilities;
  * ListTransferHandler.java is used by the 1.4
  * ExtendedDnDDemo.java example.
  */
+import java.util.Hashtable;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JComponent;
+import javax.swing.JList;
+
 import jsattrak.gui.JSatTrak;
 import jsattrak.objects.SatelliteTleSGP4;
-import java.util.Hashtable;
-import javax.swing.*;
 
 public class ListTransferHandler extends StringTransferHandler  implements java.io.Serializable
 {
