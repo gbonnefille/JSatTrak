@@ -36,6 +36,7 @@ import name.gano.astro.AstroConst;
 import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
+import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.CartesianOrbit;
@@ -47,6 +48,7 @@ import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngle;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;
 
@@ -83,7 +85,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	private Time scenarioEpochDate;
 
-	private AbsoluteDate date;
+	private AbsoluteDate absoluteDate;
 
 	// Mean, true or eccentric
 	private PositionAngle positionAngle = PositionAngle.MEAN;
@@ -93,7 +95,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	private Frame frame = FramesFactory.getEME2000();
 
 	public InitialConditionsNode(CustomTreeTableNode parentNode,
-			Time scenarioEpochDate) {
+			Time scenarioEpochDate) throws OrekitException {
 		super(new String[] { "Initial Conditions", "", "" }); // initialize
 																// node, default
 																// values
@@ -106,20 +108,17 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 				getClass().getResource("/icons/customSatIcons/ini.png"))));
 		// set Node Type
 		setNodeType("Initial Conditions");
+		
+//		 absoluteDate = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
 
-		 // date for orekit orbit
-		// convert UTC to terestrial time
-		double iniJulDate_TT = iniJulDate
-						+ Time.deltaT(iniJulDate - AstroConst.JDminusMJD);
-		
-		 date = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
-		
-		 //Setup the keplerian orbit
+		 absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, iniJulDate * 86400, TimeScalesFactory.getUTC());
+
+		//Setup the keplerian orbit
 		 this.orbitOrekit = new KeplerianOrbit(this.keplarianElements[0],
 		 this.keplarianElements[1], this.keplarianElements[2],
 		 this.keplarianElements[4], this.keplarianElements[3],
 		 this.keplarianElements[5], this.positionAngle, this.frame,
-		 date, this.mu);
+		 this.absoluteDate, this.mu);
 
 
 		// add this node to parent - last thing
@@ -229,7 +228,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 				keplarianElements[1], keplarianElements[2],
 				keplarianElements[4], keplarianElements[3],
 				keplarianElements[5], this.positionAngle, this.frame,
-				this.date, this.mu);
+				this.absoluteDate, this.mu);
 
 	}
 
@@ -248,7 +247,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 		this.cartesianElements = cartesianElements;
 
 		this.orbitOrekit = new CartesianOrbit(cartesianElements, this.frame,
-				this.date, this.mu);
+				this.absoluteDate, this.mu);
 	}
 
 	public boolean isUsingKepElements() {
@@ -265,6 +264,10 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public void setIniJulDate(double iniJulDate) {
 		this.iniJulDate = iniJulDate;
+	}
+	
+	public void setAbsoluteDate(double date) throws OrekitException{
+		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date * 86400, TimeScalesFactory.getUTC());
 	}
 
 	public Orbit getOrbitOrekit() {
@@ -294,7 +297,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public void setCircularElements(double[] circularElements) {
 		this.circularElements = circularElements;
 		this.orbitOrekit = new CircularOrbit(circularElements[0], circularElements[1],circularElements[2],circularElements[3],
-				circularElements[4],circularElements[5], this.positionAngle, this.frame, this.date, this.mu);
+				circularElements[4],circularElements[5], this.positionAngle, this.frame, this.absoluteDate, this.mu);
 	}
 
 	public double[] getEquinoctialElements() {
@@ -304,7 +307,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public void setEquinoctialElements(double[] equinoctialElements) {
 		this.equinoctialElements = equinoctialElements;
 		this.orbitOrekit = new EquinoctialOrbit(equinoctialElements[0], equinoctialElements[1],equinoctialElements[2],equinoctialElements[3],
-				equinoctialElements[4],equinoctialElements[5], this.positionAngle, this.frame, this.date, this.mu);
+				equinoctialElements[4],equinoctialElements[5], this.positionAngle, this.frame, this.absoluteDate, this.mu);
 	}
 
 	public int getCoordinate() {

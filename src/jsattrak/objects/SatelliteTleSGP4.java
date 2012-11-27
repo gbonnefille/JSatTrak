@@ -218,7 +218,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// read TLE
 
 		// TLE age since AJD
-		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 3600 / 24;
+		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) /86400;
 
 		// ground track needs to be redone with new data
 		groundTrackIni = false;
@@ -231,11 +231,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// save date
 		this.currentJulianDate = julDate;
 
-		// using JulDate because function uses time diff between jultDate of
-		// ephemeris, SGP4 uses UTC
-		// propogate satellite to given date - saves result in TEME to posTEME
-		// and velTEME in km, km/s
-
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -245,52 +240,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		position = posVit.getPosition();
 		velocity = posVit.getVelocity();
 
-		// print differene TT-UT
-		// System.out.println("TT-UT [days]= " +
-		// SDP4TimeUtilities.DeltaT(julDate-2450000)*24.0*60*60);
-
-		// SEG - 11 June 2009 -- new information (to me) on SGP4 propogator
-		// coordinate system:
-		// SGP4 output is in true equator and mean equinox (TEME) of Date ***
-		// note some think of epoch, but STK beleives it is of date from tests
-		// **
-		// It depends also on the source for the TLs if from the Nasa MCC might
-		// be MEME but most US Gov - TEME
-		// Also the Lat/Lon/Alt calculations are based on TEME (of Date) so that
-		// is correct as it was used before!
-		// References:
-		// http://www.stk.com/pdf/STKandSGP4/STKandSGP4.pdf (STK's stance on
-		// SGP4)
-		// http://www.agi.com/resources/faqSystem/files/2144.pdf (newer version
-		// of above)
-		// http://www.satobs.org/seesat/Aug-2004/0111.html
-		// http://celestrak.com/columns/v02n01/
-		// "Orbital Coordinate Systems, Part I" by Dr. T.S. Kelso
-		// http://en.wikipedia.org/wiki/Earth_Centered_Inertial
-		// http://ccar.colorado.edu/asen5050/projects/projects_2004/aphanuphong/p1.html
-		// (bad coefficients? conversion between TEME and J2000 (though slightly
-		// off?))
-		// http://www.centerforspace.com/downloads/files/pubs/AIAA-2000-4025.pdf
-		// http://celestrak.com/software/vallado-sw.asp (good software)
-
-		double mjd = julDate - AstroConst.JDminusMJD;
-
-		// get position information back out - convert to J2000 (does TT time
-		// need to be used? - no)
-		// j2kPos = CoordinateConversion.EquatorialEquinoxToJ2K(mjd,
-		// sdp4Prop.itsR); //julDate-2400000.5
-		// j2kVel = CoordinateConversion.EquatorialEquinoxToJ2K(mjd,
-		// sdp4Prop.itsV);
-		// based on new info about coordinate system, to get the J2K other
-		// conversions are needed!
-		// precession from rk5 -> mod
-		double ttt = (mjd - AstroConst.MJD_J2000) / 36525.0;
-		double[][] A = J2kCoordinateConversion.teme_j2k(
-				J2kCoordinateConversion.Direction.to, ttt, 24, 2, 'a');
-		// rotate position and velocity
-
-		// System.out.println("Date: " + julDate +", Pos: " + sdp4Prop.itsR[0] +
-		// ", " + sdp4Prop.itsR[1] + ", " + sdp4Prop.itsR[2]);
 
 		// save old lat/long for ascending node check
 		double[] oldLLA = lla.clone(); // copy old LLA
@@ -527,11 +476,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	public Vector3D calculatePositionFromUT(double julDate)
 			throws OrekitException {
 		Vector3D ptPos = Vector3D.ZERO;
-
-		// using JulDate because function uses time diff between jultDate of
-		// ephemeris, SGP4 uses UTC
-		// propogate satellite to given date - saves result in TEME to posTEME
-		// and velTEME in km, km/s
 
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);

@@ -23,18 +23,14 @@
  */
 package jsattrak.gui;
 
-import gov.nasa.worldwind.render.FrameFactory;
-
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 
 import jsattrak.customsat.EphemerisFromFileNode;
 import jsattrak.customsat.InitialConditionsNode;
@@ -55,8 +51,8 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jdesktop.swingx.decorator.ColorHighlighter;
 import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
+import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
-import org.orekit.frames.FramesFactory;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
@@ -922,8 +918,13 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	private void addFromFileButton1ActionPerformed(
 			java.awt.event.ActionEvent evt)// GEN-FIRST:event_addFromFileButton1ActionPerformed
 	{// GEN-HEADEREND:event_addFromFileButton1ActionPerformed
-		addNode2MissionDesigner(new InitialConditionsNode(null,
-				app.getScenarioEpochDate())); // add default objects
+		try {
+			addNode2MissionDesigner(new InitialConditionsNode(null,
+					app.getScenarioEpochDate()));
+		} catch (OrekitException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		} // add default objects
 	}// GEN-LAST:event_addFromFileButton1ActionPerformed
 
 	// returns if successful
@@ -943,27 +944,27 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		String beginTime = "";
 
 		try {
-		BoundedPropagator ephemeris = this.sat.getEphemeris();
+			BoundedPropagator ephemeris = this.sat.getEphemeris();
 
-		if (ephemeris != null) {
+			if (ephemeris != null) {
 
+				// double firstTime = (ephemeris.getMinDate().durationFrom(
+				// AbsoluteDate.JULIAN_EPOCH) / 86400);
 
-//			double firstTime = (ephemeris.getMinDate().durationFrom(
-//					AbsoluteDate.JULIAN_EPOCH) / 86400);
-			
-			beginTime = ephemeris.getMinDate().toString(TimeScalesFactory.getUTC());
+				beginTime = ephemeris.getMinDate().toString(
+						TimeScalesFactory.getUTC());
 
-//			GregorianCalendar cal = Time.convertJD2Calendar(firstTime);
-//
-//			SimpleDateFormat dateformatShort1 = new SimpleDateFormat(
-//					"dd MMM yyyy HH:mm:ss.SSS");
-//			dateformatShort1.setTimeZone(TimeZone.getTimeZone("UTC"));
-//			stkEpoch = dateformatShort1.format(cal.getTime());
-		}
+				// GregorianCalendar cal = Time.convertJD2Calendar(firstTime);
+				//
+				// SimpleDateFormat dateformatShort1 = new SimpleDateFormat(
+				// "dd MMM yyyy HH:mm:ss.SSS");
+				// dateformatShort1.setTimeZone(TimeZone.getTimeZone("UTC"));
+				// stkEpoch = dateformatShort1.format(cal.getTime());
+			}
 
-		// open file for writing
-		BufferedWriter buffWriter;
-		
+			// open file for writing
+			BufferedWriter buffWriter;
+
 			int NumberOfEphemerisPoints = this.sat.getPropNode()
 					.getNumberOfStep();
 			double stepSize = this.sat.getPropNode().getStepSize();
@@ -1015,7 +1016,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 				time = current.durationFrom(begin); // seconds
 
-				pvCoord = ephemeris.getPVCoordinates(current,frame);
+				pvCoord = ephemeris.getPVCoordinates(current, frame);
 				pos = pvCoord.getPosition();
 				vit = pvCoord.getVelocity(); // since
 												// start

@@ -172,7 +172,7 @@ public class CustomSatellite extends AbstractSatellite {
 	}
 
 	// initalizes the mission Table Model
-	private void iniMissionTableModel(Time scenarioEpochDate) {
+	private void iniMissionTableModel(Time scenarioEpochDate) throws OrekitException {
 		// set names of columns
 		Vector<String> tableHeaders = new Vector<String>();
 		tableHeaders.add("Mission Objects");
@@ -468,20 +468,6 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-			// make sure the time is in ephemeris -- TIMES IN ARE UTC epeheris
-			// time is TT
-			// make that time correction
-			double deltaTT2UTC = Time.deltaT(ptTime - AstroConst.JDminusMJD); // =
-																				// TT
-																				// -
-																				// UTC
-																				// if
-																				// (ptTime
-																				// >=
-																				// ephemeris.firstElement().state[0]
-																				// -
-																				// deltaTT2UTC
-			// && ptTime <= ephemeris.lastElement().state[0] - deltaTT2UTC) {
 
 			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
@@ -525,20 +511,6 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-			// make sure the time is in ephemeris -- TIMES IN ARE UTC epeheris
-			// time is TT
-			// make that time correction
-			double deltaTT2UTC = Time.deltaT(ptTime - AstroConst.JDminusMJD); // =
-																				// TT
-																				// -
-																				// UTC
-																				// if
-																				// (ptTime
-																				// >=
-																				// ephemeris.firstElement().state[0]
-																				// -
-																				// deltaTT2UTC
-			// && ptTime <= ephemeris.lastElement().state[0] - deltaTT2UTC) {
 
 			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
@@ -594,11 +566,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 
 			} 
-		} // if epeheris contains anything
-
-		// get lat and long
-		// double[] ptLla = GeoFunctions.GeodeticLLA(ptPos, julDate
-		// - AstroConst.JDminusMJD);
+		} 
 
 		GeodeticPoint geodeticPoint = null;
 		try {

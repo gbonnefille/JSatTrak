@@ -29,6 +29,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.Vector;
 import jsattrak.utilities.StateVector;
@@ -213,8 +214,8 @@ public class StkEphemerisReader
     {
         GregorianCalendar currentTimeDate = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
 
-        SimpleDateFormat dateformatShort1 = new SimpleDateFormat("dd MMM y H:m:s.S z");
-        SimpleDateFormat dateformatShort2 = new SimpleDateFormat("dd MMM y H:m:s z"); // no Milliseconds
+        SimpleDateFormat dateformatShort1 = new SimpleDateFormat("dd MMM y H:m:s.S z", Locale.ENGLISH);
+        SimpleDateFormat dateformatShort2 = new SimpleDateFormat("dd MMM y H:m:s z", Locale.ENGLISH); // no Milliseconds
 
         try
         {

@@ -39,6 +39,7 @@ import name.gano.astro.Kepler;
 import name.gano.astro.time.Time;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.errors.OrekitException;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.PositionAngle;
 import org.orekit.utils.PVCoordinates;
@@ -1363,7 +1364,13 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	private void okButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_okButtonActionPerformed
 	{// GEN-HEADEREND:event_okButtonActionPerformed
-		boolean success = saveSettings();
+		boolean success = false;
+		try {
+			success = saveSettings();
+		} catch (OrekitException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// close internal frame
 		if (success) {
@@ -1385,7 +1392,12 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	private void applyButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_applyButtonActionPerformed
 	{// GEN-HEADEREND:event_applyButtonActionPerformed
-		saveSettings();
+		try {
+			saveSettings();
+		} catch (OrekitException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}// GEN-LAST:event_applyButtonActionPerformed
 
 	private void iniTabbedPaneStateChanged(ChangeEvent evt) {
@@ -1444,7 +1456,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	}
 
-	private boolean saveSettings() {
+	private boolean saveSettings() throws OrekitException {
 		// save settings back to Node
 		boolean saveSuccess = true;
 
@@ -1598,7 +1610,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 	private SimpleDateFormat dateformatShort2 = new SimpleDateFormat(
 			"dd MMM y H:m:s z"); // no Milliseconds
 
-	private boolean saveEpoch() {
+	private boolean saveEpoch() throws OrekitException {
 
 		// enter hit in date/time box...
 		// System.out.println("Date Time Changed");
@@ -1641,6 +1653,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 			newTime.set(currentTimeDate.getTimeInMillis());
 
 			icNode.setIniJulDate(newTime.getJulianDate());
+			icNode.setAbsoluteDate(newTime.getJulianDate());
 
 		} // if date accepted
 		else {
