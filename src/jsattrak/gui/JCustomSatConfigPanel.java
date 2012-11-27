@@ -832,17 +832,17 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 					.getLastPathComponent();
 
 			double nodeStartTime = selectedNode.getStartTTjulDate()
-					.durationFrom(AbsoluteDate.JULIAN_EPOCH) / 86400;
+					.durationFrom(AbsoluteDate.JULIAN_EPOCH);
 
 			if (nodeStartTime > 0) // if it has a valid value
 			{
 				// convert time to UTC
-				double deltaTT2UTC = Time.deltaT(nodeStartTime
-						- AstroConst.JDminusMJD); // = TT - UTC
-				Time n = new Time();
+//				double deltaTT2UTC = Time.deltaT(nodeStartTime
+//						- AstroConst.JDminusMJD); // = TT - UTC
+//				Time n = new Time();
 
 				// set app time
-				app.setTime(nodeStartTime - deltaTT2UTC);
+				app.setTime(nodeStartTime);
 
 				// force repaint and regeneration of ground paths - SEG 24 Sept
 				// 2008

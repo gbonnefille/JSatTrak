@@ -23,7 +23,6 @@
 package jsattrak.customsat;
 
 import java.awt.Toolkit;
-import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
@@ -31,8 +30,6 @@ import javax.swing.JInternalFrame;
 import jsattrak.customsat.gui.InitialConditionsPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
-import jsattrak.utilities.StateVector;
-import name.gano.astro.AstroConst;
 import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
@@ -46,7 +43,6 @@ import org.orekit.orbits.KeplerianOrbit;
 import org.orekit.orbits.Orbit;
 import org.orekit.orbits.OrbitType;
 import org.orekit.orbits.PositionAngle;
-import org.orekit.propagation.BoundedPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
@@ -109,9 +105,11 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 		// set Node Type
 		setNodeType("Initial Conditions");
 		
-//		 absoluteDate = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
+//		AbsoluteDate absoluteDateTest = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
 
-		 absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, iniJulDate * 86400, TimeScalesFactory.getUTC());
+		absoluteDate = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
+
+//		 absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, iniJulDate * 86400, TimeScalesFactory.getUTC());
 
 		//Setup the keplerian orbit
 		 this.orbitOrekit = new KeplerianOrbit(this.keplarianElements[0],
@@ -132,6 +130,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 		
 		// set inial time of the node ( TT)
 		this.setStartTTjulDate(AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate));
+		
 
 
 	}// execute
@@ -267,7 +266,8 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	}
 	
 	public void setAbsoluteDate(double date) throws OrekitException{
-		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date * 86400, TimeScalesFactory.getUTC());
+//		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date * 86400, TimeScalesFactory.getUTC());
+		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date * 86400);
 	}
 
 	public Orbit getOrbitOrekit() {

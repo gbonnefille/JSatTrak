@@ -47,6 +47,7 @@ import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;
 
@@ -231,8 +232,11 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// save date
 		this.currentJulianDate = julDate;
 
-		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
-				.shiftedBy(julDate * 86400);
+//		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
+//				.shiftedBy(julDate * 86400);
+		
+		AbsoluteDate orekitJulDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400, TimeScalesFactory.getUTC());				
+
 
 		PVCoordinates posVit = orekitTlePropagator
 				.getPVCoordinates(orekitJulDate);

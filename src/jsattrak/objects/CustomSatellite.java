@@ -230,6 +230,9 @@ public class CustomSatellite extends AbstractSatellite {
 		AbsoluteDate maxTime;
 		AbsoluteDate minTime;
 
+//		AbsoluteDate orekitJulDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400, TimeScalesFactory.getUTC());
+
+		
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
