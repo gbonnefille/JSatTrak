@@ -1060,22 +1060,17 @@ public class PropogatorPanel extends javax.swing.JPanel {
 														javax.swing.GroupLayout.DEFAULT_SIZE,
 														382, Short.MAX_VALUE)
 												.addGroup(
-														javax.swing.GroupLayout.Alignment.LEADING,
+														javax.swing.GroupLayout.Alignment.TRAILING,
 														layout.createSequentialGroup()
-																.addGroup(
-																		layout.createParallelGroup(
-																				javax.swing.GroupLayout.Alignment.TRAILING)
-																				.addGroup(
-																						layout.createSequentialGroup()
-																								.addComponent(
-																										okButton)
-																								.addPreferredGap(
-																										javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-																.addGap(8, 8, 8)
+																.addContainerGap()
+																.addComponent(
+																		okButton)
+																.addPreferredGap(
+																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																.addComponent(
 																		cancelButton)
 																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																.addComponent(
 																		applyButton)))
 								.addContainerGap()));

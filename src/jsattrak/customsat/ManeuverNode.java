@@ -91,7 +91,7 @@ public class ManeuverNode  extends CustomTreeTableNode
     
     public ManeuverNode(CustomTreeTableNode parentNode)
     {
-        super(new String[] {"Burn","",""}); // initialize node, default values
+        super(new String[] {"Event","",""}); // initialize node, default values
         // set icon for this type
         setIcon( new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/customSatIcons/burn.png")) ) );
         //set Node Type
@@ -173,7 +173,7 @@ public class ManeuverNode  extends CustomTreeTableNode
         panel.setIframe(iframe);        
         
         iframe.setContentPane( panel );
-        iframe.setSize(300,200+25); // w,h
+        iframe.setSize(400,350); // w,h
         iframe.setLocation(5,5);
         
         app.addInternalFrame(iframe);

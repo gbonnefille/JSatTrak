@@ -1267,7 +1267,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 																.addComponent(
 																		cancelButton)
 																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																.addComponent(
 																		applyButton))
 												.addComponent(
@@ -1426,7 +1426,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 			break;
 		}
 
-		//Convert element to other system
+		//Convert element to other coordinate system
 		switch (iniTabbedPane.getSelectedIndex()) {
 		case 0:
 			// Convert label to keplerian element
