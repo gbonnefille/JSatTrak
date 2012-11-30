@@ -26,6 +26,8 @@ package jsattrak.customsat.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Enumeration;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
@@ -51,11 +53,36 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 		initComponents();
 
-		// set tet fields
+		// load last values
 		double[] vnc = mNode.getVncThrustVector();
 		xTextField.setText(vnc[0] + "");
 		yTextField.setText(vnc[1] + "");
 		zTextField.setText(vnc[2] + "");
+
+		eventTextField1.setText(mNode.getEventsParams()[0] + "");
+		eventTextField2.setText(mNode.getEventsParams()[1] + "");
+		eventTextField3.setText(mNode.getEventsParams()[2] + "");
+
+		eventsComboBox.setSelectedItem(mNode.getEvent().value);
+
+		// Load the bodyComboBox
+
+		// If an object was saved
+		if (mNode.getTargetBodyObjectName() != null) {
+			// Satellite object
+			if (mNode.getTypeOfTarget() == ManeuverNode.SATELLITEOBJECT) {
+				satObjectRadioButtonActionPerformed(null);
+			}
+			// Ground station object
+			else if (mNode.getTypeOfTarget() == ManeuverNode.GROUNDSTATIONOBJECT) {
+				groundStationBodyRadioButtonActionPerformed(null);
+			}
+			// Celestial body object
+			else {
+				celestialBodyRadioButtonActionPerformed(null);
+			}
+			bodyComboBox.setSelectedItem(mNode.getTargetBodyObjectName());
+		}
 
 	}
 
@@ -92,7 +119,12 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		eventTextField3 = new javax.swing.JTextField();
 		totalEclipseEventRadioButton = new javax.swing.JRadioButton();
 		penumbraEclipseEventRadioButton = new javax.swing.JRadioButton();
+		satBodyEventRadioButton = new javax.swing.JRadioButton();
+		groundStationBodyEventRadioButton = new javax.swing.JRadioButton();
+		CelestialBodyEventRadioButton = new javax.swing.JRadioButton();
+
 		bodyComboBox = new javax.swing.JComboBox();
+		bodyLabel = new javax.swing.JLabel();
 
 		jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12));
 		jLabel1.setText("Impulse Maneuver Thrust Vector [m/s]");
@@ -156,13 +188,40 @@ public class ManeuverPanel extends javax.swing.JPanel {
 					}
 				});
 
+		satBodyEventRadioButton.setSelected(true);
+		satBodyEventRadioButton.setText("Satellite"); // NOI18N
+		satBodyEventRadioButton
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						satObjectRadioButtonActionPerformed(evt);
+					}
+				});
+
+		groundStationBodyEventRadioButton.setText("Ground station"); // NOI18N
+		groundStationBodyEventRadioButton
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						groundStationBodyRadioButtonActionPerformed(evt);
+					}
+				});
+
+		CelestialBodyEventRadioButton.setText("Celestial object"); // NOI18N
+		CelestialBodyEventRadioButton
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						celestialBodyRadioButtonActionPerformed(evt);
+					}
+				});
+
 		jLabelEvents.setText("Type of event:");
 
-		jLabelEvent1.setText("Body to align");
+		jLabelEvent1.setText("Align angle");
 
-		jLabelEvent2.setText("Align angle");
+		bodyLabel.setText("Body to align");
 
-		jLabelEvent3.setText("Altitude value");
+		jLabelEvent2.setVisible(false);
+
+		eventTextField2.setVisible(false);
 
 		jLabelEvent3.setVisible(false);
 
@@ -171,22 +230,34 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		totalEclipseEventRadioButton.setVisible(false);
 		penumbraEclipseEventRadioButton.setVisible(false);
 
-		bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(
-				new String[] { "Earth", "Moon", "Sun" }));
+		// Construction de la liste des satellites et stations sols definies par
+		// l'utilisateur
+		ArrayList<String> satList = new ArrayList<String>();
+
+		for (Enumeration<String> e = mNode.getUserSatList().keys(); e
+				.hasMoreElements();) {
+			String sat = e.nextElement();
+			// non prise en compte du sat courant
+			if (!sat.equals(mNode.getCurrentSat().getName()))
+				satList.add(sat);
+
+		}
+
+		bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(satList
+				.toArray()));
 
 		bodyComboBox.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 
+				bodyActionPerformed();
+
 			}
 		});
 
-		eventsComboBox.setModel(new javax.swing.DefaultComboBoxModel(
-				new String[] { "Alignment", "Altitude", "Apparent Elevation",
-						"Apside", "Circular field of view", "Date",
-						"Diheral field of view", "Eclipse", "Elevation",
-						"Ground mask elevation", "Node" }));
+		eventsComboBox.setModel(new javax.swing.DefaultComboBoxModel(Events
+				.getValues()));
 
 		eventsComboBox.addActionListener(new ActionListener() {
 
@@ -217,7 +288,10 @@ public class ManeuverPanel extends javax.swing.JPanel {
 														.addComponent(
 																jLabelEvent2)
 														.addComponent(
-																jLabelEvent3))
+																jLabelEvent3)
+														.addComponent(bodyLabel)
+
+										)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 
@@ -248,6 +322,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 																javax.swing.GroupLayout.DEFAULT_SIZE,
 																121,
 																Short.MAX_VALUE)
+														.addGroup(
+																jPanelEventLayout
+																		.createSequentialGroup()
+
+																		.addComponent(
+																				satBodyEventRadioButton)
+																		.addPreferredGap(
+																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																		.addComponent(
+																				groundStationBodyEventRadioButton)
+																		.addPreferredGap(
+																				javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+																		.addComponent(
+																				CelestialBodyEventRadioButton))
 
 														.addGroup(
 																jPanelEventLayout
@@ -307,10 +395,25 @@ public class ManeuverPanel extends javax.swing.JPanel {
 																javax.swing.GroupLayout.PREFERRED_SIZE))
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addComponent(bodyComboBox,
+										.addGroup(
+												jPanelEventLayout
+														.createParallelGroup(
+																javax.swing.GroupLayout.Alignment.BASELINE)
+														.addComponent(bodyLabel)
+														.addComponent(
+																satBodyEventRadioButton)
+														.addComponent(
+																groundStationBodyEventRadioButton)
+														.addComponent(
+																CelestialBodyEventRadioButton))
+										.addComponent(
+												bodyComboBox,
 												javax.swing.GroupLayout.PREFERRED_SIZE,
 												javax.swing.GroupLayout.DEFAULT_SIZE,
 												javax.swing.GroupLayout.PREFERRED_SIZE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+
 										.addGroup(
 												jPanelEventLayout
 														.createParallelGroup(
@@ -532,6 +635,58 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		penumbraEclipseEventRadioButton.setSelected(true);
 	}// GEN-LAST:event_ecefRadioButtonActionPerformed
 
+	private void satObjectRadioButtonActionPerformed(
+			java.awt.event.ActionEvent evt)// GEN-FIRST:event_ecefRadioButtonActionPerformed
+	{// GEN-HEADEREND:event_ecefRadioButtonActionPerformed
+
+		// Construction de la liste des satellites definis par l'utilisateur
+		ArrayList<String> satList = new ArrayList<String>();
+		for (Enumeration<String> e = mNode.getUserSatList().keys(); e
+				.hasMoreElements();) {
+			String sat = e.nextElement();
+			// non prise en compte du sat courant
+			if (!sat.equals(mNode.getCurrentSat().getName()))
+				satList.add(sat);
+		}
+		bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(satList
+				.toArray()));
+
+		satBodyEventRadioButton.setSelected(true);
+		groundStationBodyEventRadioButton.setSelected(false);
+		CelestialBodyEventRadioButton.setSelected(false);
+	}// GEN-LAST:event_ecefRadioButtonActionPerformed
+
+	private void groundStationBodyRadioButtonActionPerformed(
+			java.awt.event.ActionEvent evt)// GEN-FIRST:event_ecefRadioButtonActionPerformed
+	{// GEN-HEADEREND:event_ecefRadioButtonActionPerformed
+
+		// Construction de la liste des stations sols definis par l'utilisateur
+		ArrayList<String> groundstationList = new ArrayList<String>();
+		for (Enumeration<String> e = mNode.getUserGroundStationsList().keys(); e
+				.hasMoreElements();) {
+			groundstationList.add(e.nextElement());
+		}
+		bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(
+				groundstationList.toArray()));
+
+		satBodyEventRadioButton.setSelected(false);
+		groundStationBodyEventRadioButton.setSelected(true);
+		CelestialBodyEventRadioButton.setSelected(false);
+	}// GEN-LAST:event_ecefRadioButtonActionPerformed
+
+	private void celestialBodyRadioButtonActionPerformed(
+			java.awt.event.ActionEvent evt)// GEN-FIRST:event_ecefRadioButtonActionPerformed
+	{// GEN-HEADEREND:event_ecefRadioButtonActionPerformed
+
+		// Recupere la liste des objets celestes
+		bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(
+				CelestialBodyObject.getValues()));
+
+		satBodyEventRadioButton.setSelected(false);
+		groundStationBodyEventRadioButton.setSelected(false);
+		CelestialBodyEventRadioButton.setSelected(true);
+	}// GEN-LAST:event_ecefRadioButtonActionPerformed
+
 	// Variables declaration - do not modify//GEN-BEGIN:variables
 	private javax.swing.JButton applyButton;
 	private javax.swing.JButton cancelButton;
@@ -558,40 +713,75 @@ public class ManeuverPanel extends javax.swing.JPanel {
 	private javax.swing.JRadioButton totalEclipseEventRadioButton;
 	private javax.swing.JRadioButton penumbraEclipseEventRadioButton;
 	private javax.swing.JComboBox bodyComboBox;
+	private javax.swing.JLabel bodyLabel;
+	private javax.swing.JRadioButton satBodyEventRadioButton;
+	private javax.swing.JRadioButton groundStationBodyEventRadioButton;
+	private javax.swing.JRadioButton CelestialBodyEventRadioButton;
 
 	// End of variables declaration//GEN-END:variables
 
 	private void eventActionPerformed() {
-		switch (eventsComboBox.getSelectedIndex()) {
+
+		eventTextField1.setText(0 + "");
+		eventTextField2.setText(0 + "");
+		eventTextField3.setText(0 + "");
+
+		switch (Events.getEnum(eventsComboBox.getSelectedItem().toString())) {
 
 		// Alignment detector
-		case 0:
+		case ALIGNMENT:
 
-			jLabelEvent1.setText("Body to align");
-
-			jLabelEvent2.setText("Align angle");
+			jLabelEvent1.setText("Align angle");
 
 			jLabelEvent1.setVisible(true);
 
 			eventTextField1.setVisible(true);
 
-			jLabelEvent2.setVisible(true);
+			jLabelEvent2.setVisible(false);
 
-			eventTextField2.setVisible(true);
+			eventTextField2.setVisible(false);
 
 			jLabelEvent3.setVisible(false);
 
 			eventTextField3.setVisible(false);
-			
+
+			// Construction de la liste des satellites et stations sols definies
+			// par l'utilisateur
+			ArrayList<String> satAndGroundstationList = new ArrayList<String>();
+
+			for (Enumeration<String> e = mNode.getUserSatList().keys(); e
+					.hasMoreElements();) {
+				String sat = e.nextElement();
+				// non prise en compte du sat courant
+				if (!sat.equals(mNode.getCurrentSat().getName()))
+					satAndGroundstationList.add(sat);
+
+			}
+
+			for (Enumeration<String> e = mNode.getUserGroundStationsList()
+					.keys(); e.hasMoreElements();) {
+				satAndGroundstationList.add(e.nextElement());
+
+			}
+
+			bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(
+					satAndGroundstationList.toArray()));
+
 			bodyComboBox.setVisible(true);
+
+			bodyLabel.setVisible(true);
 
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
 
+			satBodyEventRadioButton.setVisible(true);
+			groundStationBodyEventRadioButton.setVisible(true);
+			CelestialBodyEventRadioButton.setVisible(true);
+
 			break;
 
 		// Altitude detector
-		case 1:
+		case ALTITUDE:
 			jLabelEvent1.setText("Altitude Value");
 
 			jLabelEvent1.setVisible(true);
@@ -606,13 +796,21 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(false);
 
+			bodyComboBox.setVisible(false);
+
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Apparent Elevation detector
-		case 2:
+		case APPARENTELEVATION:
 			jLabelEvent1.setText("Elevation Value");
 
 			jLabelEvent1.setVisible(true);
@@ -627,13 +825,21 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(false);
 
+			bodyComboBox.setVisible(false);
+
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Apside detector
-		case 3:
+		case APSIDE:
 			jLabelEvent1.setText("Body to align");
 
 			jLabelEvent2.setText("Align angle");
@@ -652,13 +858,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(false);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Circular field of view detector
-		case 4:
+		case CIRCULARFIELDOFVIEW:
 			jLabelEvent1.setText("Max Interval");
 
 			jLabelEvent2.setText("Center Direction");
@@ -677,13 +890,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(true);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Date Detector
-		case 5:
+		case DATE:
 			jLabelEvent1.setText("Max check");
 
 			jLabelEvent2.setText("Date");
@@ -702,13 +922,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(true);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Dihedral field of view detector
-		case 6:
+		case DIHEDRALFIELDOFVIEW:
 			jLabelEvent1.setText("Max interval(sec)");
 
 			jLabelEvent2.setText("Target");
@@ -727,13 +954,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(true);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Eclipse detector
-		case 7:
+		case ECLIPSE:
 			jLabelEvent1.setText("Radius of body occulted (rad)");
 
 			jLabelEvent2.setText("Occulting body (sun)");
@@ -752,13 +986,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(true);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(true);
 			penumbraEclipseEventRadioButton.setVisible(true);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Elevation detector
-		case 8:
+		case ELEVATION:
 			jLabelEvent1.setText("Elevation (rad)");
 
 			jLabelEvent2.setText("Topocentric frame");
@@ -775,13 +1016,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(false);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Ground mask elevation detector
-		case 9:
+		case GROUNDMASKELEVATION:
 
 			jLabelEvent1.setVisible(false);
 
@@ -795,13 +1043,20 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(false);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		// Node detector
-		case 10:
+		case NODE:
 
 			jLabelEvent1.setVisible(false);
 
@@ -815,12 +1070,23 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			eventTextField3.setVisible(false);
 
+			bodyComboBox.setVisible(false);
+			bodyLabel.setVisible(false);
+
 			totalEclipseEventRadioButton.setVisible(false);
 			penumbraEclipseEventRadioButton.setVisible(false);
+
+			satBodyEventRadioButton.setVisible(false);
+			groundStationBodyEventRadioButton.setVisible(false);
+			CelestialBodyEventRadioButton.setVisible(false);
 
 			break;
 
 		}
+
+	}
+
+	private void bodyActionPerformed() {
 
 	}
 
@@ -834,6 +1100,109 @@ public class ManeuverPanel extends javax.swing.JPanel {
 			vnc[0] = Double.parseDouble(xTextField.getText());
 			vnc[1] = Double.parseDouble(yTextField.getText());
 			vnc[2] = Double.parseDouble(zTextField.getText());
+
+			mNode.setEventsParams(new double[] {
+					Double.parseDouble(eventTextField1.getText()),
+					Double.parseDouble(eventTextField2.getText()),
+					Double.parseDouble(eventTextField3.getText()) });
+
+			switch (Events.getEnum(eventsComboBox.getSelectedItem().toString())) {
+
+			// Alignment detector
+			case ALIGNMENT:
+
+				// Sat, ground station or celestial body
+				mNode.setTargetBodyObjectName(bodyComboBox.getSelectedItem()
+						.toString());
+				mNode.setEvent(Events.ALIGNMENT);
+				mNode.setEventsParams(new double[] {
+						Double.parseDouble(eventTextField1.getText()), 0, 0 });
+
+				if (satBodyEventRadioButton.isSelected()) {
+					mNode.setTypeOfTarget(ManeuverNode.SATELLITEOBJECT);
+				}
+
+				else if (groundStationBodyEventRadioButton.isSelected()) {
+
+					mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
+				}
+
+				else {
+
+					mNode.setTypeOfTarget(ManeuverNode.CELESTIALBODYOBJECT);
+				}
+
+				break;
+
+			// Altitude detector
+			case ALTITUDE:
+
+				mNode.setEvent(Events.ALTITUDE);
+
+				break;
+
+			// Apparent Elevation detector
+			case APPARENTELEVATION:
+
+				mNode.setEvent(Events.APPARENTELEVATION);
+
+				break;
+
+			// Apside detector
+			case APSIDE:
+
+				mNode.setEvent(Events.APSIDE);
+
+				break;
+
+			// Circular field of view detector
+			case CIRCULARFIELDOFVIEW:
+
+				mNode.setEvent(Events.CIRCULARFIELDOFVIEW);
+
+				break;
+
+			// Date Detector
+			case DATE:
+				mNode.setEvent(Events.DATE);
+
+				break;
+
+			// Dihedral field of view detector
+			case DIHEDRALFIELDOFVIEW:
+
+				mNode.setEvent(Events.DIHEDRALFIELDOFVIEW);
+
+				break;
+
+			// Eclipse detector
+			case ECLIPSE:
+
+				mNode.setEvent(Events.ECLIPSE);
+
+				break;
+
+			// Elevation detector
+			case ELEVATION:
+
+				mNode.setEvent(Events.ELEVATION);
+
+				break;
+
+			// Ground mask elevation detector
+			case GROUNDMASKELEVATION:
+
+				mNode.setEvent(Events.GROUNDMASKELEVATION);
+
+				break;
+
+			// Node detector
+			case NODE:
+				mNode.setEvent(Events.NODE);
+
+				break;
+
+			}
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(this,
@@ -852,6 +1221,78 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 	public void setIframe(JInternalFrame iframe) {
 		this.iframe = iframe;
+	}
+
+	public enum Events {
+		ALIGNMENT("Alignment"), ALTITUDE("Altitude"), APPARENTELEVATION(
+				"Apparent Elevation"), APSIDE("Apside"), CIRCULARFIELDOFVIEW(
+				"Circular field of view"), DATE("Date"), DIHEDRALFIELDOFVIEW(
+				"Diheral field of view"), ECLIPSE("Eclipse"), ELEVATION(
+				"Elevation"), GROUNDMASKELEVATION("Ground mask elevation"), NODE(
+				"Node");
+
+		private String value;
+
+		private Events(String event) {
+			this.value = event;
+		}
+
+		public String getEvent() {
+			return value;
+		}
+
+		public static Object[] getValues() {
+
+			ArrayList<String> eventList = new ArrayList<String>();
+
+			for (Events e : Events.values()) {
+				eventList.add(e.value);
+			}
+
+			return eventList.toArray();
+		}
+
+		public static Events getEnum(String value) {
+			for (Events event : values()) {
+				if (event.value.equals(value))
+					return event;
+			}
+			return null;
+		}
+
+	}
+
+	public enum CelestialBodyObject {
+
+		SUN("Sun"), MERCURY("Mercury"), VENUS("Venus"), EARTH_MOON(
+				"Earth-Moon barycenter"),
+
+		EARTH("Earth"), MOON("Moon"), MARS("Mars"), JUPITER("Jupiter"), SATURN(
+				"Saturn"),
+
+		URANUS("Uranus"), NEPTUNE("Neptune"), PLUTO("Pluto");
+
+		private String value;
+
+		private CelestialBodyObject(String value) {
+			this.value = value;
+
+		}
+
+		public static Object[] getValues() {
+
+			ArrayList<String> bodyList = new ArrayList<String>();
+
+			for (CelestialBodyObject e : CelestialBodyObject.values()) {
+				bodyList.add(e.value);
+			}
+
+			return bodyList.toArray();
+		}
+
+		public String getBody() {
+			return value;
+		}
 	}
 
 }

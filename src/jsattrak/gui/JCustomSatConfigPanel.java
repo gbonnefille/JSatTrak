@@ -630,7 +630,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	private void addBurnButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addBurnButtonActionPerformed
 	{// GEN-HEADEREND:event_addBurnButtonActionPerformed
-		addNode2MissionDesigner(new ManeuverNode(null));
+		addNode2MissionDesigner(new ManeuverNode(null, sat, app.getSatHash(),
+				app.getGsHash()));
 	}// GEN-LAST:event_addBurnButtonActionPerformed
 
 	private void addSolverButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addSolverButtonActionPerformed
@@ -835,9 +836,9 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			if (nodeStartTime > 0) // if it has a valid value
 			{
 				// convert time to UTC
-//				double deltaTT2UTC = Time.deltaT(nodeStartTime
-//						- AstroConst.JDminusMJD); // = TT - UTC
-//				Time n = new Time();
+				// double deltaTT2UTC = Time.deltaT(nodeStartTime
+				// - AstroConst.JDminusMJD); // = TT - UTC
+				// Time n = new Time();
 
 				// set app time
 				app.setTime(nodeStartTime);

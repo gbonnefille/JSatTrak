@@ -67,6 +67,7 @@ import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.analytical.EcksteinHechlerPropagator;
 import org.orekit.propagation.analytical.KeplerianPropagator;
+import org.orekit.propagation.events.AbstractDetector;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
@@ -91,6 +92,8 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 	private Orbit orbitOrekit = null;
 
 	private InitialConditionsNode initNode = null;
+
+	private AbstractDetector eventDetector = null;
 
 	// Central attraction coefficient
 	private double mu = Constants.EIGEN5C_EARTH_MU;
@@ -306,6 +309,11 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			// Activate the ephemeris mode
 			prop.setEphemerisMode();
+
+			// take into account the events if there is
+			if (eventDetector != null) {
+				prop.addEventDetector(eventDetector);
+			}
 
 			prop.propagate(EndOfSimulation);
 
@@ -886,6 +894,10 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 	public int getNumberOfStep() {
 		return numberOfStep;
+	}
+
+	public void setEventDetector(AbstractDetector eventDetector) {
+		this.eventDetector = eventDetector;
 	}
 
 }

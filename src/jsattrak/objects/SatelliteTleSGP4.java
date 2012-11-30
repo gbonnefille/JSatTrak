@@ -900,6 +900,10 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		this.threeDModelSizeFactor = modelSizeFactor;
 	}
 
+	public TLEPropagator getOrekitTlePropagator() {
+		return orekitTlePropagator;
+	}
+
 	@Override
 	public String toString() {
 		return this.tle.getSatName();
