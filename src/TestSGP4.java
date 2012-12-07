@@ -67,7 +67,7 @@ public class TestSGP4
 
         // prop to the desired time
         try {
-			prop.propogate2JulDate(julianDate);
+			prop.propogate2JulDate(julianDate,true);
 		} catch (OrekitException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

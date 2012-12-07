@@ -490,7 +490,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 
 		try {
 			// propogate satellite to current date
-			prop.propogate2JulDate(parentApp.getCurrentJulTime());
+			prop.propogate2JulDate(parentApp.getCurrentJulTime(),true);
 
 			// add name to list
 			IconTreeNode newNode = new IconTreeNode(prop.getName());

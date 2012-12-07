@@ -141,7 +141,7 @@ public class ListTransferHandler extends StringTransferHandler  implements java.
                     satHash.put(name, prop);
 
                     // propogate satellite to current date
-                    prop.propogate2JulDate(parentApp.getCurrentJulTime());
+                    prop.propogate2JulDate(parentApp.getCurrentJulTime(),true);
 
                     listModel.add(index++, name); // add to the list
 

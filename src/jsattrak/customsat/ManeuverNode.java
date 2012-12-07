@@ -24,15 +24,18 @@
 package jsattrak.customsat;
 
 import java.awt.Toolkit;
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 
 import jsattrak.customsat.gui.ManeuverPanel;
-import jsattrak.customsat.gui.ManeuverPanel.CelestialBodyObject;
 import jsattrak.customsat.gui.ManeuverPanel.Events;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
@@ -47,13 +50,28 @@ import name.gano.astro.Kepler;
 import name.gano.astro.MathUtils;
 import name.gano.astro.coordinates.CoordinateConversion;
 import name.gano.astro.time.Time;
+import name.gano.eventsorekit.AlignmentDetectorJsat;
+import name.gano.eventsorekit.AltitudeDetectorJsat;
+import name.gano.eventsorekit.ApparentElevationDetectorJsat;
+import name.gano.eventsorekit.ApsideDetectorJsat;
+import name.gano.eventsorekit.CircularFieldOfViewDetectorJsat;
+import name.gano.eventsorekit.DateDetectorJsat;
+import name.gano.eventsorekit.DihedralFieldOfViewDetectorJsat;
+import name.gano.eventsorekit.EclipseDetectorJsat;
+import name.gano.eventsorekit.ElevationDetectorJsat;
+import name.gano.eventsorekit.NodeDetectorJsat;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
 import org.apache.commons.math3.exception.util.DummyLocalizable;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.orekit.bodies.CelestialBody;
+import org.apache.commons.math3.util.FastMath;
 import org.orekit.bodies.CelestialBodyFactory;
+import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
+import org.orekit.forces.gravity.potential.GravityFieldFactory;
+import org.orekit.forces.gravity.potential.PotentialCoefficientsProvider;
+import org.orekit.frames.FramesFactory;
+import org.orekit.frames.TopocentricFrame;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.events.AbstractDetector;
 import org.orekit.propagation.events.AlignmentDetector;
@@ -62,12 +80,12 @@ import org.orekit.propagation.events.ApparentElevationDetector;
 import org.orekit.propagation.events.ApsideDetector;
 import org.orekit.propagation.events.CircularFieldOfViewDetector;
 import org.orekit.propagation.events.DateDetector;
-import org.orekit.propagation.events.DihedralFieldOfViewDetector;
-import org.orekit.propagation.events.EclipseDetector;
 import org.orekit.propagation.events.ElevationDetector;
 import org.orekit.propagation.events.GroundMaskElevationDetector;
 import org.orekit.propagation.events.NodeDetector;
 import org.orekit.time.AbsoluteDate;
+import org.orekit.time.TimeScalesFactory;
+import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinatesProvider;
 
 /**
@@ -101,6 +119,21 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 	// Events params
 	private double[] eventsParams = new double[3];
+
+	private Vector3D positionVector = Vector3D.ZERO;
+
+	private Vector3D positionVector2 = Vector3D.ZERO;
+
+	private Vector3D positionVector3 = Vector3D.ZERO;
+
+	private boolean totalEclipse = true;
+
+	GregorianCalendar currentTimeDate = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+
+	
+	
+	final SimpleDateFormat dateformatShort = new SimpleDateFormat(
+			"dd MMM yyyy HH:mm:ss z");
 
 	private CustomSatellite currentSat = null;
 	private Hashtable<String, AbstractSatellite> userSatList = null;
@@ -139,7 +172,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/icons/customSatIcons/burn.png"))));
 		// set Node Type
-		setNodeType("Maneuver");
+		setNodeType("Event");
 
 		this.currentSat = currentSat;
 
@@ -155,62 +188,63 @@ public class ManeuverNode extends CustomTreeTableNode {
 	// meant to be overridden by implementing classes
 	@Override
 	public void execute(MissionDesignPropagator missionDesign)
-			throws OrekitException {
+			throws OrekitException, IOException, ParseException {
 		// dummy but should do something based on input ephemeris
 		// System.out.println("Executing : " + getValueAt(0) );
 
 		// get last stat vector (we are going to change it - impulse burn)
 
-		BoundedPropagator ephemeris = missionDesign.getEphemeris();
-
-		double lastTime = ephemeris.getMaxDate().durationFrom(
-				AbsoluteDate.JULIAN_EPOCH) / 86400;
-		StateVector lastState = new StateVector(ephemeris.getPVCoordinates(
-				ephemeris.getMaxDate(), ephemeris.getFrame()), lastTime);
-
-		// for VNC system see:
+		// BoundedPropagator ephemeris = missionDesign.getEphemeris();
+		//
+		// double lastTime = ephemeris.getMaxDate().durationFrom(
+		// AbsoluteDate.JULIAN_EPOCH) / 86400;
+		// StateVector lastState = new StateVector(ephemeris.getPVCoordinates(
+		// ephemeris.getMaxDate(), ephemeris.getFrame()), lastTime);
+		//
+		// // for VNC system see:
+		// //
 		// http://www.stk.com/resources/help/stk613/helpSystem/extfile/gator/eq-coordsys.htm
-
-		// set inial time of the node ( TT)
-		this.setStartTTjulDate(ephemeris.getMaxDate());
-
-		// get r and v vectors
-		double[] r = new double[] { lastState.state[1], lastState.state[2],
-				lastState.state[3] };
-		double[] v = new double[] { lastState.state[4], lastState.state[5],
-				lastState.state[6] };
-
-		// calculate unit vector in V direction (in J2K coordinate frame)
-		double normV = MathUtils.norm(v);
-		double[] unitV = new double[] { v[0] / normV, v[1] / normV,
-				v[2] / normV };
-
-		// calculate unit vector in N direction
-		double[] unitNorm = MathUtils.cross(r, v);
-		double normNorm = MathUtils.norm(unitNorm);
-		unitNorm[0] = unitNorm[0] / normNorm;
-		unitNorm[1] = unitNorm[1] / normNorm;
-		unitNorm[2] = unitNorm[2] / normNorm;
-
-		// calculate unit vector in the Co-Normal direction
-		double[] unitCoNorm = MathUtils.cross(unitV, unitNorm);
-
-		// calculate Thrust Vector in J2000.0
-		double[] thrustj2K = new double[] { 0.0, 0.0, 0.0 };
-		// add V component
-		thrustj2K = MathUtils.add(thrustj2K,
-				MathUtils.scale(unitV, vncThrustVector[0]));
-		// add N component
-		thrustj2K = MathUtils.add(thrustj2K,
-				MathUtils.scale(unitNorm, vncThrustVector[1]));
-		// add C component
-		thrustj2K = MathUtils.add(thrustj2K,
-				MathUtils.scale(unitCoNorm, vncThrustVector[2]));
-
-		// add the trustj2k as a delta V to the last state
-		lastState.state[4] += thrustj2K[0];
-		lastState.state[5] += thrustj2K[1];
-		lastState.state[6] += thrustj2K[2];
+		//
+		// // set inial time of the node ( TT)
+		// this.setStartTTjulDate(ephemeris.getMaxDate());
+		//
+		// // get r and v vectors
+		// double[] r = new double[] { lastState.state[1], lastState.state[2],
+		// lastState.state[3] };
+		// double[] v = new double[] { lastState.state[4], lastState.state[5],
+		// lastState.state[6] };
+		//
+		// // calculate unit vector in V direction (in J2K coordinate frame)
+		// double normV = MathUtils.norm(v);
+		// double[] unitV = new double[] { v[0] / normV, v[1] / normV,
+		// v[2] / normV };
+		//
+		// // calculate unit vector in N direction
+		// double[] unitNorm = MathUtils.cross(r, v);
+		// double normNorm = MathUtils.norm(unitNorm);
+		// unitNorm[0] = unitNorm[0] / normNorm;
+		// unitNorm[1] = unitNorm[1] / normNorm;
+		// unitNorm[2] = unitNorm[2] / normNorm;
+		//
+		// // calculate unit vector in the Co-Normal direction
+		// double[] unitCoNorm = MathUtils.cross(unitV, unitNorm);
+		//
+		// // calculate Thrust Vector in J2000.0
+		// double[] thrustj2K = new double[] { 0.0, 0.0, 0.0 };
+		// // add V component
+		// thrustj2K = MathUtils.add(thrustj2K,
+		// MathUtils.scale(unitV, vncThrustVector[0]));
+		// // add N component
+		// thrustj2K = MathUtils.add(thrustj2K,
+		// MathUtils.scale(unitNorm, vncThrustVector[1]));
+		// // add C component
+		// thrustj2K = MathUtils.add(thrustj2K,
+		// MathUtils.scale(unitCoNorm, vncThrustVector[2]));
+		//
+		// // add the trustj2k as a delta V to the last state
+		// lastState.state[4] += thrustj2K[0];
+		// lastState.state[5] += thrustj2K[1];
+		// lastState.state[6] += thrustj2K[2];
 
 		// copy final ephemeris state: - for goal calculations
 		// lastStateVector = ephemeris.lastElement();
@@ -218,110 +252,335 @@ public class ManeuverNode extends CustomTreeTableNode {
 		// Compute the event
 		AbstractDetector eventDetector = null;
 
-		switch (event) {
+		GroundStation groundStation = null;
 
-		// Alignment detector
-		case ALIGNMENT:
+		PotentialCoefficientsProvider provider = null;
 
-			PVCoordinatesProvider pvSat = null;
+		OneAxisEllipsoid earth = null;
 
-			if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+		TopocentricFrame topo = null;
 
-				AbstractSatellite abstractSat = userSatList
-						.get(targetBodyObjectName);
-				if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
+		PVCoordinatesProvider pvTarget = null;
 
-					A TESTER
-					SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
-					pvSat = satSGP4.getOrekitTlePropagator();
+		try {
 
-				} else if (abstractSat.getClass().equals(CustomSatellite.class)) {
+			switch (event) {
 
-					CustomSatellite customSat = (CustomSatellite) abstractSat;
-					pvSat = customSat.getEphemeris();
-				} else {
+			// Alignment detector
+			case ALIGNMENT:
 
-					throw new OrekitException(new DummyLocalizable(
-							"unknown satellite"));
+				if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+
+					AbstractSatellite abstractSat = userSatList
+							.get(targetBodyObjectName);
+					// Test si c'est un satellite SGP4 ou custom
+					if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
+
+						SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
+						pvTarget = satSGP4.getOrekitTlePropagator();
+
+					} else if (abstractSat.getClass().equals(
+							CustomSatellite.class)) {
+
+						CustomSatellite customSat = (CustomSatellite) abstractSat;
+						pvTarget = customSat.getEphemeris();
+					} else {
+
+						throw new OrekitException(new DummyLocalizable(
+								"unknown satellite"));
+
+					}
 
 				}
 
+				else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
+
+					groundStation = userGroundStationsList
+							.get(targetBodyObjectName);
+
+					// Factory used to read gravity field files in several
+					// supported
+					// formats
+					provider = GravityFieldFactory.getPotentialProvider();
+					// Earth central body reference radius
+
+					earth = new OneAxisEllipsoid(provider.getAe(),
+							Constants.WGS84_EARTH_FLATTENING,
+							FramesFactory.getITRF2005());
+
+					pvTarget = new TopocentricFrame(earth,
+							groundStation.getLatLongAlt(),
+							groundStation.getStationName());
+
+				}
+
+				else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
+
+					pvTarget = CelestialBodyFactory
+							.getBody(targetBodyObjectName);
+
+				}
+
+				else {
+
+					throw new OrekitException(new DummyLocalizable(
+							"unknown target object"));
+				}
+
+				eventDetector = new AlignmentDetectorJsat(this.currentSat,
+						pvTarget, FastMath.toRadians(eventsParams[0]));
+
+				break;
+
+			// Altitude detector
+			case ALTITUDE:
+
+				// Factory used to read gravity field files in several
+				// supported
+				// formats
+				provider = GravityFieldFactory.getPotentialProvider();
+				// Earth central body reference radius
+
+				earth = new OneAxisEllipsoid(provider.getAe(),
+						Constants.WGS84_EARTH_FLATTENING,
+						FramesFactory.getITRF2005());
+
+				eventDetector = new AltitudeDetectorJsat(this.currentSat,
+						eventsParams[0], earth);
+				break;
+
+			// Apparent Elevation detector
+			case APPARENTELEVATION:
+
+				groundStation = userGroundStationsList
+						.get(targetBodyObjectName);
+
+				// Factory used to read gravity field files in several supported
+				// formats
+				provider = GravityFieldFactory.getPotentialProvider();
+				// Earth central body reference radius
+
+				earth = new OneAxisEllipsoid(provider.getAe(),
+						Constants.WGS84_EARTH_FLATTENING,
+						FramesFactory.getITRF2005());
+
+				topo = new TopocentricFrame(earth,
+						groundStation.getLatLongAlt(),
+						groundStation.getStationName());
+
+				eventDetector = new ApparentElevationDetectorJsat(
+						this.currentSat, FastMath.toRadians(eventsParams[0]),
+						topo);
+				break;
+
+			// Apside detector
+			case APSIDE:
+				eventDetector = new ApsideDetectorJsat(this.currentSat);
+				break;
+
+			// Circular field of view detector
+			case CIRCULARFIELDOFVIEW:
+
+				if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+
+					AbstractSatellite abstractSat = userSatList
+							.get(targetBodyObjectName);
+					// Test si c'est un satellite SGP4 ou custom
+					if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
+
+						SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
+						pvTarget = satSGP4.getOrekitTlePropagator();
+
+					} else if (abstractSat.getClass().equals(
+							CustomSatellite.class)) {
+
+						CustomSatellite customSat = (CustomSatellite) abstractSat;
+						pvTarget = customSat.getEphemeris();
+					} else {
+
+						throw new OrekitException(new DummyLocalizable(
+								"unknown satellite"));
+
+					}
+
+				}
+
+				else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
+
+					groundStation = userGroundStationsList
+							.get(targetBodyObjectName);
+
+					// Factory used to read gravity field files in several
+					// supported
+					// formats
+					provider = GravityFieldFactory.getPotentialProvider();
+					// Earth central body reference radius
+
+					earth = new OneAxisEllipsoid(provider.getAe(),
+							Constants.WGS84_EARTH_FLATTENING,
+							FramesFactory.getITRF2005());
+
+					topo = new TopocentricFrame(earth,
+							groundStation.getLatLongAlt(),
+							groundStation.getStationName());
+
+					pvTarget = topo;
+
+				}
+
+				else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
+
+					pvTarget = CelestialBodyFactory
+							.getBody(targetBodyObjectName);
+
+				}
+
+				else {
+
+					throw new OrekitException(new DummyLocalizable(
+							"unknown target object"));
+				}
+
+				eventDetector = new CircularFieldOfViewDetectorJsat(
+						this.currentSat, eventsParams[0], pvTarget,
+						positionVector, FastMath.toRadians(eventsParams[1]));
+				break;
+
+			// Date Detector
+			case DATE:
+
+				AbsoluteDate absoluteDate = new AbsoluteDate(
+						currentTimeDate.getTime(), TimeScalesFactory.getUTC());
+				eventDetector = new DateDetectorJsat(this.currentSat,
+						absoluteDate);
+				break;
+
+			// Dihedral field of view detector
+			case DIHEDRALFIELDOFVIEW:
+
+				if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+
+					AbstractSatellite abstractSat = userSatList
+							.get(targetBodyObjectName);
+					// Test si c'est un satellite SGP4 ou custom
+					if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
+
+						SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
+						pvTarget = satSGP4.getOrekitTlePropagator();
+
+					} else if (abstractSat.getClass().equals(
+							CustomSatellite.class)) {
+
+						CustomSatellite customSat = (CustomSatellite) abstractSat;
+						pvTarget = customSat.getEphemeris();
+					} else {
+
+						throw new OrekitException(new DummyLocalizable(
+								"unknown satellite"));
+
+					}
+
+				}
+
+				else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
+
+					groundStation = userGroundStationsList
+							.get(targetBodyObjectName);
+
+					// Factory used to read gravity field files in several
+					// supported
+					// formats
+					provider = GravityFieldFactory.getPotentialProvider();
+					// Earth central body reference radius
+
+					earth = new OneAxisEllipsoid(provider.getAe(),
+							Constants.WGS84_EARTH_FLATTENING,
+							FramesFactory.getITRF2005());
+
+					topo = new TopocentricFrame(earth,
+							groundStation.getLatLongAlt(),
+							groundStation.getStationName());
+
+					pvTarget = topo;
+
+				}
+
+				else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
+
+					pvTarget = CelestialBodyFactory
+							.getBody(targetBodyObjectName);
+
+				}
+
+				else {
+
+					throw new OrekitException(new DummyLocalizable(
+							"unknown target object"));
+				}
+
+				eventDetector = new DihedralFieldOfViewDetectorJsat(
+						this.currentSat, eventsParams[0], pvTarget,
+						positionVector, positionVector2, eventsParams[1],
+						positionVector3, eventsParams[2]);
+				break;
+
+			// Eclipse detector
+			case ECLIPSE:
+
+				pvTarget = CelestialBodyFactory.getBody(targetBodyObjectName);
+
+				eventDetector = new EclipseDetectorJsat(this.currentSat,
+						FastMath.toRadians(eventsParams[0]), pvTarget,
+						FastMath.toRadians(eventsParams[1]), totalEclipse);
+
+				break;
+
+			// Elevation detector
+			case ELEVATION:
+
+				groundStation = userGroundStationsList
+						.get(targetBodyObjectName);
+
+				// Factory used to read gravity field files in several supported
+				// formats
+				provider = GravityFieldFactory.getPotentialProvider();
+				// Earth central body reference radius
+
+				earth = new OneAxisEllipsoid(provider.getAe(),
+						Constants.WGS84_EARTH_FLATTENING,
+						FramesFactory.getITRF2005());
+
+				topo = new TopocentricFrame(earth,
+						groundStation.getLatLongAlt(),
+						groundStation.getStationName());
+				eventDetector = new ElevationDetectorJsat(this.currentSat,
+						FastMath.toRadians(eventsParams[0]), topo);
+				break;
+
+			// // Ground mask elevation detector
+			// case GROUNDMASKELEVATION:
+			// eventDetector = new GroundMaskElevationDetectorJsat(azimelev,
+			// topo);
+			// break;
+
+			// Node detector
+			case NODE:
+				eventDetector = new NodeDetectorJsat(this.currentSat,
+						this.currentSat.getInitNode().getFrame());
+				break;
+
+			default:
+				throw OrekitException.createInternalError(null);
+
 			}
+		} catch (Exception e) {
 
-			else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
-
-				A IMPLEMENTER APRES AVOIR CHANGER LES OBJETS GROUND STATION
-			}
-
-			else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
-
-				pvSat = CelestialBodyFactory.getBody(targetBodyObjectName);
-
-			}
-
-			else {
-
-				throw new OrekitException(new DummyLocalizable(
-						"unknown target object"));
-			}
-
-			eventDetector = new AlignmentDetector(this.currentSat.getInitNode()
-					.getOrbitOrekit(), pvSat, eventsParams[0]);
-
-			break;
-
-		// Altitude detector
-		case ALTITUDE:
-			eventDetector = new AltitudeDetector(altitude, bodyShape);
-			break;
-
-		// Apparent Elevation detector
-		case APPARENTELEVATION:
-			eventDetector = new ApparentElevationDetector(elevation, topo);
-			break;
-
-		// Apside detector
-		case APSIDE:
-			eventDetector = new ApsideDetector(orbit);
-			break;
-
-		// Circular field of view detector
-		case CIRCULARFIELDOFVIEW:
-			eventDetector = new CircularFieldOfViewDetector(maxCheck, pvTarget, center, halfAperture);
-			break;
-
-		// Date Detector
-		case DATE:
-			eventDetector = new DateDetector(target);
-			break;
-
-		// Dihedral field of view detector
-		case DIHEDRALFIELDOFVIEW:
-			eventDetector = new DihedralFieldOfViewDetector(maxCheck, pvTarget, center, axis1, halfAperture1, axis2, halfAperture2);
-			break;
-
-		// Eclipse detector
-		case ECLIPSE:
-			eventDetector = new EclipseDetector(occulted, occultedRadius, occulting, occultingRadius);
-			break;
-
-		// Elevation detector
-		case ELEVATION:
-			eventDetector = new ElevationDetector(elevation, topo);
-			break;
-
-		// Ground mask elevation detector
-		case GROUNDMASKELEVATION:
-			eventDetector = new GroundMaskElevationDetector(azimelev, topo);
-			break;
-
-		// Node detector
-		case NODE:
-			eventDetector = new NodeDetector(orbit, frame);
-			break;
+			throw new OrekitException(new DummyLocalizable(
+					"Event step is not configured"));
 
 		}
 
+		// Add event to the satellite
 		this.currentSat.getPropNode().setEventDetector(eventDetector);
 
 	}// execute
@@ -339,7 +598,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 		panel.setIframe(iframe);
 
 		iframe.setContentPane(panel);
-		iframe.setSize(400, 350); // w,h
+		iframe.setSize(420, 350); // w,h
 		iframe.setLocation(5, 5);
 
 		app.addInternalFrame(iframe);
@@ -588,6 +847,50 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 	public int getTypeOfTarget() {
 		return typeOfTarget;
+	}
+
+	public void setTotalEclipse(boolean totalEclipse) {
+		this.totalEclipse = totalEclipse;
+	}
+
+	public boolean isTotalEclipse() {
+		return totalEclipse;
+	}
+
+	public Vector3D getPositionVector() {
+		return positionVector;
+	}
+
+	public void setPositionVector(Vector3D positionVector) {
+		this.positionVector = positionVector;
+	}
+
+	public Vector3D getPositionVector2() {
+		return positionVector2;
+	}
+
+	public void setPositionVector2(Vector3D positionVector2) {
+		this.positionVector2 = positionVector2;
+	}
+
+	public Vector3D getPositionVector3() {
+		return positionVector3;
+	}
+
+	public void setPositionVector3(Vector3D positionVector3) {
+		this.positionVector3 = positionVector3;
+	}
+
+	public SimpleDateFormat getDateformatShort() {
+		return dateformatShort;
+	}
+
+	public GregorianCalendar getCurrentTimeDate() {
+		return currentTimeDate;
+	}
+
+	public void setCurrentTimeDate(GregorianCalendar currentTimeDate) {
+		this.currentTimeDate = currentTimeDate;
 	}
 
 }

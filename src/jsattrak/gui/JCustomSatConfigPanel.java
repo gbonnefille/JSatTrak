@@ -132,6 +132,12 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			return;
 		}
 
+		// special case -- inserting an EVENT node -- always at the TOP!
+		if (node.getNodeType().equalsIgnoreCase("Event")) {
+			treeTableModel.insertNodeInto(node, rootNode, 1);
+			return;
+		}
+
 		// see if something is selected
 		if (missionDesignJXTreeTable.getSelectedRow() >= 0) {
 			// get selected object
@@ -265,7 +271,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		addBurnButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/icons/customSatIcons/burn.png"))); // NOI18N
-		addBurnButton.setToolTipText("Add maneuver node");
+		addBurnButton.setToolTipText("Add event node");
 		addBurnButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				addBurnButtonActionPerformed(evt);
@@ -689,7 +695,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// make sure selected node not root
 			if (selectedNode != ((CustomTreeTableNode) treeTableModel.getRoot())
 					&& !selectedNode.getNodeType().equalsIgnoreCase(
-							"Initial Conditions")) {
+							"Initial Conditions")&& !selectedNode.getNodeType().equalsIgnoreCase(
+									"Event")) {
 				// get parent of selected object
 				CustomTreeTableNode selectedNodeParent = (CustomTreeTableNode) missionDesignJXTreeTable
 						.getTreeSelectionModel().getSelectionPath()
@@ -701,13 +708,14 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 				// if index not 0, get node above, else if 0 and parent not
 				// root, get parents parents last node
-				if (childIndex != 0) {
+				if (childIndex != 0 && childIndex != 1) {
 					// get node that is above the selected one
 					CustomTreeTableNode nodeAbove = (CustomTreeTableNode) treeTableModel
 							.getChild(selectedNodeParent, childIndex - 1);
 
 					if (!nodeAbove.getNodeType().equalsIgnoreCase(
-							"Initial Conditions")) {
+							"Initial Conditions")&&!nodeAbove.getNodeType().equalsIgnoreCase(
+									"Event")) {
 
 						// not below INI - so move it up
 						treeTableModel.removeNodeFromParent(selectedNode); // remove
@@ -741,7 +749,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// make sure selected node not root
 			if (selectedNode != ((CustomTreeTableNode) treeTableModel.getRoot())
 					&& !selectedNode.getNodeType().equalsIgnoreCase(
-							"Initial Conditions")) {
+							"Initial Conditions")&& !selectedNode.getNodeType().equalsIgnoreCase(
+									"Event")) {
 				// get parent of selected object
 				CustomTreeTableNode selectedNodeParent = (CustomTreeTableNode) missionDesignJXTreeTable
 						.getTreeSelectionModel().getSelectionPath()
@@ -850,7 +859,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 				app.forceRepainting(false); // repait without updating
 											// positional data
 
-				app.updateTime(); // update time to redraw ground track! SEG 10
+				app.updateTime(true); // update time to redraw ground track! SEG 10
 									// July 2009
 
 			} // valid value

@@ -482,7 +482,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		currentJulianDate.setDateFormat(dateformat);
 		scenarioEpochDate.setDateFormat(dateformat);
 
-		updateTime(); // update plots
+		updateTime(true); // update plots
 
 		// update gui with timestep
 		updateTimeStepsDataGUI();
@@ -1597,7 +1597,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		// set time string format
 		currentJulianDate.setDateFormat(dateformat);
 
-		updateTime(); // update plots
+		updateTime(true); // update plots
 
 		// update gui with timestep
 		updateTimeStepsDataGUI();
@@ -1831,7 +1831,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 			// set animation direction = 0
 			currentPlayDirection = 0;
 			// update graphics
-			updateTime();
+			updateTime(true);
 
 		} // if date accepted
 
@@ -1893,7 +1893,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		// set animation direction = 0
 		currentPlayDirection = 0;
 		// update graphics
-		updateTime();
+		updateTime(true);
 	}// GEN-LAST:event_resetTimeButtonActionPerformed
 
 	private void playBackButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_playBackButtonActionPerformed
@@ -1905,7 +1905,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 	private void stepBackButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_stepBackButtonActionPerformed
 	{// GEN-HEADEREND:event_stepBackButtonActionPerformed
 		currentPlayDirection = -1; // backward in time
-		updateTime();
+		updateTime(true);
 	}// GEN-LAST:event_stepBackButtonActionPerformed
 
 	private void playButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_playButtonActionPerformed
@@ -1928,7 +1928,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		playTimer = new Timer(animationRefreshRateMs, new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				// take one time step in the aimation
-				updateTime(); // animate
+				updateTime(true); // animate
 				long stopTime = System.currentTimeMillis();
 
 				fpsAnimation = 1.0 / ((stopTime - lastFPSms) / 1000.0); // fps
@@ -2032,7 +2032,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 			java.awt.event.ActionEvent evt)// GEN-FIRST:event_stepForwardTimeButtonActionPerformed
 	{// GEN-HEADEREND:event_stepForwardTimeButtonActionPerformed
 		currentPlayDirection = 1; // forward in time
-		updateTime();
+		updateTime(true);
 	}// GEN-LAST:event_stepForwardTimeButtonActionPerformed
 
 	private void new2DWindowMenuItemActionPerformed(
@@ -2193,7 +2193,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 	} // update3Dconfig
 
 	// update time and take an anmiation step
-	public void updateTime() {
+	public void updateTime(boolean eventDetector) {
 		// save old time
 		double prevJulDate = currentJulianDate.getJulianDate();
 
@@ -2247,7 +2247,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 			// now propogate all satellites to the current time
 			for (AbstractSatellite sat : satHash.values()) {
 
-				sat.propogate2JulDate(currentJulianDate.getJulianDate());
+				sat.propogate2JulDate(currentJulianDate.getJulianDate(),eventDetector);
 
 			} // propgate each sat
 
@@ -2324,7 +2324,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 			// set animation direction = 0
 			currentPlayDirection = 0;
 			// update graphics
-			updateTime();
+			updateTime(true);
 		} else {
 			// just do a normal update -- don't regenerate data
 			forceRepainting();
@@ -3690,7 +3690,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		// set animation direction = 0
 		currentPlayDirection = 0;
 		// update graphics
-		updateTime();
+		updateTime(true);
 	}
 
 	/**
@@ -3909,7 +3909,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		satHash.put(name, prop);
 
 		// set satellite time to current date
-		prop.propogate2JulDate(this.getCurrentJulTime());
+		prop.propogate2JulDate(this.getCurrentJulTime(),true);
 
 		// add item to the Object list tree
 		objListPanel.addSat2List(prop);

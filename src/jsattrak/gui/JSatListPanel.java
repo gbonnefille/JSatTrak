@@ -295,7 +295,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 
 		// propogate satellite to current date
 		try {
-			prop.propogate2JulDate(parentApp.getCurrentJulTime());
+			prop.propogate2JulDate(parentApp.getCurrentJulTime(),true);
 
 			// add name to list
 			satListModel.addElement(prop.getName());

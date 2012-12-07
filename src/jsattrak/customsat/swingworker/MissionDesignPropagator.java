@@ -146,7 +146,8 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 
 		// repaint
 		sat.setGroundTrackIni2False(); // force recalculation of ground tracks
-		app.updateTime(); // update time of everything and repaint
+		//On ne prend pas en compte les evenements pour la trace au sol
+		app.updateTime(false); // update time of everything and repaint
 		// app.forceRepainting();
 	}
 
@@ -170,6 +171,7 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 			IllegalArgumentException, IllegalStateException {
 		// now just exe children only if a child has children it is responsible
 		// for running them
+//		sat.getPropNode().setEventDetector(null);
 		if (!propMissionTreeStop) {
 			for (int i = 0; i < treeTableModel.getChildCount(o); i++) {
 				// get child

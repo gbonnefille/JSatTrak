@@ -970,7 +970,7 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 for(AbstractSatellite sat : tempSatHash.values())
                 {
                     try {
-						sat.propogate2JulDate(currentTime.getJulianDate());
+						sat.propogate2JulDate(currentTime.getJulianDate(),true);
 					} catch (OrekitException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

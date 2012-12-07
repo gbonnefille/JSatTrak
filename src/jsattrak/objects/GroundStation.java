@@ -25,6 +25,9 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.Random;
 
+import org.apache.commons.math3.util.FastMath;
+import org.orekit.bodies.GeodeticPoint;
+
 import name.gano.astro.AstroConst;
 import name.gano.astro.MathUtils;
 import name.gano.astro.Sidereal;
@@ -38,6 +41,7 @@ public class GroundStation implements Serializable
     // basic atributes
     private String stationName;
     private double[] lla_deg_m; // lat long and alt of station in deg/deg/meters (Geodetic)
+    private GeodeticPoint latLongAlt = null;
     
     private double elevationConst = 10; // 360 deg averaged elevation constraint (in future might want to make this an array around site)
     
@@ -61,6 +65,7 @@ public class GroundStation implements Serializable
         this.stationName = name;
         this.lla_deg_m = lla_deg_m;
         this.currentJulianDate = currentJulianDate;
+        this.latLongAlt = new GeodeticPoint(FastMath.toRadians(lla_deg_m[0]), FastMath.toRadians(lla_deg_m[1]), lla_deg_m[2]);
         
         // pick random color
         Random generator = new Random();
@@ -305,7 +310,11 @@ public class GroundStation implements Serializable
         this.currentJulianDate = currentJulianDate;
     }
     
-    @Override
+    public GeodeticPoint getLatLongAlt() {
+		return latLongAlt;
+	}
+
+	@Override
     public String toString()
     {
         return this.stationName;

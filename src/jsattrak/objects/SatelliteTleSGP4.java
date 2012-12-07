@@ -227,7 +227,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	}
 
 	@Override
-	public void propogate2JulDate(double julDate) throws OrekitException {
+	public void propogate2JulDate(double julDate,boolean eventDetector) throws OrekitException {
 		// save date
 		this.currentJulianDate = julDate;
 

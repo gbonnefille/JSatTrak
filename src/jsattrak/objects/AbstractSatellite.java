@@ -128,7 +128,7 @@ public abstract class AbstractSatellite implements Serializable {
 
 	public abstract boolean isShowName2D();
 
-	public abstract void propogate2JulDate(double julDate) throws OrekitException;
+	public abstract void propogate2JulDate(double julDate,boolean eventDetector) throws OrekitException;
 
 	public abstract void setFillFootPrint(boolean fillFootPrint);
 

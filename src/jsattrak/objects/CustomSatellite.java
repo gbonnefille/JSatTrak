@@ -26,6 +26,7 @@ import gov.nasa.worldwind.geom.Position;
 
 import java.awt.Color;
 import java.awt.Toolkit;
+import java.util.Collection;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -49,6 +50,7 @@ import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.propagation.BoundedPropagator;
+import org.orekit.propagation.events.EventDetector;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinates;
@@ -71,6 +73,12 @@ public class CustomSatellite extends AbstractSatellite {
 	private InitialConditionsNode initNode = null;
 
 	private PropogatorNode propNode = null;
+	
+	private Boolean eventMode = false;
+
+	public void setEventMode(Boolean eventMode) {
+		this.eventMode = eventMode;
+	}
 
 	// Frame ITRF2005
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
@@ -223,11 +231,12 @@ public class CustomSatellite extends AbstractSatellite {
 	// this function is basically given time update all current info and update
 	// lead/lag data if needed
 	@Override
-	public void propogate2JulDate(double julDate) throws OrekitException {
+	public void propogate2JulDate(double julDate,boolean eventDetector) throws OrekitException {
 		// save date
 		this.currentJulianDate = julDate; // UTC
 		AbsoluteDate maxTime;
 		AbsoluteDate minTime;
+		Collection<EventDetector> events = null;
 
 //		AbsoluteDate orekitJulDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400, TimeScalesFactory.getUTC());
 
@@ -238,6 +247,11 @@ public class CustomSatellite extends AbstractSatellite {
 		// find the nodes closest to the current time
 		if (ephemeris != null) //
 		{
+			//Retrait des evenements pour le calcul de la trace au sol
+			if (!eventDetector){
+				events = ephemeris.getEventsDetectors();
+				ephemeris.clearEventsDetectors();
+			}
 			// double epochkMJD = tleEpochJD - AstroConst.JDminusMJD;
 
 			// in UTC
@@ -247,6 +261,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 			minTime = ephemeris.getMinDate();
 			maxTime = ephemeris.getMaxDate();
+			
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
@@ -335,7 +350,11 @@ public class CustomSatellite extends AbstractSatellite {
 				// isInTime = false;
 				// System.out.println("false1");
 			}
-
+			//Restauration des evenements
+			if (!eventDetector){
+				for (EventDetector event : events)
+				ephemeris.addEventDetector(event);
+			}
 		}
 
 	} // propogate2JulDate

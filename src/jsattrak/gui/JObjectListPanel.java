@@ -417,7 +417,7 @@ private void objectTreeMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:
         satHash.put( prop.getName() ,  prop);
         try{
         // propogate satellite to current date
-        prop.propogate2JulDate( parentApp.getCurrentJulTime() );
+        prop.propogate2JulDate( parentApp.getCurrentJulTime(),true );
         
         // add name to list
         IconTreeNode newNode = new IconTreeNode(prop.getName());

@@ -164,7 +164,7 @@ public class ObjectTreeTransferHandler extends StringTransferHandler implements 
                             satHash.put(name, prop);
 
                             // propogate satellite to current date
-                            prop.propogate2JulDate(parentApp.getCurrentJulTime());
+                            prop.propogate2JulDate(parentApp.getCurrentJulTime(),true);
 
                             // add item to the tree
                             //topSatTreeNode.add( new IconTreeNode(name) );

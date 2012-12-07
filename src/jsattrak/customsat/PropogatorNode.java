@@ -222,6 +222,8 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// Numerical propogator//
 		// ///////////////////////
 
+		BoundedPropagator ephemeris = null;
+
 		if (propogator == PropogatorNode.NUMERICAL) {
 
 			double[][] tolerance = NumericalPropagator.tolerances(this.dP,
@@ -311,13 +313,19 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 			prop.setEphemerisMode();
 
 			// take into account the events if there is
-			if (eventDetector != null) {
-				prop.addEventDetector(eventDetector);
-			}
 
 			prop.propagate(EndOfSimulation);
 
-			missionDesign.setEphemeris(prop.getGeneratedEphemeris());
+			ephemeris = prop.getGeneratedEphemeris();
+
+			if (eventDetector != null) {
+				ephemeris.addEventDetector(eventDetector);
+			}
+
+			missionDesign.setEphemeris(ephemeris);
+
+			// Reset the event if not use in the next simulation
+			this.eventDetector = null;
 
 			// // use seconds as integration time (start at 0.0)
 			// RungeKutta4 integrator = new RungeKutta4(0.0, dt, pos, vel,
@@ -360,7 +368,16 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			missionDesign.setEphemeris(prop.getGeneratedEphemeris());
+			ephemeris = prop.getGeneratedEphemeris();
+
+			if (eventDetector != null) {
+				ephemeris.addEventDetector(eventDetector);
+			}
+
+			missionDesign.setEphemeris(ephemeris);
+
+			// Reset the event if not use in the next simulation
+			this.eventDetector = null;
 
 			propSuccess = true;
 		}
@@ -383,7 +400,16 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			missionDesign.setEphemeris(prop.getGeneratedEphemeris());
+			ephemeris = prop.getGeneratedEphemeris();
+
+			if (eventDetector != null) {
+				ephemeris.addEventDetector(eventDetector);
+			}
+
+			missionDesign.setEphemeris(ephemeris);
+
+			// Reset the event if not use in the next simulation
+			this.eventDetector = null;
 
 			propSuccess = true;
 
@@ -402,14 +428,13 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// lastStateVector = ephemeris.lastElement();
 		// ephemerisOrekit
 
-		BoundedPropagator ephemeris = missionDesign.getEphemeris();
 
-		PVCoordinates lastPvCoord = ephemeris.getPVCoordinates(
-				ephemeris.getMaxDate(), this.orbitOrekit.getFrame());
-		double lastTime = ephemeris.getMaxDate().durationFrom(
-				AbsoluteDate.JULIAN_EPOCH) / 86400;
+//		PVCoordinates lastPvCoord = ephemeris.getPVCoordinates(
+//				ephemeris.getMaxDate().shiftedBy(-1), this.orbitOrekit.getFrame());
+//		double lastTime = ephemeris.getMaxDate().shiftedBy(-1).durationFrom(
+//				AbsoluteDate.JULIAN_EPOCH) / 86400;
 
-		lastStateVector = new StateVector(lastPvCoord, lastTime);
+//		lastStateVector = new StateVector(lastPvCoord, lastTime);
 
 		// copy internal ephemeris to the external ephemeris, making conversion
 		// from TT to UT??
