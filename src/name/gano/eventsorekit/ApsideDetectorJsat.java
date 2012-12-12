@@ -23,6 +23,8 @@ public class ApsideDetectorJsat extends ApsideDetector {
 	public Action eventOccurred(SpacecraftState s, boolean increasing)
 			throws OrekitException {
 		
+		
+		//Dessiner une croix!!
 		if (increasing) {
 			satellite.setSatColor(Color.MAGENTA);
 		} else {

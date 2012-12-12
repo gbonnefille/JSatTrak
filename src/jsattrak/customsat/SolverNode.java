@@ -92,7 +92,7 @@ public class SolverNode extends CustomTreeTableNode implements
 		// add default (burn and propogate componets as children) if desired
 		if (addDefaultcomponets) {
 			new ManeuverNode(this);
-			new PropogatorNode(this,(InitialConditionsNode)parentNode.getChildAt(0));
+			new PropagatorNode(this,(InitialConditionsNode)parentNode.getChildAt(0));
 		}
 
 		// always gets an end solver / loop node

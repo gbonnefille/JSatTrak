@@ -141,6 +141,8 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 	//
 	private String targetBodyObjectName = null;
+	
+	private String targetCelestialBodyObjectName = null;
 
 	// Enum for orekit events
 	private Events event = Events.ALIGNMENT;
@@ -528,10 +530,12 @@ public class ManeuverNode extends CustomTreeTableNode {
 			case ECLIPSE:
 
 				pvTarget = CelestialBodyFactory.getBody(targetBodyObjectName);
+				
+				 PVCoordinatesProvider celestialBodyOcculted = CelestialBodyFactory.getBody(targetCelestialBodyObjectName);
 
-				eventDetector = new EclipseDetectorJsat(this.currentSat,
-						FastMath.toRadians(eventsParams[0]), pvTarget,
-						FastMath.toRadians(eventsParams[1]), totalEclipse);
+				eventDetector = new EclipseDetectorJsat(pvTarget,
+						eventsParams[0],celestialBodyOcculted,eventsParams[1],this.currentSat,
+						totalEclipse);
 
 				break;
 
@@ -891,6 +895,15 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 	public void setCurrentTimeDate(GregorianCalendar currentTimeDate) {
 		this.currentTimeDate = currentTimeDate;
+	}
+
+	public String getTargetCelestialBodyObjectName() {
+		return targetCelestialBodyObjectName;
+	}
+
+	public void setTargetCelestialBodyObjectName(
+			String targetCelestialBodyObjectName) {
+		this.targetCelestialBodyObjectName = targetCelestialBodyObjectName;
 	}
 
 }

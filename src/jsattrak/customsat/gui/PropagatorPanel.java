@@ -27,19 +27,19 @@ package jsattrak.customsat.gui;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
-import jsattrak.customsat.PropogatorNode;
+import jsattrak.customsat.PropagatorNode;
 
 /**
  * 
  * @author sgano
  */
-public class PropogatorPanel extends javax.swing.JPanel {
-	PropogatorNode pNode;
+public class PropagatorPanel extends javax.swing.JPanel {
+	PropagatorNode pNode;
 	private JInternalFrame iframe; // used to know what its parent frame is - to
 									// close window
 
 	/** Creates new form PropogatorPanel */
-	public PropogatorPanel(PropogatorNode pNode, JInternalFrame iframe) {
+	public PropagatorPanel(PropagatorNode pNode, JInternalFrame iframe) {
 		this.pNode = pNode;
 		this.iframe = iframe;
 
@@ -384,7 +384,7 @@ public class PropogatorPanel extends javax.swing.JPanel {
 										.addContainerGap()));
 
 		jPanel5.setBorder(javax.swing.BorderFactory
-				.createTitledBorder("Propogator External Force Options:"));
+				.createTitledBorder("Propagator External Force Options:"));
 
 		jCheckBox1.setText("Lunar Perturbations");
 
@@ -836,9 +836,9 @@ public class PropogatorPanel extends javax.swing.JPanel {
 																javax.swing.GroupLayout.DEFAULT_SIZE,
 																javax.swing.GroupLayout.PREFERRED_SIZE))));
 
-		perigeeCheckBox.setText("Stop propogating at Perigee");
+		perigeeCheckBox.setText("Stop propagating at Perigee");
 
-		apogeeCheckBox.setText("Stop propogating at Apogee");
+		apogeeCheckBox.setText("Stop propagating at Apogee");
 
 		javax.swing.GroupLayout jPanel8Layout = new javax.swing.GroupLayout(
 				jPanel8);

@@ -1893,7 +1893,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		// set animation direction = 0
 		currentPlayDirection = 0;
 		// update graphics
-		updateTime(true);
+		updateTime(false);
 	}// GEN-LAST:event_resetTimeButtonActionPerformed
 
 	private void playBackButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_playBackButtonActionPerformed

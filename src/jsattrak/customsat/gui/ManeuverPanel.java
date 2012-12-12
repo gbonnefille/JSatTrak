@@ -40,6 +40,7 @@ import javax.swing.JOptionPane;
 import javax.swing.text.DateFormatter;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.orekit.utils.Constants;
 
 import jsattrak.customsat.ManeuverNode;
 import jsattrak.customsat.gui.ManeuverPanel.Events;
@@ -74,9 +75,6 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		totalEclipseEventRadioButton.setSelected(mNode.isTotalEclipse());
 		penumbraEclipseEventRadioButton.setSelected(!mNode.isTotalEclipse());
 
-		
-		
-
 		switch (Events.getEnum(event)) {
 
 		case DIHEDRALFIELDOFVIEW:
@@ -97,6 +95,13 @@ public class ManeuverPanel extends javax.swing.JPanel {
 			xTextField.setText(mNode.getPositionVector().getX() + "");
 			yTextField.setText(mNode.getPositionVector().getY() + "");
 			zTextField.setText(mNode.getPositionVector().getZ() + "");
+			break;
+		case ECLIPSE:
+			celestialBodyComboBox
+					.setModel(new javax.swing.DefaultComboBoxModel(
+							CelestialBodyObject.getValues()));
+			celestialBodyComboBox.setSelectedItem(mNode
+					.getTargetCelestialBodyObjectName());
 			break;
 
 		}
@@ -172,7 +177,9 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		dateTextField = new javax.swing.JTextField();
 
 		bodyComboBox = new javax.swing.JComboBox();
+		celestialBodyComboBox = new javax.swing.JComboBox();
 		bodyLabel = new javax.swing.JLabel();
+		celestialBodyLabel = new javax.swing.JLabel();
 
 		jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12));
 		jLabel1.setText("Event detector node:");
@@ -308,6 +315,16 @@ public class ManeuverPanel extends javax.swing.JPanel {
 			}
 		});
 
+		celestialBodyComboBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+
+				celestialBodyActionPerformed();
+
+			}
+		});
+
 		eventsComboBox.setModel(new javax.swing.DefaultComboBoxModel(Events
 				.getValues()));
 
@@ -346,6 +363,8 @@ public class ManeuverPanel extends javax.swing.JPanel {
 														.addComponent(
 																jLabelEvent3)
 														.addComponent(bodyLabel)
+														.addComponent(
+																celestialBodyLabel)
 														.addComponent(jLabel2)
 														.addComponent(posLabel)
 														.addComponent(pos2Label)
@@ -378,6 +397,11 @@ public class ManeuverPanel extends javax.swing.JPanel {
 																Short.MAX_VALUE)
 														.addComponent(
 																bodyComboBox,
+																javax.swing.GroupLayout.DEFAULT_SIZE,
+																121,
+																Short.MAX_VALUE)
+														.addComponent(
+																celestialBodyComboBox,
 																javax.swing.GroupLayout.DEFAULT_SIZE,
 																121,
 																Short.MAX_VALUE)
@@ -496,45 +520,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 																penumbraEclipseEventRadioButton))
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelEventLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																jLabelEvent1)
-														.addComponent(
-																eventTextField1,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelEventLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																jLabelEvent2)
-														.addComponent(
-																eventTextField2,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelEventLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																jLabelEvent3)
-														.addComponent(
-																eventTextField3,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+
 										.addGroup(
 												jPanelEventLayout
 														.createParallelGroup(
@@ -561,6 +547,62 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addGroup(
+												jPanelEventLayout
+														.createParallelGroup(
+																javax.swing.GroupLayout.Alignment.BASELINE)
+														.addComponent(
+																jLabelEvent1)
+														.addComponent(
+																eventTextField1,
+																javax.swing.GroupLayout.PREFERRED_SIZE,
+																javax.swing.GroupLayout.DEFAULT_SIZE,
+																javax.swing.GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+
+										.addGroup(
+												jPanelEventLayout
+														.createParallelGroup(
+																javax.swing.GroupLayout.Alignment.BASELINE)
+
+														.addComponent(
+																celestialBodyComboBox)
+														.addComponent(
+																celestialBodyLabel,
+																javax.swing.GroupLayout.PREFERRED_SIZE,
+																javax.swing.GroupLayout.DEFAULT_SIZE,
+																javax.swing.GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addGroup(
+												jPanelEventLayout
+														.createParallelGroup(
+																javax.swing.GroupLayout.Alignment.BASELINE)
+														.addComponent(
+																jLabelEvent2)
+														.addComponent(
+																eventTextField2,
+																javax.swing.GroupLayout.PREFERRED_SIZE,
+																javax.swing.GroupLayout.DEFAULT_SIZE,
+																javax.swing.GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+
+										.addGroup(
+												jPanelEventLayout
+														.createParallelGroup(
+																javax.swing.GroupLayout.Alignment.BASELINE)
+														.addComponent(
+																jLabelEvent3)
+														.addComponent(
+																eventTextField3,
+																javax.swing.GroupLayout.PREFERRED_SIZE,
+																javax.swing.GroupLayout.DEFAULT_SIZE,
+																javax.swing.GroupLayout.PREFERRED_SIZE))
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										
 										.addGroup(
 												jPanelEventLayout
 														.createParallelGroup(
@@ -848,7 +890,9 @@ public class ManeuverPanel extends javax.swing.JPanel {
 	private javax.swing.JRadioButton totalEclipseEventRadioButton;
 	private javax.swing.JRadioButton penumbraEclipseEventRadioButton;
 	private javax.swing.JComboBox bodyComboBox;
+	private javax.swing.JComboBox celestialBodyComboBox;
 	private javax.swing.JLabel bodyLabel;
+	private javax.swing.JLabel celestialBodyLabel;
 	private javax.swing.JRadioButton satBodyEventRadioButton;
 	private javax.swing.JRadioButton groundStationBodyEventRadioButton;
 	private javax.swing.JRadioButton CelestialBodyEventRadioButton;
@@ -869,21 +913,21 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 	private void eventActionPerformed() {
 
-		eventTextField1.setText(0 + "");
-		eventTextField2.setText(0 + "");
-		eventTextField3.setText(0 + "");
+		eventTextField1.setText(0.0 + "");
+		eventTextField2.setText(0.0 + "");
+		eventTextField3.setText(0.0 + "");
 
-		xTextField.setText(0 + "");
-		yTextField.setText(0 + "");
-		zTextField.setText(0 + "");
+		xTextField.setText(0.0 + "");
+		yTextField.setText(0.0 + "");
+		zTextField.setText(0.0 + "");
 
-		posXTextField.setText(0 + "");
-		posYTextField.setText(0 + "");
-		posZTextField.setText(0 + "");
+		posXTextField.setText(0.0 + "");
+		posYTextField.setText(0.0 + "");
+		posZTextField.setText(0.0 + "");
 
-		posX2TextField.setText(0 + "");
-		posY2TextField.setText(0 + "");
-		posZ2TextField.setText(0 + "");
+		posX2TextField.setText(0.0 + "");
+		posY2TextField.setText(0.0 + "");
+		posZ2TextField.setText(0.0 + "");
 
 		// Reset to false
 		jLabelEvent1.setVisible(false);
@@ -893,7 +937,9 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		jLabelEvent3.setVisible(false);
 		eventTextField3.setVisible(false);
 		bodyComboBox.setVisible(false);
+		celestialBodyComboBox.setVisible(false);
 		bodyLabel.setVisible(false);
+		celestialBodyLabel.setVisible(false);
 		totalEclipseEventRadioButton.setVisible(false);
 		penumbraEclipseEventRadioButton.setVisible(false);
 		satBodyEventRadioButton.setVisible(false);
@@ -1012,10 +1058,10 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		// Date Detector
 		case DATE:
 			jLabel5.setText("Date Detector");
-			
+
 			dateTextField.setText(mNode.getDateformatShort().format(
 					mNode.getCurrentTimeDate().getTime()));
-			
+
 			dateTextField.setVisible(true);
 
 			break;
@@ -1076,19 +1122,32 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		case ECLIPSE:
 			jLabel5.setText("Eclipse detector");
 			// First parameter
-			jLabelEvent1.setText("Occulted Radius [deg] :");
+			jLabelEvent1.setText("Occulted Radius [m] :");
 			jLabelEvent1.setVisible(true);
+			eventTextField1.setText(Constants.SUN_RADIUS + "");
 			eventTextField1.setVisible(true);
 
-			// Second parameter
-			jLabelEvent2.setText("Occulting radius [deg] :");
+			// second parameter
+			jLabelEvent2.setText("Occulting Radius [m] :");
 			jLabelEvent2.setVisible(true);
+			eventTextField2.setText(Constants.SUN_RADIUS + "");
 			eventTextField2.setVisible(true);
 
+			// First body combo box
 			celestialBodyRadioButtonActionPerformed(null);
-			bodyLabel.setText("Occulting body :");
+			bodyLabel.setText("Occulted body :");
 			bodyComboBox.setVisible(true);
 			bodyLabel.setVisible(true);
+
+			// Second body combo box
+			celestialBodyLabel.setText("Occulting body :");
+			celestialBodyLabel.setVisible(true);
+			celestialBodyComboBox.setVisible(true);
+			celestialBodyComboBox
+					.setModel(new javax.swing.DefaultComboBoxModel(
+							CelestialBodyObject.getValues()));
+			celestialBodyComboBox
+					.setSelectedItem(CelestialBodyObject.EARTH.value);
 
 			// Radio bouton for the type of eclipse
 			totalEclipseEventRadioButton.setVisible(true);
@@ -1103,6 +1162,17 @@ public class ManeuverPanel extends javax.swing.JPanel {
 			jLabelEvent1.setText("Elevation [deg] :");
 			jLabelEvent1.setVisible(true);
 			eventTextField1.setVisible(true);
+
+			// Construction de la liste des satellites et stations sols definies
+			// par l'utilisateur
+			satAndGroundstationList = getUserSatAndGroundstationList(false,
+					true);
+			bodyComboBox.setModel(new javax.swing.DefaultComboBoxModel(
+					satAndGroundstationList.toArray()));
+
+			bodyLabel.setText("Groundstation :");
+			bodyComboBox.setVisible(true);
+			bodyLabel.setVisible(true);
 
 			break;
 
@@ -1122,6 +1192,90 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 	private void bodyActionPerformed() {
 
+		if (Events.getEnum(eventsComboBox.getSelectedItem().toString()).equals(
+				Events.ECLIPSE)) {
+
+			switch (CelestialBodyObject.getEnum(bodyComboBox.getSelectedItem()
+					.toString())) {
+			// Set the default radius of planets
+			case SUN:
+				eventTextField1.setText(Constants.SUN_RADIUS + "");
+				break;
+			case EARTH:
+				eventTextField1.setText(Constants.WGS84_EARTH_EQUATORIAL_RADIUS + "");
+				break;
+			case MERCURY:
+				eventTextField1.setText(2439700 + "");
+				break;
+			case VENUS:
+				eventTextField1.setText(6051800 + "");
+				break;
+			case MOON:
+				eventTextField1.setText(1737400 + "");
+				break;
+			case MARS:
+				eventTextField1.setText(3396200 + "");
+				break;
+			case JUPITER:
+				eventTextField1.setText(71492000 + "");
+				break;
+			case SATURN:
+				eventTextField1.setText(60268000 + "");
+				break;
+			case NEPTUNE:
+				eventTextField1.setText(24764000 + "");
+				break;
+			case PLUTON:
+				eventTextField1.setText(1153000 + "");
+				break;
+			default:
+				eventTextField1.setText(0 + "");
+			}
+		}
+	}
+
+	private void celestialBodyActionPerformed() {
+
+		if (Events.getEnum(eventsComboBox.getSelectedItem().toString()).equals(
+				Events.ECLIPSE)) {
+
+			switch (CelestialBodyObject.getEnum(celestialBodyComboBox
+					.getSelectedItem().toString())) {
+			// Set the default radius of planets
+			case SUN:
+				eventTextField2.setText(Constants.SUN_RADIUS + "");
+				break;
+			case EARTH:
+				eventTextField2.setText(Constants.WGS84_EARTH_EQUATORIAL_RADIUS + "");
+				break;
+			case MERCURY:
+				eventTextField2.setText(2439700 + "");
+				break;
+			case VENUS:
+				eventTextField2.setText(6051800 + "");
+				break;
+			case MOON:
+				eventTextField2.setText(1737400 + "");
+				break;
+			case MARS:
+				eventTextField2.setText(3396200 + "");
+				break;
+			case JUPITER:
+				eventTextField2.setText(71492000 + "");
+				break;
+			case SATURN:
+				eventTextField2.setText(60268000 + "");
+				break;
+			case NEPTUNE:
+				eventTextField2.setText(24764000 + "");
+				break;
+			case PLUTON:
+				eventTextField2.setText(1153000 + "");
+				break;
+			default:
+				eventTextField2.setText(0 + "");
+			}
+		}
 	}
 
 	private ArrayList<String> getUserSatAndGroundstationList(boolean sat,
@@ -1313,6 +1467,9 @@ public class ManeuverPanel extends javax.swing.JPanel {
 				mNode.setTargetBodyObjectName(bodyComboBox.getSelectedItem()
 						.toString());
 
+				mNode.setTargetCelestialBodyObjectName(celestialBodyComboBox
+						.getSelectedItem().toString());
+
 				mNode.setTypeOfTarget(ManeuverNode.CELESTIALBODYOBJECT);
 
 				mNode.setTotalEclipse(totalEclipseEventRadioButton.isSelected());
@@ -1323,6 +1480,10 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 			// Elevation detector
 			case ELEVATION:
+
+				mNode.setTargetBodyObjectName(bodyComboBox.getSelectedItem()
+						.toString());
+				mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
 
 				mNode.setEvent(Events.ELEVATION);
 
@@ -1409,7 +1570,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		EARTH("Earth"), MOON("Moon"), MARS("Mars"), JUPITER("Jupiter"), SATURN(
 				"Saturn"),
 
-		URANUS("Uranus"), NEPTUNE("Neptune"), PLUTO("Pluto");
+		URANUS("Uranus"), NEPTUNE("Neptune"), PLUTON("Pluton");
 
 		private String value;
 
@@ -1427,6 +1588,14 @@ public class ManeuverPanel extends javax.swing.JPanel {
 			}
 
 			return bodyList.toArray();
+		}
+
+		public static CelestialBodyObject getEnum(String value) {
+			for (CelestialBodyObject celestialBody : values()) {
+				if (celestialBody.value.equals(value))
+					return celestialBody;
+			}
+			return null;
 		}
 
 		public String getBody() {

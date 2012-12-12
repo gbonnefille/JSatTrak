@@ -25,9 +25,9 @@ public class ElevationDetectorJsat extends ElevationDetector {
 			throws OrekitException {
 
 		if (increasing) {
-			satellite.setSatColor(Color.MAGENTA);
+			satellite.setSatColor(Color.BLUE);
 		} else {
-			satellite.setSatColor(Color.PINK);
+			satellite.setSatColor(Color.RED);
 		}
 
 		return Action.CONTINUE;

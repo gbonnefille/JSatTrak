@@ -32,7 +32,7 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 
 import jsattrak.customsat.InitialConditionsNode;
-import jsattrak.customsat.PropogatorNode;
+import jsattrak.customsat.PropagatorNode;
 import jsattrak.customsat.StopNode;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
@@ -72,7 +72,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 	private InitialConditionsNode initNode = null;
 
-	private PropogatorNode propNode = null;
+	private PropagatorNode propNode = null;
 	
 	private Boolean eventMode = false;
 
@@ -205,7 +205,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 		// by default also add a propogator node
 		// Propogator Node
-		this.propNode = new PropogatorNode(rootNode, initNode);
+		this.propNode = new PropagatorNode(rootNode, initNode);
 
 		// ADD SOME NODES (example) -----
 		// CustomTreeTableNode ttn2 = new PropogatorNode(rootNode);
@@ -314,14 +314,25 @@ public class CustomSatellite extends AbstractSatellite {
 					{
 						// System.out.println("Ascending NODE passed: " +
 						// tle.getSatName() );
+						
+						//Dessine la prochaine trace au sol : suppression puis rechargement des evenements
+						events = ephemeris.getEventsDetectors();
+						ephemeris.clearEventsDetectors();
 						initializeGroundTrack(); // for new ini each time
+						for (EventDetector event : events)
+							ephemeris.addEventDetector(event);
 
 					} // ascending node passed
 						// ELSE if current time is not in the lead/lag interval
 						// reinintialize it
 					else if (timeLead[timeLead.length - 1] < julDate
 							|| timeLag[0] > julDate) {
+						//Dessine la precedente trace au sol : suppression puis rechargement des evenements
+						events = ephemeris.getEventsDetectors();
+						ephemeris.clearEventsDetectors();
 						initializeGroundTrack();
+						for (EventDetector event : events)
+							ephemeris.addEventDetector(event);
 					}
 
 				} // if show ground track is true
@@ -1092,7 +1103,7 @@ public class CustomSatellite extends AbstractSatellite {
 		return initNode;
 	}
 
-	public PropogatorNode getPropNode() {
+	public PropagatorNode getPropNode() {
 		return propNode;
 	}
 

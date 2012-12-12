@@ -31,7 +31,7 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-import jsattrak.customsat.gui.PropogatorPanel;
+import jsattrak.customsat.gui.PropagatorPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.StateVector;
@@ -78,7 +78,7 @@ import org.orekit.utils.PVCoordinatesProvider;
  * 
  * @author sgano
  */
-public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem {
+public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem {
 	// static int to determin which propogator to use
 	public static final int NUMERICAL = 0;
 	public static final int KEPLERIAN = 1;
@@ -86,7 +86,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 	public static final int SEMIANALYTICAL = 3;
 
 	// which prop to use
-	private int propogator = PropogatorNode.NUMERICAL;
+	private int propogator = PropagatorNode.NUMERICAL;
 
 	// Orbit
 	private Orbit orbitOrekit = null;
@@ -139,7 +139,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 										// properties
 
 	// variables that can be set data ----------
-	String[] varNames = new String[] { "Propogation Time [s]" };
+	String[] varNames = new String[] { "Propagation Time [s]" };
 	// -----------------------------------------
 
 	// parameters that can be used as GOALS ---
@@ -159,9 +159,9 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 	// ========================================
 
-	public PropogatorNode(CustomTreeTableNode parentNode,
+	public PropagatorNode(CustomTreeTableNode parentNode,
 			InitialConditionsNode initNode) {
-		super(new String[] { "Propogate", "", "" }); // initialize node, default
+		super(new String[] { "Propagate", "", "" }); // initialize node, default
 														// values
 		this.initNode = initNode;
 
@@ -169,7 +169,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/icons/customSatIcons/prop.png"))));
 		// set Node Type
-		setNodeType("Propogator");
+		setNodeType("Propagator");
 
 		// add this node to parent - last thing
 		if (parentNode != null)
@@ -224,7 +224,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 		BoundedPropagator ephemeris = null;
 
-		if (propogator == PropogatorNode.NUMERICAL) {
+		if (propogator == PropagatorNode.NUMERICAL) {
 
 			double[][] tolerance = NumericalPropagator.tolerances(this.dP,
 					this.orbitOrekit, this.orbitOrekit.getType());
@@ -358,7 +358,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// Keplerian propogator//
 		// ///////////////////////
 
-		else if (propogator == PropogatorNode.KEPLERIAN) {
+		else if (propogator == PropagatorNode.KEPLERIAN) {
 
 			KeplerianPropagator prop = new KeplerianPropagator(
 					this.orbitOrekit, this.mu);
@@ -386,7 +386,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// Eckstein Hechler Propogator//
 		// /////////////////////////////
 
-		else if (propogator == PropogatorNode.ECKSTEINHECHLER) {
+		else if (propogator == PropagatorNode.ECKSTEINHECHLER) {
 
 			EcksteinHechlerPropagator prop = new EcksteinHechlerPropagator(
 					orbitOrekit, this.mass,
@@ -417,7 +417,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// Semi-Analytical propogator//
 			// ////////////////////////////
 
-		} else if (propogator == PropogatorNode.SEMIANALYTICAL) {
+		} else if (propogator == PropagatorNode.SEMIANALYTICAL) {
 
 			// Not implemented yet
 			propSuccess = false;
@@ -450,7 +450,7 @@ public class PropogatorNode extends CustomTreeTableNode implements OrbitProblem 
 				true, true);
 
 		// show satellite browser window
-		PropogatorPanel gsBrowser = new PropogatorPanel(this, iframe); // non-modal
+		PropagatorPanel gsBrowser = new PropagatorPanel(this, iframe); // non-modal
 																		// version
 
 		iframe.setContentPane(gsBrowser);
