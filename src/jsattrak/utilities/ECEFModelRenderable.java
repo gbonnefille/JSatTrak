@@ -36,6 +36,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Point;
 import java.util.Hashtable;
+import java.util.Iterator;
 
 import javax.media.opengl.GL;
 
@@ -66,6 +67,8 @@ public class ECEFModelRenderable implements Renderable
     // sphere for Ground Station
     double sphereRadius = 100000;
     SphereObject sphere = new SphereObject(new Vec4(0,0,0,0), sphereRadius, true);
+    
+    SphereObject eventSphere = new SphereObject(new Vec4(0,0,0,0), sphereRadius, true);
     
     // annotation
     //GlobeAnnotation annotation;
@@ -186,10 +189,44 @@ public class ECEFModelRenderable implements Renderable
             } // ecef orbit trace
             
             
-        } // for each sat
+            
+            //draw event position
+            if(sat.isEventDetected() && !sat.getEventPositions().isEmpty() )
+            {
+            
+            	Iterator<double[]> eventPositionIterator = sat.getEventPositions().iterator();
+            	Iterator<String> eventNameIterator = sat.getEventName().iterator();
+            	
+            	
+            	
+            	while (eventPositionIterator.hasNext())
+            	{
+            		double[] eventPosition = eventPositionIterator.next();
+            		String eventName = eventNameIterator.next();
+            		
+                     int sz = sat.getEventPosition2DPixelSize();
 
+                     Vec4 pos = globe.computePointFromPosition(Angle.fromDegrees(eventPosition[1]*180.0/Math.PI), Angle.fromDegrees(eventPosition[2]*180.0/Math.PI), eventPosition[3]);
+
+                     eventSphere.setCenter(pos);
+                     
+                     eventSphere.setColor(sat.getSatColor());
+                     //sphere.setCenter(-xyz[0], xyz[2], xyz[1]);
+                     eventSphere.render(dc);
+                     
+                     AnnotationAttributes geoAttr = createFontAttribs(sat.getSatColor());
+                     GlobeAnnotation an = new GlobeAnnotation(eventName, Position.fromDegrees(eventPosition[1]*180.0/Math.PI, eventPosition[2]*180.0/Math.PI, eventPosition[3]), geoAttr);
+                     // annotation - without any attribs, gives a bubble box
+                     // annotation doesn't strech well in GLCanvas
+                     //GlobeAnnotation an = new GlobeAnnotation(gs.getStationName(), Position.fromDegrees(gs.getLatitude(), gs.getLongitude(), gs.getAltitude()));
+                     an.render(dc);
+            		
+            	}
+
+        } // for each sat
+        }
+            
         // for each GroundStation
-        // for each satellite
         for(GroundStation gs : gsHash.values() ) // search through all sat nodes
         {
             if(gs.isShow3D())

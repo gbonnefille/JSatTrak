@@ -77,6 +77,8 @@ public class CustomSatellite extends AbstractSatellite {
 	private PropagatorNode propNode = null;
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
+	
+	private ArrayList<String> eventName = new ArrayList<String>();
 
 	private boolean lastStepInitGroundTrack = false;
 
@@ -273,6 +275,8 @@ public class CustomSatellite extends AbstractSatellite {
 
 					this.getEventPositions().remove(
 							this.getEventPositions().size() - 1);
+					this.getEventName().remove(
+							this.getEventName().size() - 1);
 					if (this.getEventPositions().isEmpty())
 						this.eventDetected = false;
 
@@ -1168,6 +1172,10 @@ public class CustomSatellite extends AbstractSatellite {
 
 	public int getEventPosition2DPixelSize() {
 		return eventPosition2DPixelSize;
+	}
+
+	public ArrayList<String> getEventName() {
+		return eventName;
 	}
 
 	@Override

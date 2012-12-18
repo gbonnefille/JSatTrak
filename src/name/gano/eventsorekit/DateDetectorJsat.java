@@ -25,6 +25,8 @@ public class DateDetectorJsat extends DateDetector {
 		satellite.getEventPositions().add(
 				new double[] { satellite.getCurrentJulDate(), LLA[0], LLA[1],
 						LLA[2] });
+		satellite.getEventName().add("Date point");
+
 
 		return Action.CONTINUE;
 	}

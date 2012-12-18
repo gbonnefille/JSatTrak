@@ -26,6 +26,8 @@ public class AlignmentDetectorJsat extends AlignmentDetector {
 		satellite.getEventPositions().add(
 				new double[] { satellite.getCurrentJulDate(), LLA[0], LLA[1],
 						LLA[2] });
+		satellite.getEventName().add("Align "+(satellite.getEventName().size()+1));
+
 
 		return Action.CONTINUE;
 	}

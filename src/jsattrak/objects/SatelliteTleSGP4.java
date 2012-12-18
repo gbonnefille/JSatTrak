@@ -77,6 +77,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
 	
+	private ArrayList<String> eventName = new ArrayList<String>();
+	
 	private int eventPosition2DPixelSize = 6;
 
 	// plot options
@@ -932,6 +934,10 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	
 	public int getEventPosition2DPixelSize() {
 		return eventPosition2DPixelSize;
+	}
+	
+	public ArrayList<String> getEventName() {
+		return eventName;
 	}
 
 	@Override

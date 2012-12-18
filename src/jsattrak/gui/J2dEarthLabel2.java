@@ -566,15 +566,17 @@ public class J2dEarthLabel2 extends JLabel  implements java.io.Serializable
                 }
                 
     
-                    
+                    //draw event position
                     if(sat.isEventDetected() && !sat.getEventPositions().isEmpty() )
                     {
                     	
-                    	Iterator<double[]> ite = sat.getEventPositions().iterator();
-                		
-                    	while (ite.hasNext())
+                    	Iterator<double[]> eventPositionIterator = sat.getEventPositions().iterator();
+                    	Iterator<String> eventNameIterator = sat.getEventName().iterator();
+
+                    	while (eventPositionIterator.hasNext())
                     	{
-                    		double[] eventPosition =ite.next();
+                    		double[] eventPosition = eventPositionIterator.next();
+                    		String eventName = eventNameIterator.next();
                     		
                     		 int[] event_xy = findXYfromLL(eventPosition[1]*180.0/Math.PI, eventPosition[2]*180.0/Math.PI, w, h, imageWidth, imageHeight);
 
@@ -587,7 +589,7 @@ public class J2dEarthLabel2 extends JLabel  implements java.io.Serializable
 //                             if(gs.isShow2DName())
 //                             {
 //                                 // show name?
-//                                 g2.drawString(gs.getStationName().trim(),gs_xy[0]+sz/2+3,gs_xy[1]+4);
+                                 g2.drawString(eventName,event_xy[0]+sz/2+3,event_xy[1]+4);
 //                                 
 //                             } // if show name
                     		

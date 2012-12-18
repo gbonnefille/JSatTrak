@@ -1894,6 +1894,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		for (AbstractSatellite sat : satHash.values()) {
 
 			sat.getEventPositions().clear();
+			sat.getEventName().clear();
 			sat.setEventDetected(false);
 
 		} 
