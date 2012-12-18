@@ -26,6 +26,8 @@ package jsattrak.customsat;
 import java.awt.Toolkit;
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -93,7 +95,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 	private InitialConditionsNode initNode = null;
 
-	private AbstractDetector eventDetector = null;
+	private ArrayList<AbstractDetector> eventDetector = new ArrayList<AbstractDetector>();
 
 	// Central attraction coefficient
 	private double mu = Constants.EIGEN5C_EARTH_MU;
@@ -318,14 +320,23 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			ephemeris = prop.getGeneratedEphemeris();
 
-			if (eventDetector != null) {
-				ephemeris.addEventDetector(eventDetector);
+			if (!eventDetector.isEmpty()) {
+
+				Iterator<AbstractDetector> eventIterator = this.eventDetector
+						.iterator();
+
+				while (eventIterator.hasNext()) {
+					AbstractDetector event = eventIterator.next();
+
+					ephemeris.addEventDetector(event);
+
+				}
 			}
 
 			missionDesign.setEphemeris(ephemeris);
 
 			// Reset the event if not use in the next simulation
-			this.eventDetector = null;
+			this.eventDetector.clear();
 
 			// // use seconds as integration time (start at 0.0)
 			// RungeKutta4 integrator = new RungeKutta4(0.0, dt, pos, vel,
@@ -370,14 +381,23 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			ephemeris = prop.getGeneratedEphemeris();
 
-			if (eventDetector != null) {
-				ephemeris.addEventDetector(eventDetector);
+			if (!eventDetector.isEmpty()) {
+
+				Iterator<AbstractDetector> eventIterator = this.eventDetector
+						.iterator();
+
+				while (eventIterator.hasNext()) {
+					AbstractDetector event = eventIterator.next();
+
+					ephemeris.addEventDetector(event);
+
+				}
 			}
 
 			missionDesign.setEphemeris(ephemeris);
 
 			// Reset the event if not use in the next simulation
-			this.eventDetector = null;
+			this.eventDetector.clear();
 
 			propSuccess = true;
 		}
@@ -402,14 +422,23 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			ephemeris = prop.getGeneratedEphemeris();
 
-			if (eventDetector != null) {
-				ephemeris.addEventDetector(eventDetector);
+			if (!eventDetector.isEmpty()) {
+
+				Iterator<AbstractDetector> eventIterator = this.eventDetector
+						.iterator();
+
+				while (eventIterator.hasNext()) {
+					AbstractDetector event = eventIterator.next();
+
+					ephemeris.addEventDetector(event);
+
+				}
 			}
 
 			missionDesign.setEphemeris(ephemeris);
 
 			// Reset the event if not use in the next simulation
-			this.eventDetector = null;
+			this.eventDetector.clear();
 
 			propSuccess = true;
 
@@ -428,13 +457,12 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// lastStateVector = ephemeris.lastElement();
 		// ephemerisOrekit
 
+		// PVCoordinates lastPvCoord = ephemeris.getPVCoordinates(
+		// ephemeris.getMaxDate().shiftedBy(-1), this.orbitOrekit.getFrame());
+		// double lastTime = ephemeris.getMaxDate().shiftedBy(-1).durationFrom(
+		// AbsoluteDate.JULIAN_EPOCH) / 86400;
 
-//		PVCoordinates lastPvCoord = ephemeris.getPVCoordinates(
-//				ephemeris.getMaxDate().shiftedBy(-1), this.orbitOrekit.getFrame());
-//		double lastTime = ephemeris.getMaxDate().shiftedBy(-1).durationFrom(
-//				AbsoluteDate.JULIAN_EPOCH) / 86400;
-
-//		lastStateVector = new StateVector(lastPvCoord, lastTime);
+		// lastStateVector = new StateVector(lastPvCoord, lastTime);
 
 		// copy internal ephemeris to the external ephemeris, making conversion
 		// from TT to UT??
@@ -921,8 +949,8 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		return numberOfStep;
 	}
 
-	public void setEventDetector(AbstractDetector eventDetector) {
-		this.eventDetector = eventDetector;
+	public void addEventDetector(AbstractDetector eventDetector) {
+		this.eventDetector.add(eventDetector);
 	}
 
 }

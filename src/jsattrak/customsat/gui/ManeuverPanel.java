@@ -211,6 +211,8 @@ public class ManeuverPanel extends javax.swing.JPanel {
 				addButtonActionPerformed(evt);
 			}
 		});
+		
+		addButton.setVisible(false);
 
 		jLabel3.setText("Y (Normal, out of plane):");
 

@@ -40,6 +40,7 @@ import jsattrak.customsat.PropagatorNode;
 import jsattrak.customsat.SolverNode;
 import jsattrak.customsat.StopNode;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
+import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
 import name.gano.swingx.treetable.CustomTreeTableNode;
@@ -848,6 +849,11 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 				// double deltaTT2UTC = Time.deltaT(nodeStartTime
 				// - AstroConst.JDminusMJD); // = TT - UTC
 				// Time n = new Time();
+				
+				//Reset events
+					sat.getEventPositions().clear();
+					sat.getEventName().clear();
+					sat.setEventDetected(false);
 
 				// set app time
 				app.setTime(nodeStartTime);

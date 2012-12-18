@@ -585,7 +585,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 		}
 
 		// Add event to the satellite
-		this.currentSat.getPropNode().setEventDetector(eventDetector);
+		this.currentSat.getPropNode().addEventDetector(eventDetector);
 
 	}// execute
 

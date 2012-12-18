@@ -230,6 +230,7 @@ import name.gano.astro.time.Time;
 import name.gano.file.FileTypeFilter;
 import name.gano.file.SaveImageFile;
 
+import org.apache.commons.math3.exception.util.DummyLocalizable;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.ZipJarCrawler;
 import org.orekit.errors.OrekitException;
@@ -3909,9 +3910,16 @@ public class JSatTrak extends javax.swing.JFrame implements
 		if (name == null || name.equalsIgnoreCase("")) {
 			// System.out.println("returned");
 			this.setStatusMessage("Custom Satellite Canceled: Either by user or not supplying a name.");
-			return;
+			throw new OrekitException(new DummyLocalizable(
+					"Custom Satellite Canceled: Either by user or not supplying a name"));
 		}
 
+		if(satHash.containsKey(name)){
+			this.setStatusMessage("This custom satellite name already exists.");
+			throw new OrekitException(new DummyLocalizable(
+					"This custom satellite name already exists"));
+		}
+		
 		CustomSatellite prop = new CustomSatellite(name,
 				this.getScenarioEpochDate());
 

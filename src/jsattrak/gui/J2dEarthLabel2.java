@@ -572,6 +572,7 @@ public class J2dEarthLabel2 extends JLabel  implements java.io.Serializable
                     	
                     	Iterator<double[]> eventPositionIterator = sat.getEventPositions().iterator();
                     	Iterator<String> eventNameIterator = sat.getEventName().iterator();
+                        g2.setPaint( sat.getGroundTrackColor() );
 
                     	while (eventPositionIterator.hasNext())
                     	{
