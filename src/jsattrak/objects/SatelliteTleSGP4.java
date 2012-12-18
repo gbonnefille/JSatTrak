@@ -29,6 +29,7 @@ import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.Position;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Random;
 
 import jsattrak.utilities.TLElements;
@@ -74,14 +75,21 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	// lat,long,alt [radians, radians, m ]
 	private double[] lla = new double[3];
 
+	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
+	
+	private int eventPosition2DPixelSize = 6;
+
 	// plot options
 	private boolean plot2d = true;
 	private Color satColor = Color.RED; // randomize in future
+	private Color groundTrackColor = Color.RED;
+
 	private boolean plot2DFootPrint = true;
 	private boolean fillFootPrint = true;
 	private int numPtsFootPrint = 41; // number of points in footprint, used to
 										// be 101
 
+	private boolean node = false;
 	// ground track options -- grounds tracks draw to asending nodes,
 	// re-calculated at acending nodes
 	boolean showGroundTrack = true;
@@ -184,6 +192,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 			break;
 		} // random color switch
 
+		groundTrackColor = satColor;
+
 		// try to load TLE into propogator
 
 		// options - hard coded
@@ -218,7 +228,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// read TLE
 
 		// TLE age since AJD
-		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) /86400;
+		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 86400;
 
 		// ground track needs to be redone with new data
 		groundTrackIni = false;
@@ -227,22 +237,23 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	}
 
 	@Override
-	public void propogate2JulDate(double julDate,boolean eventDetector) throws OrekitException {
+	public void propogate2JulDate(double julDate, boolean eventDetector)
+			throws OrekitException {
 		// save date
 		this.currentJulianDate = julDate;
 
-//		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
-//				.shiftedBy(julDate * 86400);
-		
-		AbsoluteDate orekitJulDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400, TimeScalesFactory.getUTC());				
+		// AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
+		// .shiftedBy(julDate * 86400);
 
+		AbsoluteDate orekitJulDate = new AbsoluteDate(
+				AbsoluteDate.JULIAN_EPOCH, julDate * 86400,
+				TimeScalesFactory.getUTC());
 
 		PVCoordinates posVit = orekitTlePropagator
 				.getPVCoordinates(orekitJulDate);
 
 		position = posVit.getPosition();
 		velocity = posVit.getVelocity();
-
 
 		// save old lat/long for ascending node check
 		double[] oldLLA = lla.clone(); // copy old LLA
@@ -466,9 +477,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	//
 
 	/**
-	 * Calculate  position of this sat
-	 * at a given JulDateTime (doesn't save the time) - can be useful for event
-	 * searches or optimization
+	 * Calculate position of this sat at a given JulDateTime (doesn't save the
+	 * time) - can be useful for event searches or optimization
 	 * 
 	 * @param julDate
 	 *            - julian date
@@ -902,6 +912,26 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	public TLEPropagator getOrekitTlePropagator() {
 		return orekitTlePropagator;
+	}
+
+	public boolean isEventDetected() {
+		return node;
+	}
+
+	public Color getGroundTrackColor() {
+		return groundTrackColor;
+	}
+
+	public void setEventDetected(boolean node) {
+		this.node = node;
+	}
+
+	public ArrayList<double[]> getEventPositions() {
+		return eventPositions;
+	}
+	
+	public int getEventPosition2DPixelSize() {
+		return eventPosition2DPixelSize;
 	}
 
 	@Override

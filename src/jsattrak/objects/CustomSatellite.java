@@ -26,7 +26,9 @@ import gov.nasa.worldwind.geom.Position;
 
 import java.awt.Color;
 import java.awt.Toolkit;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -73,12 +75,12 @@ public class CustomSatellite extends AbstractSatellite {
 	private InitialConditionsNode initNode = null;
 
 	private PropagatorNode propNode = null;
-	
-	private Boolean eventMode = false;
 
-	public void setEventMode(Boolean eventMode) {
-		this.eventMode = eventMode;
-	}
+	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
+
+	private boolean lastStepInitGroundTrack = false;
+
+	private int eventPosition2DPixelSize = 10;
 
 	// Frame ITRF2005
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
@@ -111,9 +113,12 @@ public class CustomSatellite extends AbstractSatellite {
 	// current lat,long,alt [radians, radians, km/m ?]
 	private double[] lla;// = new double[3];
 
+	private boolean eventDetected = false;
+
 	// plot options
 	private boolean plot2d = true;
 	private Color satColor = Color.RED; // randomize in future
+	private Color groundTrackColor = Color.RED;
 	private boolean plot2DFootPrint = true;
 	private boolean fillFootPrint = true;
 	private int numPtsFootPrint = 101; // number of points in footprint
@@ -179,7 +184,8 @@ public class CustomSatellite extends AbstractSatellite {
 	}
 
 	// initalizes the mission Table Model
-	private void iniMissionTableModel(Time scenarioEpochDate) throws OrekitException {
+	private void iniMissionTableModel(Time scenarioEpochDate)
+			throws OrekitException {
 		// set names of columns
 		Vector<String> tableHeaders = new Vector<String>();
 		tableHeaders.add("Mission Objects");
@@ -231,42 +237,71 @@ public class CustomSatellite extends AbstractSatellite {
 	// this function is basically given time update all current info and update
 	// lead/lag data if needed
 	@Override
-	public void propogate2JulDate(double julDate,boolean eventDetector) throws OrekitException {
+	public void propogate2JulDate(double julDate, boolean eventDetector)
+			throws OrekitException {
 		// save date
 		this.currentJulianDate = julDate; // UTC
 		AbsoluteDate maxTime;
 		AbsoluteDate minTime;
 		Collection<EventDetector> events = null;
 
-//		AbsoluteDate orekitJulDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400, TimeScalesFactory.getUTC());
+		// AbsoluteDate orekitJulDate = new
+		// AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400,
+		// TimeScalesFactory.getUTC());
 
-		
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
 		// find the nodes closest to the current time
 		if (ephemeris != null) //
 		{
-			//Retrait des evenements pour le calcul de la trace au sol
-			if (!eventDetector){
-				events = ephemeris.getEventsDetectors();
-				ephemeris.clearEventsDetectors();
-			}
-			// double epochkMJD = tleEpochJD - AstroConst.JDminusMJD;
 
-			// in UTC
-			// minTime = ephemeris.get(0).state[0] - deltaTT2UTC;
-			// maxTime = ephemeris.get(ephemeris.size() - 1).state[0]
-			// - deltaTT2UTC;
+			
 
 			minTime = ephemeris.getMinDate();
 			maxTime = ephemeris.getMaxDate();
-			
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
+				// Suppression des points de detection d'evenement si l'on recul
+				// dans le temps
+				if (this.isEventDetected()
+						&& this.getCurrentJulDate() < this.getEventPositions()
+								.get(this.getEventPositions().size() - 1)[0]) {
+
+					this.getEventPositions().remove(
+							this.getEventPositions().size() - 1);
+					if (this.getEventPositions().isEmpty())
+						this.eventDetected = false;
+
+					// Iterator<double[]> ite =
+					// this.getEventPositions().iterator();
+					//
+					// while (ite.hasNext())
+					// {
+					// double[] eventTimePosition =ite.next();
+					// if (eventTimePosition<this.getCurrentJulDate())
+					//
+					// }
+				}
+				
+
+				// Au step qui suit le calcul de la trace au sol il faut desactiver
+				// la detection d'evenement car s'il y a eut un evenement
+				// precedement il sera redétecté car au premier tour qui suit le
+				// calcul
+				// de la trace au sol la propagation se fait depuis la "date début"
+				if (lastStepInitGroundTrack) {
+					eventDetector = false;
+					lastStepInitGroundTrack = false;
+				}
+				// Retrait des evenements 
+				if (!eventDetector) {
+					events = ephemeris.getEventsDetectors();
+					ephemeris.clearEventsDetectors();
+				}
 
 				PVCoordinates pvCoordinateInertialFrame = ephemeris
 						.getPVCoordinates(orekitJulDate,
@@ -274,18 +309,22 @@ public class CustomSatellite extends AbstractSatellite {
 
 				PVCoordinates pvCoordinateEarthFrame = ephemeris
 						.getPVCoordinates(orekitJulDate, ITRF2005);
+				
+				// Restauration des evenements
+				if (!eventDetector) {
+					for (EventDetector event : events)
+						ephemeris.addEventDetector(event);
+				}
 
 				GeodeticPoint geodeticPoint = this.earth.transform(
 						pvCoordinateEarthFrame.getPosition(), this.ITRF2005,
 						orekitJulDate);
-
 
 				// Satellite trace
 
 				// Current position point
 				position = pvCoordinateInertialFrame.getPosition();
 				velocity = pvCoordinateInertialFrame.getVelocity();
-
 
 				// save old lat/long for ascending node check
 				double[] oldLLA = new double[3];
@@ -294,31 +333,46 @@ public class CustomSatellite extends AbstractSatellite {
 				}
 
 				// current LLA
-				// lla = GeoFunctions.GeodeticLLA(posTEME, currentMJDtime);
-
 				lla = new double[] { geodeticPoint.getLatitude(),
 						geodeticPoint.getLongitude(),
 						geodeticPoint.getAltitude() };
 
 				// Check to see if the ascending node has been passed
 				if (showGroundTrack == true) {
+					
+					
+					
 					if (groundTrackIni == false || oldLLA == null) // update
 																	// ground
 																	// track
 																	// needed
 					{
+						// Retrait des evenements pour le calcul de la trace au sol
+						events = ephemeris.getEventsDetectors();
+						ephemeris.clearEventsDetectors();
+						
 						initializeGroundTrack();
+						lastStepInitGroundTrack = true;
+						
+						//Restauration des evenements
+						for (EventDetector event : events)
+							ephemeris.addEventDetector(event);
+
 					} else if (oldLLA[0] < 0 && lla[0] >= 0) // check for
 																// ascending
 																// node pass
 					{
 						// System.out.println("Ascending NODE passed: " +
 						// tle.getSatName() );
-						
-						//Dessine la prochaine trace au sol : suppression puis rechargement des evenements
+
+						// Retrait des evenements pour le calcul de la trace au sol
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
-						initializeGroundTrack(); // for new ini each time
+						
+						initializeGroundTrack();
+						lastStepInitGroundTrack = true;
+						
+						//Restauration des evenements
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
@@ -327,14 +381,21 @@ public class CustomSatellite extends AbstractSatellite {
 						// reinintialize it
 					else if (timeLead[timeLead.length - 1] < julDate
 							|| timeLag[0] > julDate) {
-						//Dessine la precedente trace au sol : suppression puis rechargement des evenements
+						
+						// Retrait des evenements pour le calcul de la trace au sol
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
+						
 						initializeGroundTrack();
+						lastStepInitGroundTrack = true;
+						
+						//Restauration des evenements
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
-					}
 
+					}
+					
+					
 				} // if show ground track is true
 
 				// isInTime = true;
@@ -361,28 +422,16 @@ public class CustomSatellite extends AbstractSatellite {
 				// isInTime = false;
 				// System.out.println("false1");
 			}
-			//Restauration des evenements
-			if (!eventDetector){
-				for (EventDetector event : events)
-				ephemeris.addEventDetector(event);
-			}
+			
 		}
 
 	} // propogate2JulDate
 
-	public double getSatTleEpochJulDate() {
-		// if (ephemeris.size() > 0) {
-		// return ephemeris.firstElement().state[0]; // returns TT time
-		// } else {
-		return 0; // means it hasn't been propagated yet
-		// }
-	}
 
-	
 
 	/**
-	 * Calculate position of this sat at a given JulDateTime (doesn't save
-	 * the time) - can be useful for event searches or optimization
+	 * Calculate position of this sat at a given JulDateTime (doesn't save the
+	 * time) - can be useful for event searches or optimization
 	 * 
 	 * @param julDate
 	 *            - julian date
@@ -415,7 +464,7 @@ public class CustomSatellite extends AbstractSatellite {
 				ptPos = ephemeris.getPVCoordinates(orekitJulDate,
 						this.initNode.getFrame()).getPosition();
 
-			} 
+			}
 		} // if epeheris contains anything
 
 		return ptPos;
@@ -500,7 +549,6 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-
 			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
 
@@ -543,7 +591,6 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-
 			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
 
@@ -575,7 +622,7 @@ public class CustomSatellite extends AbstractSatellite {
 	// takes in JulDate
 	private double[] calculateLatLongAltXyz(double julDate)
 			throws OrekitException {
-
+		
 		Vector3D ptPos = calculatePositionFromUT(julDate);
 
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
@@ -592,13 +639,11 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
+				pos = ephemeris.getPVCoordinates(orekitJulDate, this.ITRF2005)
+						.getPosition();
 
-					pos = ephemeris.getPVCoordinates(orekitJulDate,
-							this.ITRF2005).getPosition();
-
-
-			} 
-		} 
+			}
+		}
 
 		GeodeticPoint geodeticPoint = null;
 		try {
@@ -695,8 +740,6 @@ public class CustomSatellite extends AbstractSatellite {
 	public double getCurrentJulDate() {
 		return currentJulianDate;
 	}
-
-
 
 	public boolean getPlot2D() {
 		return plot2d;
@@ -1107,9 +1150,35 @@ public class CustomSatellite extends AbstractSatellite {
 		return propNode;
 	}
 
+	public boolean isEventDetected() {
+		return eventDetected;
+	}
+
+	public Color getGroundTrackColor() {
+		return groundTrackColor;
+	}
+
+	public void setEventDetected(boolean eventDetected) {
+		this.eventDetected = eventDetected;
+	}
+
+	public ArrayList<double[]> getEventPositions() {
+		return eventPositions;
+	}
+
+	public int getEventPosition2DPixelSize() {
+		return eventPosition2DPixelSize;
+	}
+
 	@Override
 	public String toString() {
 		return this.getName();
+	}
+
+	@Override
+	public double getSatTleEpochJulDate() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

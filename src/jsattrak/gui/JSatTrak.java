@@ -1889,6 +1889,14 @@ public class JSatTrak extends javax.swing.JFrame implements
 		double timeDiffDays = Math.abs(currentJulianDate.getJulianDate()
 				- prevJulDate); // in days
 		checkTimeDiffResetGroundTracks(timeDiffDays);
+		
+		//Reset events
+		for (AbstractSatellite sat : satHash.values()) {
+
+			sat.getEventPositions().clear();
+			sat.setEventDetected(false);
+
+		} 
 
 		// set animation direction = 0
 		currentPlayDirection = 0;
@@ -1899,22 +1907,22 @@ public class JSatTrak extends javax.swing.JFrame implements
 	private void playBackButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_playBackButtonActionPerformed
 	{// GEN-HEADEREND:event_playBackButtonActionPerformed
 		currentPlayDirection = -1; // backwards
-		runAnimation();
+		runAnimation(false);
 	}// GEN-LAST:event_playBackButtonActionPerformed
 
 	private void stepBackButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_stepBackButtonActionPerformed
 	{// GEN-HEADEREND:event_stepBackButtonActionPerformed
 		currentPlayDirection = -1; // backward in time
-		updateTime(true);
+		updateTime(false);
 	}// GEN-LAST:event_stepBackButtonActionPerformed
 
 	private void playButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_playButtonActionPerformed
 	{// GEN-HEADEREND:event_playButtonActionPerformed
 		currentPlayDirection = 1; // forwards
-		runAnimation(); // perform animation
+		runAnimation(true); // perform animation
 	}// GEN-LAST:event_playButtonActionPerformed
 
-	private void runAnimation() {
+	private void runAnimation(final boolean eventDetector) {
 		// useses globally set animation direction and starts animation
 		playButton.setEnabled(false);
 		stepForwardTimeButton.setEnabled(false);
@@ -1928,7 +1936,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 		playTimer = new Timer(animationRefreshRateMs, new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
 				// take one time step in the aimation
-				updateTime(true); // animate
+				updateTime(eventDetector); // animate
 				long stopTime = System.currentTimeMillis();
 
 				fpsAnimation = 1.0 / ((stopTime - lastFPSms) / 1000.0); // fps

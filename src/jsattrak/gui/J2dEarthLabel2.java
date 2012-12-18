@@ -33,7 +33,9 @@ import java.awt.Polygon;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -294,7 +296,7 @@ public class J2dEarthLabel2 extends JLabel  implements java.io.Serializable
             {                
                 //System.out.println("Plotting node:"+i);
                 // okay plot LLA's of the satellite
-                g2.setPaint( sat.getSatColor() );
+                g2.setPaint( sat.getGroundTrackColor());
                 
                 ///// LEAD track:
                 // first Lead point
@@ -562,6 +564,41 @@ public class J2dEarthLabel2 extends JLabel  implements java.io.Serializable
                 {
                     g2.drawString(sat.getName().trim(),xy[0]+10,xy[1]+3);
                 }
+                
+    
+                    
+                    if(sat.isEventDetected() && !sat.getEventPositions().isEmpty() )
+                    {
+                    	
+                    	Iterator<double[]> ite = sat.getEventPositions().iterator();
+                		
+                    	while (ite.hasNext())
+                    	{
+                    		double[] eventPosition =ite.next();
+                    		
+                    		 int[] event_xy = findXYfromLL(eventPosition[1]*180.0/Math.PI, eventPosition[2]*180.0/Math.PI, w, h, imageWidth, imageHeight);
+
+                             int sz = sat.getEventPosition2DPixelSize();
+
+                             g2.fillOval(event_xy[0]-sz/2,event_xy[1]-sz/2,sz,sz);
+                             
+//                             g2.fillRect(event_xy[0] - sz / 2, event_xy[1] - sz / 2, sz, sz);
+                             
+//                             if(gs.isShow2DName())
+//                             {
+//                                 // show name?
+//                                 g2.drawString(gs.getStationName().trim(),gs_xy[0]+sz/2+3,gs_xy[1]+4);
+//                                 
+//                             } // if show name
+                    		
+                    	}
+
+                    } 
+                    
+   
+                
+                
+                
                 
                 
             }

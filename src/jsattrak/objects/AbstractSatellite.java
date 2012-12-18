@@ -24,6 +24,7 @@ package jsattrak.objects;
 
 import java.awt.Color;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import jsattrak.utilities.TLElements;
 import name.gano.worldwind.modelloader.WWModel3D_new;
@@ -99,6 +100,8 @@ public abstract class AbstractSatellite implements Serializable {
 	public abstract boolean getPlot2DFootPrint();
 
 	public abstract Color getSatColor();
+	
+	public abstract Color getGroundTrackColor();
 
 	public abstract double getSatTleEpochJulDate();
 
@@ -182,5 +185,13 @@ public abstract class AbstractSatellite implements Serializable {
 	public abstract double getThreeDModelSizeFactor();
 
 	public abstract void setThreeDModelSizeFactor(double modelSizeFactor);
+
+	public abstract boolean isEventDetected();
+
+	public abstract void setEventDetected(boolean b);
+	
+	public abstract ArrayList<double[]> getEventPositions();
+	
+	public abstract int getEventPosition2DPixelSize();
 
 }

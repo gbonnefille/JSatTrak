@@ -1,14 +1,10 @@
 package name.gano.eventsorekit;
 
-import java.awt.Color;
-
 import jsattrak.objects.CustomSatellite;
 
 import org.orekit.errors.OrekitException;
-import org.orekit.orbits.Orbit;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.ApsideDetector;
-import org.orekit.propagation.events.EventDetector.Action;
 
 public class ApsideDetectorJsat extends ApsideDetector {
 
@@ -22,17 +18,14 @@ public class ApsideDetectorJsat extends ApsideDetector {
 	@Override
 	public Action eventOccurred(SpacecraftState s, boolean increasing)
 			throws OrekitException {
-		
-		
-		//Dessiner une croix!!
-		if (increasing) {
-			satellite.setSatColor(Color.MAGENTA);
-		} else {
-			satellite.setSatColor(Color.PINK);
-		}
+
+		satellite.setEventDetected(true);
+		double[] LLA = satellite.getLLA();
+		satellite.getEventPositions().add(
+				new double[] { satellite.getCurrentJulDate(), LLA[0], LLA[1],
+						LLA[2] });
 
 		return Action.CONTINUE;
-
 	}
 
 }

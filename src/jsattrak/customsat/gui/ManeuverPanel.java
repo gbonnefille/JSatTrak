@@ -1199,34 +1199,37 @@ public class ManeuverPanel extends javax.swing.JPanel {
 					.toString())) {
 			// Set the default radius of planets
 			case SUN:
-				eventTextField1.setText(Constants.SUN_RADIUS + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.SUN.equatorialRadius));
 				break;
 			case EARTH:
-				eventTextField1.setText(Constants.WGS84_EARTH_EQUATORIAL_RADIUS + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.EARTH.equatorialRadius));
 				break;
 			case MERCURY:
-				eventTextField1.setText(2439700 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.MERCURY.equatorialRadius));
 				break;
 			case VENUS:
-				eventTextField1.setText(6051800 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.VENUS.equatorialRadius));
 				break;
 			case MOON:
-				eventTextField1.setText(1737400 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.MOON.equatorialRadius));
 				break;
 			case MARS:
-				eventTextField1.setText(3396200 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.MARS.equatorialRadius));
 				break;
 			case JUPITER:
-				eventTextField1.setText(71492000 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.JUPITER.equatorialRadius));
 				break;
 			case SATURN:
-				eventTextField1.setText(60268000 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.SATURN.equatorialRadius));
+				break;
+			case URANUS:
+				eventTextField1.setText(Double.toString(CelestialBodyObject.URANUS.equatorialRadius));
 				break;
 			case NEPTUNE:
-				eventTextField1.setText(24764000 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.NEPTUNE.equatorialRadius));
 				break;
 			case PLUTON:
-				eventTextField1.setText(1153000 + "");
+				eventTextField1.setText(Double.toString(CelestialBodyObject.PLUTON.equatorialRadius));
 				break;
 			default:
 				eventTextField1.setText(0 + "");
@@ -1243,34 +1246,37 @@ public class ManeuverPanel extends javax.swing.JPanel {
 					.getSelectedItem().toString())) {
 			// Set the default radius of planets
 			case SUN:
-				eventTextField2.setText(Constants.SUN_RADIUS + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.SUN.equatorialRadius));
 				break;
 			case EARTH:
-				eventTextField2.setText(Constants.WGS84_EARTH_EQUATORIAL_RADIUS + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.EARTH.equatorialRadius));
 				break;
 			case MERCURY:
-				eventTextField2.setText(2439700 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.MERCURY.equatorialRadius));
 				break;
 			case VENUS:
-				eventTextField2.setText(6051800 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.VENUS.equatorialRadius));
 				break;
 			case MOON:
-				eventTextField2.setText(1737400 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.MOON.equatorialRadius));
 				break;
 			case MARS:
-				eventTextField2.setText(3396200 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.MARS.equatorialRadius));
 				break;
 			case JUPITER:
-				eventTextField2.setText(71492000 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.JUPITER.equatorialRadius));
 				break;
 			case SATURN:
-				eventTextField2.setText(60268000 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.SATURN.equatorialRadius));
+				break;
+			case URANUS:
+				eventTextField2.setText(Double.toString(CelestialBodyObject.URANUS.equatorialRadius));
 				break;
 			case NEPTUNE:
-				eventTextField2.setText(24764000 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.NEPTUNE.equatorialRadius));
 				break;
 			case PLUTON:
-				eventTextField2.setText(1153000 + "");
+				eventTextField2.setText(Double.toString(CelestialBodyObject.PLUTON.equatorialRadius));
 				break;
 			default:
 				eventTextField2.setText(0 + "");
@@ -1564,18 +1570,21 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 	public enum CelestialBodyObject {
 
-		SUN("Sun"), MERCURY("Mercury"), VENUS("Venus"), EARTH_MOON(
-				"Earth-Moon barycenter"),
+		SUN("Sun",Constants.SUN_RADIUS), MERCURY("Mercury",2439700), VENUS("Venus",6051800),
 
-		EARTH("Earth"), MOON("Moon"), MARS("Mars"), JUPITER("Jupiter"), SATURN(
-				"Saturn"),
+		EARTH("Earth",Constants.WGS84_EARTH_EQUATORIAL_RADIUS), MOON("Moon",1737400), MARS("Mars",3396200), 
+		JUPITER("Jupiter",71492000), SATURN(
+				"Saturn",60268000),
 
-		URANUS("Uranus"), NEPTUNE("Neptune"), PLUTON("Pluton");
+		URANUS("Uranus",25559000), NEPTUNE("Neptune",24764000), PLUTON("Pluton",1153000);
 
 		private String value;
+		
+		private double equatorialRadius;
 
-		private CelestialBodyObject(String value) {
+		private CelestialBodyObject(String value,double equatorialRadius) {
 			this.value = value;
+			this.equatorialRadius = equatorialRadius;
 
 		}
 
@@ -1600,6 +1609,10 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 		public String getBody() {
 			return value;
+		}
+
+		public double getEquatorialRadius() {
+			return equatorialRadius;
 		}
 	}
 

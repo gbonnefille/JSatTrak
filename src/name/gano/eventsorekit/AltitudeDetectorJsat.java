@@ -8,7 +8,6 @@ import org.orekit.bodies.BodyShape;
 import org.orekit.errors.OrekitException;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.AltitudeDetector;
-import org.orekit.propagation.events.EventDetector.Action;
 
 public class AltitudeDetectorJsat extends AltitudeDetector {
 
@@ -24,11 +23,11 @@ public class AltitudeDetectorJsat extends AltitudeDetector {
 			throws OrekitException {
 
 		if (increasing) {
-				satellite.setSatColor(Color.red);
+				satellite.setSatColor(Color.RED);
 			
 		}
 		else{
-			satellite.setSatColor(Color.blue);
+			satellite.setSatColor(Color.BLUE);
 		}
 		
 		
