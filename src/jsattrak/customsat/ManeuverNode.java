@@ -140,7 +140,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 	private Hashtable<String, GroundStation> userGroundStationsList = null;
 
 	//
-	private String targetBodyObjectName = null;
+	private String targetBodyObjectName = "ISS (ZARYA)             ";
 	
 	private String targetCelestialBodyObjectName = null;
 

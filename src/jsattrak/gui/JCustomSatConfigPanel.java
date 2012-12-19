@@ -263,7 +263,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		addPropButton.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/icons/customSatIcons/prop.png"))); // NOI18N
-		addPropButton.setToolTipText("Add propogation node");
+		addPropButton.setToolTipText("Add propagation node");
 		addPropButton.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent evt) {
 				addPropButtonActionPerformed(evt);
@@ -290,7 +290,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		propMissionButton.setIcon(new javax.swing.ImageIcon(getClass()
 				.getResource("/icons/other/Play16.gif"))); // NOI18N
-		propMissionButton.setToolTipText("Propogate Mission");
+		propMissionButton.setToolTipText("Propagate Mission");
 		propMissionButton
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -594,7 +594,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 								javax.swing.GroupLayout.DEFAULT_SIZE,
 								javax.swing.GroupLayout.PREFERRED_SIZE)));
 
-		jTabbedPane1.addTab("Propogation", jPanel3);
+		jTabbedPane1.addTab("Propagation", jPanel3);
 
 		javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(
 				jPanel2);
