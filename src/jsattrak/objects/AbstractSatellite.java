@@ -195,5 +195,7 @@ public abstract class AbstractSatellite implements Serializable {
 	public abstract ArrayList<String> getEventName();
 	
 	public abstract int getEventPosition2DPixelSize();
+	
+	public abstract void setName(String name);
 
 }

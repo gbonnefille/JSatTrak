@@ -57,6 +57,9 @@ import org.orekit.utils.PVCoordinates;
  */
 public class SatelliteTleSGP4 extends AbstractSatellite {
 	private TLElements tle;
+	
+	String name ;
+	
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
 
 	private SGP4SatData sgp4SatData; // sgp4 propogator data
@@ -160,6 +163,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 			throws Exception {
 		// create internal Orekit TLE object
 		tle = new TLElements(name, tleLine1, tleLine2);
+		
+		name = tle.getSatName();
 
 		// initialize sgp4 propogator data for the satellite
 		sgp4SatData = new SGP4SatData();
@@ -679,6 +684,11 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	public String getName() {
 		return tle.getSatName();
+	}
+	
+	@Override
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public double[] getKeplarianElements() {

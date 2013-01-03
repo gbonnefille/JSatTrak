@@ -71,6 +71,8 @@ public class CustomSatellite extends AbstractSatellite {
 	// private Vector<StateVector> ephemeris = new Vector<StateVector>(
 	// ephemerisIncrement, ephemerisIncrement); // array to store ephemeris
 	private BoundedPropagator ephemeris = null;
+	
+	private CustomTreeTableNode rootNode = null;
 
 	private InitialConditionsNode initNode = null;
 
@@ -98,7 +100,7 @@ public class CustomSatellite extends AbstractSatellite {
 	private DefaultTreeTableModel missionTableModel = new DefaultTreeTableModel(); // any
 																					// TreeTableModel
 
-	String name = "Custom Sat";
+	String name = "Default name";
 
 	// current time - julian date
 	double currentJulianDate = -1;
@@ -179,9 +181,9 @@ public class CustomSatellite extends AbstractSatellite {
 													// TOO MUCH DATA!
 	private double threeDModelSizeFactor = 300000;
 
-	public CustomSatellite(String name, Time scenarioEpochDate)
+	public CustomSatellite( Time scenarioEpochDate)
 			throws OrekitException {
-		this.name = name;
+	
 		iniMissionTableModel(scenarioEpochDate);
 	}
 
@@ -202,7 +204,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 		// DefaultMutableTreeTableNode ttn = new
 		// DefaultMutableTreeTableNode(str);
-		CustomTreeTableNode rootNode = new CustomTreeTableNode(str);
+		rootNode = new CustomTreeTableNode(str);
 		rootNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/icons/custom/sat_icon.png"))));
 		missionTableModel.setRoot(rootNode);
@@ -1187,6 +1189,12 @@ public class CustomSatellite extends AbstractSatellite {
 	public double getSatTleEpochJulDate() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+		this.rootNode.setValueAt(name, 0);
 	}
 
 }

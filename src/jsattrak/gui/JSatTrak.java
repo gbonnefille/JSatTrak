@@ -3882,72 +3882,79 @@ public class JSatTrak extends javax.swing.JFrame implements
 		return coverageAnalyzer;
 	}
 
+//	public void addCustomSat() {
+//		// start status bar animation
+////		startStatusAnimation();
+////
+////		// get a name from the user:
+////		String name = JOptionPane
+////				.showInputDialog(this, "Custom Satellite Name");
+////
+////		stopStatusAnimation();
+//
+//		// call overloaded function with name
+//		try {
+//			addCustomSat(name);
+//		} catch (OrekitException e) {
+//			JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+//					JOptionPane.ERROR_MESSAGE);
+//		}
+//	}
+
 	public void addCustomSat() {
-		// start status bar animation
-		startStatusAnimation();
-
-		// get a name from the user:
-		String name = JOptionPane
-				.showInputDialog(this, "Custom Satellite Name");
-
-		stopStatusAnimation();
-
-		// call overloaded function with name
+		
 		try {
-			addCustomSat(name);
-		} catch (OrekitException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
-					JOptionPane.ERROR_MESSAGE);
-		}
-	}
-
-	public void addCustomSat(String name) throws OrekitException {
 		// add new custom sat to the list
 		// is not already in list
 		// add to hashTable
 
 		// if nothing given:
-		if (name == null || name.equalsIgnoreCase("")) {
-			// System.out.println("returned");
-			this.setStatusMessage("Custom Satellite Canceled: Either by user or not supplying a name.");
-			throw new OrekitException(new DummyLocalizable(
-					"Custom Satellite Canceled: Either by user or not supplying a name"));
-		}
-
-		if(satHash.containsKey(name)){
-			this.setStatusMessage("This custom satellite name already exists.");
-			throw new OrekitException(new DummyLocalizable(
-					"This custom satellite name already exists"));
-		}
+//		if (name == null || name.equalsIgnoreCase("")) {
+//			// System.out.println("returned");
+//			this.setStatusMessage("Custom Satellite Canceled: Either by user or not supplying a name.");
+//			throw new OrekitException(new DummyLocalizable(
+//					"Custom Satellite Canceled: Either by user or not supplying a name"));
+//		}
+//
+//		if(satHash.containsKey(name)){
+//			this.setStatusMessage("This custom satellite name already exists.");
+//			throw new OrekitException(new DummyLocalizable(
+//					"This custom satellite name already exists"));
+//		}
 		
-		CustomSatellite prop = new CustomSatellite(name,
+		CustomSatellite prop = new CustomSatellite(
 				this.getScenarioEpochDate());
-
-		satHash.put(name, prop);
-
-		// set satellite time to current date
-		prop.propogate2JulDate(this.getCurrentJulTime(),true);
-
-		// add item to the Object list tree
-		objListPanel.addSat2List(prop);
-
-		// //topSatTreeNode.add( new IconTreeNode(name) );
-		// IconTreeNode newNode = new IconTreeNode(name);
-		// // assign icon to node
-		// newNode.setIcon(new
-		// ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/custom/sat_icon_cst.png"))));
-		//
-		// treeModel.insertNodeInto(newNode, topSatTreeNode,
-		// topSatTreeNode.getChildCount());
-		//
-		//
-		// //System.out.println("node added: " + name);
-		// objectTree.scrollPathToVisible(getPath(newNode));
-
-		this.setStatusMessage("Custom Satellite Added: " + name);
+		
 		// open properties panel
-		objListPanel.openCurrentOptions(prop);
+				objListPanel.openCurrentOptions(prop,true);
 
+//		satHash.put(prop.getName(), prop);
+//
+//		// set satellite time to current date
+//		prop.propogate2JulDate(this.getCurrentJulTime(),true);
+//
+//		// add item to the Object list tree
+//		objListPanel.addSat2List(prop);
+//
+//		// //topSatTreeNode.add( new IconTreeNode(name) );
+//		// IconTreeNode newNode = new IconTreeNode(name);
+//		// // assign icon to node
+//		// newNode.setIcon(new
+//		// ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/icons/custom/sat_icon_cst.png"))));
+//		//
+//		// treeModel.insertNodeInto(newNode, topSatTreeNode,
+//		// topSatTreeNode.getChildCount());
+//		//
+//		//
+//		// //System.out.println("node added: " + name);
+//		// objectTree.scrollPathToVisible(getPath(newNode));
+//
+//		this.setStatusMessage("Custom Satellite Added: " + prop.getName());
+//		
+		} catch (OrekitException e) {
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	public// 3D windows

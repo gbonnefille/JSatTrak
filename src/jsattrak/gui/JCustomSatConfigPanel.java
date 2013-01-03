@@ -184,6 +184,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		jPanel1 = new javax.swing.JPanel();
 		jLabel1 = new javax.swing.JLabel();
+		satNameTextField = new javax.swing.JTextField();
 		jLabel2 = new javax.swing.JLabel();
 		jPanel2 = new javax.swing.JPanel();
 		jTabbedPane1 = new javax.swing.JTabbedPane();
@@ -212,10 +213,13 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
 		jLabel1.setFont(new java.awt.Font("Tahoma", 1, 12));
-		jLabel1.setText("Custom Satellite Configuration");
+		jLabel1.setText(" Satellite name :");
 
 		jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource(
 				"/icons/other/Orbit.png"))); // NOI18N
+
+		satNameTextField.setFont(new java.awt.Font("Tahoma", 1, 12));
+		satNameTextField.setText(sat.getName());
 
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
 				jPanel1);
@@ -228,6 +232,14 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 								jPanel1Layout
 										.createSequentialGroup()
 										.addComponent(jLabel1)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+												50, Short.MAX_VALUE)
+										.addComponent(
+												satNameTextField,
+												javax.swing.GroupLayout.PREFERRED_SIZE,
+												90,
+												javax.swing.GroupLayout.PREFERRED_SIZE)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
 												262, Short.MAX_VALUE)
@@ -252,11 +264,31 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 																				Short.MAX_VALUE)
 																		.addComponent(
 																				jLabel2))
-														.addComponent(
-																jLabel1,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																27,
-																Short.MAX_VALUE))
+														
+
+														.addGroup(
+																jPanel1Layout
+																		.createSequentialGroup()
+																		.addContainerGap(
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				Short.MAX_VALUE)
+																		.addComponent(
+																				jLabel1,
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				24,
+																				Short.MAX_VALUE))
+
+														.addGroup(
+																jPanel1Layout
+																		.createSequentialGroup()
+																		.addContainerGap(
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				Short.MAX_VALUE)
+																		.addComponent(
+																				satNameTextField,
+																				javax.swing.GroupLayout.PREFERRED_SIZE,
+																				javax.swing.GroupLayout.DEFAULT_SIZE,
+																				javax.swing.GroupLayout.PREFERRED_SIZE)))
 										.addContainerGap()));
 
 		jLabel3.setText("Mission Designer:");
@@ -696,8 +728,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// make sure selected node not root
 			if (selectedNode != ((CustomTreeTableNode) treeTableModel.getRoot())
 					&& !selectedNode.getNodeType().equalsIgnoreCase(
-							"Initial Conditions")&& !selectedNode.getNodeType().equalsIgnoreCase(
-									"Event")) {
+							"Initial Conditions")
+					&& !selectedNode.getNodeType().equalsIgnoreCase("Event")) {
 				// get parent of selected object
 				CustomTreeTableNode selectedNodeParent = (CustomTreeTableNode) missionDesignJXTreeTable
 						.getTreeSelectionModel().getSelectionPath()
@@ -715,7 +747,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 							.getChild(selectedNodeParent, childIndex - 1);
 
 					if (!nodeAbove.getNodeType().equalsIgnoreCase(
-							"Initial Conditions")&&!nodeAbove.getNodeType().equalsIgnoreCase(
+							"Initial Conditions")
+							&& !nodeAbove.getNodeType().equalsIgnoreCase(
 									"Event")) {
 
 						// not below INI - so move it up
@@ -750,8 +783,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// make sure selected node not root
 			if (selectedNode != ((CustomTreeTableNode) treeTableModel.getRoot())
 					&& !selectedNode.getNodeType().equalsIgnoreCase(
-							"Initial Conditions")&& !selectedNode.getNodeType().equalsIgnoreCase(
-									"Event")) {
+							"Initial Conditions")
+					&& !selectedNode.getNodeType().equalsIgnoreCase("Event")) {
 				// get parent of selected object
 				CustomTreeTableNode selectedNodeParent = (CustomTreeTableNode) missionDesignJXTreeTable
 						.getTreeSelectionModel().getSelectionPath()
@@ -849,11 +882,11 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 				// double deltaTT2UTC = Time.deltaT(nodeStartTime
 				// - AstroConst.JDminusMJD); // = TT - UTC
 				// Time n = new Time();
-				
-				//Reset events
-					sat.getEventPositions().clear();
-					sat.getEventName().clear();
-					sat.setEventDetected(false);
+
+				// Reset events
+				sat.getEventPositions().clear();
+				sat.getEventName().clear();
+				sat.setEventDetected(false);
 
 				// set app time
 				app.setTime(nodeStartTime);
@@ -865,8 +898,9 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 				app.forceRepainting(false); // repait without updating
 											// positional data
 
-				app.updateTime(true); // update time to redraw ground track! SEG 10
-									// July 2009
+				app.updateTime(true); // update time to redraw ground track! SEG
+										// 10
+										// July 2009
 
 			} // valid value
 		} // node selected
@@ -1093,6 +1127,10 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	} // revert variables
 		// Variables declaration - do not modify//GEN-BEGIN:variables
 
+	public javax.swing.JTextField getSatNameTextField() {
+		return satNameTextField;
+	}
+
 	private javax.swing.JButton addBurnButton;
 	private javax.swing.JButton addFromFileButton;
 	private javax.swing.JButton addFromFileButton1;
@@ -1103,6 +1141,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	private javax.swing.JButton downNodeButton;
 	private javax.swing.JButton exportEphemerisButton;
 	private javax.swing.JLabel jLabel1;
+	private javax.swing.JTextField satNameTextField;
 	private javax.swing.JLabel jLabel2;
 	private javax.swing.JLabel jLabel3;
 	private javax.swing.JPanel jPanel1;

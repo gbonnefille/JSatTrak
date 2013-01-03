@@ -393,7 +393,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 			AbstractSatellite prop = satHash.get(nameSelected);
 
 			// create create Sat Settings panel
-			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp);
+			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp,false);
 
 			String windowName = prop.getName().trim() + " - Settings"; // set
 																		// name
