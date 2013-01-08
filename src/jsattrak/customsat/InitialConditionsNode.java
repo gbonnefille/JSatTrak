@@ -30,6 +30,7 @@ import javax.swing.JInternalFrame;
 import jsattrak.customsat.gui.InitialConditionsPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
+import jsattrak.utilities.TLElements;
 import name.gano.astro.time.Time;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
@@ -57,9 +58,14 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public static final int CARTESIAN = 1;
 	public static final int CIRCULAR = 2;
 	public static final int EQUINOCTIAL = 3;
+	public static final int TLE = 4;
 
 	// which coord to use
 	private int coordinate = InitialConditionsNode.KEPLERIAN;
+	
+	private String satelliteTleName = null;
+	
+	private TLElements satelliteTleElements = null;
 
 	private double[] keplarianElements = new double[] { 6678140, 0.01,
 			45.0 * Math.PI / 180.0, 0.0, 0.0, 0.0 }; 
@@ -67,9 +73,6 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	private PVCoordinates cartesianElements = new PVCoordinates();; // x,y,z,dx,dy,dz
 	private double[] circularElements = new double[6];
 	private double[] equinoctialElements = new double[6];
-
-	private boolean usingKepElements = true; // if user is inputting keplarian
-												// elements
 
 	private double iniJulDate = 0; // (UTC) julian date of the inital conditions
 									// (should set to epock of scenario by
@@ -142,7 +145,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 				true, true);
 
 		// show satellite browser window
-		InitialConditionsPanel gsBrowser = new InitialConditionsPanel(this,
+		InitialConditionsPanel gsBrowser = new InitialConditionsPanel(app,this,
 				scenarioEpochDate); // non-modal version
 		gsBrowser.setIframe(iframe);
 
@@ -248,14 +251,6 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 				this.absoluteDate, this.mu);
 	}
 
-	public boolean isUsingKepElements() {
-		return usingKepElements;
-	}
-
-	public void setUsingKepElements(boolean usingKepElements) {
-		this.usingKepElements = usingKepElements;
-	}
-
 	public double getIniJulDate() {
 		return iniJulDate;
 	}
@@ -323,6 +318,23 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public void setPositionAngle(PositionAngle positionAngle) {
 		this.positionAngle = positionAngle;
+	}
+
+	public String getSatelliteTleName() {
+		return satelliteTleName;
+	}
+
+	public void setSatelliteTleName(String satelliteTleName) {
+		this.satelliteTleName = satelliteTleName;
+	}
+
+	public TLElements getSatelliteTleElements() {
+		return satelliteTleElements;
+	}
+
+	public void setSatelliteTleElements(TLElements satelliteTleElements) {
+		this.satelliteTleElements = satelliteTleElements;
+		
 	}
 
 }

@@ -2,20 +2,19 @@ package name.gano.eventsorekit;
 
 import java.awt.Color;
 
-import jsattrak.objects.CustomSatellite;
+import jsattrak.objects.AbstractSatellite;
 
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.events.ApparentElevationDetector;
-import org.orekit.propagation.events.EventDetector.Action;
 
 public class ApparentElevationDetectorJsat extends ApparentElevationDetector {
 
-	private CustomSatellite satellite = null;
+	private AbstractSatellite satellite = null;
 
-	public ApparentElevationDetectorJsat(CustomSatellite sat, double elevation,
-			TopocentricFrame topo) {
+	public ApparentElevationDetectorJsat(AbstractSatellite sat,
+			double elevation, TopocentricFrame topo) {
 		super(elevation, topo);
 		this.satellite = sat;
 	}

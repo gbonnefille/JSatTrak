@@ -32,6 +32,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
+import jsattrak.customsat.InitialConditionsNode;
+import jsattrak.customsat.PropagatorNode;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
 import name.gano.astro.Kepler;
@@ -40,11 +42,13 @@ import name.gano.worldwind.modelloader.WWModel3D_new;
 import net.java.joglutils.model.ModelFactory;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
+import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
+import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
@@ -57,13 +61,21 @@ import org.orekit.utils.PVCoordinates;
  */
 public class SatelliteTleSGP4 extends AbstractSatellite {
 	private TLElements tle;
-	
-	String name ;
-	
+
+	String name;
+
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
 
 	private SGP4SatData sgp4SatData; // sgp4 propogator data
 	private TLEPropagator orekitTlePropagator;
+
+	private InitialConditionsNode initNode = null;
+
+	private PropagatorNode propNode = null;
+
+	private DefaultTreeTableModel missionTableModel = new DefaultTreeTableModel();
+
+	private boolean showConsoleOnPropogate = true;
 
 	// current time - julian date
 	double currentJulianDate = -1;
@@ -79,9 +91,9 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	private double[] lla = new double[3];
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
-	
+
 	private ArrayList<String> eventName = new ArrayList<String>();
-	
+
 	private int eventPosition2DPixelSize = 6;
 
 	// plot options
@@ -160,10 +172,10 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	 *             if TLE data is bad
 	 */
 	public SatelliteTleSGP4(String name, String tleLine1, String tleLine2)
-			throws Exception {
+			throws OrekitException {
 		// create internal Orekit TLE object
 		tle = new TLElements(name, tleLine1, tleLine2);
-		
+
 		name = tle.getSatName();
 
 		// initialize sgp4 propogator data for the satellite
@@ -685,7 +697,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	public String getName() {
 		return tle.getSatName();
 	}
-	
+
 	@Override
 	public void setName(String name) {
 		this.name = name;
@@ -941,11 +953,11 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	public ArrayList<double[]> getEventPositions() {
 		return eventPositions;
 	}
-	
+
 	public int getEventPosition2DPixelSize() {
 		return eventPosition2DPixelSize;
 	}
-	
+
 	public ArrayList<String> getEventName() {
 		return eventName;
 	}
@@ -953,6 +965,43 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	@Override
 	public String toString() {
 		return this.tle.getSatName();
+	}
+
+	@Override
+	public void setEphemeris(AbstractPropagator ephemeris) {
+		this.orekitTlePropagator = (TLEPropagator) ephemeris;
+
+	}
+
+	@Override
+	public PropagatorNode getPropNode() {
+		return propNode;
+	}
+
+	@Override
+	public InitialConditionsNode getInitNode() {
+		return initNode;
+	}
+
+	@Override
+	public void setShowConsoleOnPropogate(boolean showConsoleOnPropogate) {
+		this.showConsoleOnPropogate = showConsoleOnPropogate;
+
+	}
+
+	@Override
+	public boolean isShowConsoleOnPropogate() {
+		return showConsoleOnPropogate;
+	}
+
+	@Override
+	public AbstractPropagator getEphemeris() {
+		return orekitTlePropagator;
+	}
+
+	@Override
+	public DefaultTreeTableModel getMissionTableModel() {
+		return missionTableModel;
 	}
 
 } // SatelliteProps

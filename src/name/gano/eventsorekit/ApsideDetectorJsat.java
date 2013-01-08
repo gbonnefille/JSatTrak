@@ -1,6 +1,6 @@
 package name.gano.eventsorekit;
 
-import jsattrak.objects.CustomSatellite;
+import jsattrak.objects.AbstractSatellite;
 
 import org.orekit.errors.OrekitException;
 import org.orekit.propagation.SpacecraftState;
@@ -8,9 +8,9 @@ import org.orekit.propagation.events.ApsideDetector;
 
 public class ApsideDetectorJsat extends ApsideDetector {
 
-	private CustomSatellite satellite = null;
+	private AbstractSatellite satellite = null;
 
-	public ApsideDetectorJsat(CustomSatellite sat) {
+	public ApsideDetectorJsat(AbstractSatellite sat) {
 		super(sat.getInitNode().getOrbitOrekit());
 		this.satellite = sat;
 	}
@@ -24,8 +24,8 @@ public class ApsideDetectorJsat extends ApsideDetector {
 		satellite.getEventPositions().add(
 				new double[] { satellite.getCurrentJulDate(), LLA[0], LLA[1],
 						LLA[2] });
-		satellite.getEventName().add("Apside "+(satellite.getEventName().size()+1));
-
+		satellite.getEventName().add(
+				"Apside " + (satellite.getEventName().size() + 1));
 
 		return Action.CONTINUE;
 	}

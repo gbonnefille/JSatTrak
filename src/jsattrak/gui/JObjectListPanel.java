@@ -321,6 +321,11 @@ public class JObjectListPanel extends javax.swing.JPanel {
 	public void openCurrentOptions(Object obj,boolean newSat) {
 		// try to see if obj is in a current list
 
+		if(obj!=null){
+			
+				
+		}
+		
 		String nameSelected = obj.toString();
 
 		if (satHash.containsKey(nameSelected)

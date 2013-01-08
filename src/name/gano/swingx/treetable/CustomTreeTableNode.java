@@ -166,7 +166,7 @@ public class CustomTreeTableNode extends DefaultMutableTreeTableNode implements 
         
         // save initial time of the node ( TT)
 
-    	this.setStartTTjulDate(missionDesign.getEphemeris().getMaxDate());
+    	this.setStartTTjulDate(missionDesign.getEphemeris().getGeneratedEphemeris().getMaxDate());
 //        this.setStartTTjulDate(ephemeris.lastElement().state[0]);
         
     }// execute

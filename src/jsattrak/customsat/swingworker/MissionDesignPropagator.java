@@ -33,6 +33,7 @@ import jsattrak.customsat.InputVariable;
 import jsattrak.customsat.SolverNode;
 import jsattrak.customsat.StopNode;
 import jsattrak.gui.JSatTrak;
+import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
@@ -40,6 +41,7 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
+import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.PVCoordinates;
@@ -56,12 +58,12 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 	CustomTreeTableNode rootNode;
 	DefaultTreeTableModel treeTableModel;
 	// private Vector<StateVector> ephemeris;
-	private BoundedPropagator ephemeris = null;
+	private AbstractPropagator ephemeris = null;
 
 	// /** Frame in which are defined the orbital parameters. */
 	// private Frame frame;
 
-	CustomSatellite sat; // sat for this propogation to save data back to
+	AbstractSatellite sat; // sat for this propogation to save data back to
 
 	String currentMessage = "";
 
@@ -76,7 +78,7 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 
 	public MissionDesignPropagator(CustomTreeTableNode rootNode,
 			DefaultTreeTableModel treeTableModel,
-			CustomSatellite sat, JSatTrak app) {
+			AbstractSatellite sat, JSatTrak app) {
 		// transfer in needed objects to run
 		this.rootNode = rootNode;
 		this.treeTableModel = treeTableModel;
@@ -343,13 +345,13 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 
 		double step = sat.getPropNode().getStepSize();
 		Frame frame = sat.getInitNode().getFrame();
-		AbsoluteDate absoluteT = ephemeris.getMinDate();
+		AbsoluteDate absoluteT = ephemeris.getGeneratedEphemeris().getMinDate();
 		PVCoordinates pv = null;
 		Vector3D pos = null;
 		Vector3D vel = null;
 		double t = 0;
 
-		while (absoluteT.compareTo(ephemeris.getMaxDate()) < 0) {
+		while (absoluteT.compareTo(ephemeris.getGeneratedEphemeris().getMaxDate()) < 0) {
 
 
 				pv = ephemeris.getPVCoordinates(absoluteT, frame);
@@ -371,11 +373,11 @@ public class MissionDesignPropagator extends SwingWorker<Object, Integer> {
 
 	} // printEphemeris
 
-	public BoundedPropagator getEphemeris() {
+	public AbstractPropagator getEphemeris() {
 		return ephemeris;
 	}
 
-	public void setEphemeris(BoundedPropagator ephemeris) {
+	public void setEphemeris(AbstractPropagator ephemeris) {
 		this.ephemeris = ephemeris;
 	}
 

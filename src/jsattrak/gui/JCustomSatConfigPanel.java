@@ -42,6 +42,7 @@ import jsattrak.customsat.StopNode;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
+import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.CustomFileFilter;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 import name.gano.swingx.treetable.IconTreeTableNodeRenderer;
@@ -52,7 +53,9 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
+import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.BoundedPropagator;
+import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.PVCoordinates;
@@ -65,13 +68,13 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	DefaultTreeTableModel treeTableModel; // any TreeTableModel
 	CustomTreeTableNode rootNode; // root node in mission designer treetable
-	CustomSatellite sat;
+	AbstractSatellite sat;
 	// private Vector<StateVector> ephemeris;
 	// private BoundedPropagator ephemeris;
 	JSatTrak app; // used to add message etc.
 
 	/** Creates new form JCustomSatConfigPanel */
-	public JCustomSatConfigPanel(CustomSatellite sat, JSatTrak app) {
+	public JCustomSatConfigPanel(AbstractSatellite sat, JSatTrak app) {
 
 		this.treeTableModel = sat.getMissionTableModel(); // treeTableModel;
 		this.app = app;
@@ -992,14 +995,17 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		String beginTime = "";
 
 		try {
-			BoundedPropagator ephemeris = this.sat.getEphemeris();
+			
+				AbstractPropagator ephemeris = this.sat.getEphemeris();
+		
+			
 
 			if (ephemeris != null) {
 
 				// double firstTime = (ephemeris.getMinDate().durationFrom(
 				// AbsoluteDate.JULIAN_EPOCH) / 86400);
 
-				beginTime = ephemeris.getMinDate().toString(
+				beginTime = ephemeris.getGeneratedEphemeris().getMinDate().toString(
 						TimeScalesFactory.getUTC());
 
 				// GregorianCalendar cal = Time.convertJD2Calendar(firstTime);
@@ -1045,7 +1051,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// write each epheris line - time should range from 0 to n seconds
 			double time = 0;
 
-			AbsoluteDate begin = ephemeris.getMinDate();
+			AbsoluteDate begin = ephemeris.getGeneratedEphemeris().getMinDate();
 			AbsoluteDate current = null;
 			PVCoordinates pvCoord = null;
 			Vector3D pos = null;

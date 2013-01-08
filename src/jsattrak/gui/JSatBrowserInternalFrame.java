@@ -124,6 +124,7 @@ public class JSatBrowserInternalFrame extends javax.swing.JInternalFrame {
 			// System.out.println("trys:"+ i);
 		} // wait for thread if needed
 	} // contructor
+	
 
 	/**
 	 * This method is called from within the constructor to initialize the form.

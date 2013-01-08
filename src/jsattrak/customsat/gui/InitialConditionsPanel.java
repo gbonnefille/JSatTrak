@@ -24,16 +24,26 @@
 
 package jsattrak.customsat.gui;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Hashtable;
 import java.util.TimeZone;
 
+import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import jsattrak.customsat.InitialConditionsNode;
+import jsattrak.gui.JSatTrak;
+import jsattrak.utilities.CustomFileFilter;
+import jsattrak.utilities.SatBrowserTleDataLoader;
+import jsattrak.utilities.TLEDownloader;
+import jsattrak.utilities.TLElements;
 import name.gano.astro.time.Time;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -59,6 +69,14 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	final Time scenarioEpochDate; // used for date string functions
 
+	// hashtable with tle's
+	private Hashtable<String, TLElements> tleHash;
+	
+	//TLE sat database
+	private SatBrowserTleDataLoader sbtdl;
+
+	private JSatTrak app;
+
 	/**
 	 * Creates new form InitialConditionsPanel
 	 * 
@@ -67,11 +85,12 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 	 * @param scenarioEpochDate
 	 *            scenario epoch date
 	 */
-	public InitialConditionsPanel(InitialConditionsNode icNode,
+	public InitialConditionsPanel(JSatTrak app, InitialConditionsNode icNode,
 			final Time scenarioEpochDate) {
 		this.icNode = icNode;
 		this.scenarioEpochDate = scenarioEpochDate;
 
+		this.app = app;
 		initComponents();
 
 		muTextField.setText("" + icNode.getMu());
@@ -144,6 +163,29 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				break;
 			}
 
+			break;
+
+		case 4:
+			// fill out equinoctial elements
+			iniTabbedPane.setSelectedIndex(4);
+			// double[] equi = icNode.getEquinoctialElements();
+			// setEquinoctialElementsInGUI(equi);
+			//
+			// switch (icNode.getPositionAngle()) {
+			// case MEAN:
+			// equiComboBox.setSelectedIndex(0);
+			// break;
+			// case TRUE:
+			// equiComboBox.setSelectedIndex(1);
+			// break;
+			// case ECCENTRIC:
+			// equiComboBox.setSelectedIndex(2);
+			// break;
+			// }
+
+			break;
+
+		default:
 			break;
 
 		}
@@ -228,6 +270,9 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 		equiPanel = new javax.swing.JPanel();
 
+		// TLE orbit
+		tlePanel = new javax.swing.JPanel();
+
 		// mu
 		jLabel31 = new javax.swing.JLabel();
 		muTextField = new javax.swing.JTextField();
@@ -249,8 +294,6 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		dxTextField = new javax.swing.JTextField();
 		jLabel2 = new javax.swing.JLabel();
 		epochTextField = new javax.swing.JTextField();
-
-		
 
 		applyButton.setText("Apply");
 		applyButton.addActionListener(new java.awt.event.ActionListener() {
@@ -1079,8 +1122,152 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 												Short.MAX_VALUE)));
 
 		iniTabbedPane.addTab("Equinoctial", equiPanel);
+
+		/**
+		 * TLE panel
+		 */
+
+		// Initialize tree
+		DefaultTreeModel treeModel;
+
+		// top node
+		DefaultMutableTreeNode topTreeNode;
+
+		outsidePanel = new javax.swing.JPanel();
+		mainPanel = new javax.swing.JPanel();
+		jPanel1 = new javax.swing.JPanel();
+		jScrollPane1 = new javax.swing.JScrollPane();
+		satTree = new javax.swing.JTree();
+		jPanelTle = new javax.swing.JPanel();
+		jScrollPane3 = new javax.swing.JScrollPane();
+		tleOutputTextArea = new javax.swing.JTextArea();
+		jMenuBar1 = new javax.swing.JMenuBar();
+		jMenu1 = new javax.swing.JMenu();
+		loadCustomTLEMenuItem = new javax.swing.JMenuItem();
+		createCustomSatMenuItem = new javax.swing.JMenuItem();
+
+		outsidePanel.setLayout(new java.awt.BorderLayout());
+
+		satTree.setToolTipText("Drag Satellite(s) over to Satellite List");
+		satTree.setDragEnabled(true);
+		satTree.addTreeSelectionListener(new javax.swing.event.TreeSelectionListener() {
+			public void valueChanged(javax.swing.event.TreeSelectionEvent evt) {
+				satTreeValueChanged(evt);
+			}
+		});
+		jScrollPane1.setViewportView(satTree);
 		
-		//add a change a listener to tabbed pane
+		
+		
+		//Button
+		jMenu1.setText("Options");
+
+		loadCustomTLEMenuItem.setIcon(new javax.swing.ImageIcon(getClass()
+				.getResource("/icons/gnome_2_18/folder-open.png"))); // NOI18N
+		loadCustomTLEMenuItem.setText("Load Custom TLE Data File");
+		loadCustomTLEMenuItem
+				.addActionListener(new java.awt.event.ActionListener() {
+					public void actionPerformed(java.awt.event.ActionEvent evt) {
+						 loadCustomTLEMenuItemActionPerformed(evt);
+					}
+				});
+		jMenu1.add(loadCustomTLEMenuItem);
+		jMenuBar1.add(jMenu1);
+		
+		
+		//panel
+		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
+				jPanel1);
+		jPanel1.setLayout(jPanel1Layout);
+		jPanel1Layout.setHorizontalGroup(jPanel1Layout.createParallelGroup(
+				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
+				jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 384,
+				Short.MAX_VALUE));
+		jPanel1Layout.setVerticalGroup(jPanel1Layout.createParallelGroup(
+				javax.swing.GroupLayout.Alignment.LEADING).addComponent(
+				jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING,
+				javax.swing.GroupLayout.DEFAULT_SIZE, 186, Short.MAX_VALUE));
+
+		tleOutputTextArea.setColumns(20);
+		tleOutputTextArea.setRows(5);
+		tleOutputTextArea.setToolTipText("Satellite TLE");
+		jScrollPane3.setViewportView(tleOutputTextArea);
+
+		javax.swing.GroupLayout jPanelTextFieldTleLayout = new javax.swing.GroupLayout(
+				jPanelTle);
+		jPanelTle.setLayout(jPanelTextFieldTleLayout);
+		jPanelTextFieldTleLayout.setHorizontalGroup(jPanelTextFieldTleLayout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				
+				.addComponent(jScrollPane3,
+						javax.swing.GroupLayout.Alignment.TRAILING,
+						javax.swing.GroupLayout.DEFAULT_SIZE, 384,
+						Short.MAX_VALUE));
+		jPanelTextFieldTleLayout.setVerticalGroup(jPanelTextFieldTleLayout.createParallelGroup(
+				javax.swing.GroupLayout.Alignment.LEADING)
+				
+				.addComponent(
+				jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING,
+				javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE));
+
+		javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(
+				mainPanel);
+		mainPanel.setLayout(mainPanelLayout);
+		mainPanelLayout.setHorizontalGroup(
+				
+				mainPanelLayout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				.addComponent(jMenuBar1)
+				.addComponent(jPanelTle, javax.swing.GroupLayout.DEFAULT_SIZE,
+						javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE,
+						javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
+		mainPanelLayout
+				.setVerticalGroup(mainPanelLayout
+						.createParallelGroup(
+								javax.swing.GroupLayout.Alignment.LEADING)
+						
+						.addGroup(
+								javax.swing.GroupLayout.Alignment.TRAILING,
+								mainPanelLayout
+										.createSequentialGroup()
+										.addComponent(jMenuBar1)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(
+												jPanel1,
+												javax.swing.GroupLayout.DEFAULT_SIZE,
+												javax.swing.GroupLayout.DEFAULT_SIZE,
+												Short.MAX_VALUE)
+										.addPreferredGap(
+												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+										.addComponent(
+												jPanelTle,
+												javax.swing.GroupLayout.PREFERRED_SIZE,
+												javax.swing.GroupLayout.DEFAULT_SIZE,
+												javax.swing.GroupLayout.PREFERRED_SIZE)));
+
+		outsidePanel.add(mainPanel, java.awt.BorderLayout.CENTER);
+
+		iniTabbedPane.addTab("TLE", outsidePanel);
+
+
+
+		topTreeNode = new DefaultMutableTreeNode("Satellites");
+
+		// create a hashmap of TLEs with key as text from tree
+		tleHash = new Hashtable<String, TLElements>();
+
+		treeModel = new DefaultTreeModel(topTreeNode); // create tree model
+														// using root node
+		satTree.setModel(treeModel); // set the tree's model
+
+		sbtdl = new SatBrowserTleDataLoader(app, topTreeNode, tleHash,
+				tleOutputTextArea, satTree);
+
+		sbtdl.execute();
+
+		// add a change a listener to tabbed pane
 		iniTabbedPane.addChangeListener(new ChangeListener() {
 
 			@Override
@@ -1295,6 +1482,54 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 												.addComponent(okButton))));
 	}// </editor-fold>//GEN-END:initComponents
 
+	private void satTreeValueChanged(javax.swing.event.TreeSelectionEvent evt)// GEN-FIRST:event_satTreeValueChanged
+	{// GEN-HEADEREND:event_satTreeValueChanged
+		// some other sat was selected
+
+		if (satTree.getSelectionCount() > 0) {
+			if (tleHash.containsKey(satTree.getLastSelectedPathComponent()
+					.toString())) {
+				TLElements selectedTLE = tleHash.get(satTree
+						.getLastSelectedPathComponent().toString());
+
+				try {
+					tleOutputTextArea.setText(selectedTLE.getLine1() + "\n"
+							+ selectedTLE.getLine2());
+				} catch (OrekitException e) {
+
+					e.printStackTrace();
+				}
+			} else // clear text area
+			{
+				tleOutputTextArea.setText("");
+			}
+		} // something is selected
+	}// GEN-LAST:event_satTreeValueChanged
+	
+	private void loadCustomTLEMenuItemActionPerformed(
+			java.awt.event.ActionEvent evt)// GEN-FIRST:event_loadCustomTLEMenuItemActionPerformed
+	{// GEN-HEADEREND:event_loadCustomTLEMenuItemActionPerformed
+		// ask user to browse for file (.tle, .dat, .txt, other?)
+		final JFileChooser fc = new JFileChooser(
+				new TLEDownloader().getTleFilePath(0));
+		CustomFileFilter xmlFilter = new CustomFileFilter("tle", "*.tle");
+		fc.addChoosableFileFilter(xmlFilter);
+		xmlFilter = new CustomFileFilter("dat", "*.dat");
+		fc.addChoosableFileFilter(xmlFilter);
+		xmlFilter = new CustomFileFilter("txt", "*.txt");
+		fc.addChoosableFileFilter(xmlFilter);
+
+		int returnVal = fc.showOpenDialog(this);
+
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File file = fc.getSelectedFile();
+
+			Boolean result = sbtdl.loadTLEDataFile(file, "Custom", null);
+			// System.out.println("Result Loading: " + result.toString());
+		}
+
+	}// GEN-LAST:event_loadCustomTLEMenuItemActionPerformed
+
 	private void xTextFieldActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_xTextFieldActionPerformed
 	{// GEN-HEADEREND:event_xTextFieldActionPerformed
 		// TODO add your handling code here:
@@ -1366,8 +1601,8 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		try {
 			success = saveSettings();
 		} catch (OrekitException e1) {
-			JOptionPane.showMessageDialog(this, e1.getMessage(),
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, e1.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 
 		// close internal frame
@@ -1393,8 +1628,8 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		try {
 			saveSettings();
 		} catch (OrekitException e) {
-			JOptionPane.showMessageDialog(this, e.getMessage(),
-					"Error", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+					JOptionPane.ERROR_MESSAGE);
 		}
 	}// GEN-LAST:event_applyButtonActionPerformed
 
@@ -1402,15 +1637,17 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 		double[] ret = null;
 		PVCoordinates retCart = null;
+		// Enable epoch, mu & frame type in IHM
+		jPanel3.setVisible(true);
 
-		//Transmit the position angle to other panel
+		// Transmit the position angle to other panel
 		switch (icNode.getPositionAngle()) {
 
 		case MEAN:
-			kepComboBox.setSelectedIndex(0);	
+			kepComboBox.setSelectedIndex(0);
 			circComboBox.setSelectedIndex(0);
 			equiComboBox.setSelectedIndex(0);
-			
+
 			break;
 
 		case TRUE:
@@ -1426,7 +1663,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 			break;
 		}
 
-		//Convert element to other coordinate system
+		// Convert element to other coordinate system
 		switch (iniTabbedPane.getSelectedIndex()) {
 		case 0:
 			// Convert label to keplerian element
@@ -1449,6 +1686,15 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 			ret = icNode.convertToEquinoctial();
 			setEquinoctialElementsInGUI(ret);
 			break;
+		case 4:
+			// TLE panel
+			// Disable epoch, mu & frame type in IHM
+			jPanel3.setVisible(false);
+
+			break;
+
+		default:
+			break;
 
 		}
 
@@ -1458,49 +1704,52 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		// save settings back to Node
 		boolean saveSuccess = true;
 
-		// save epoch
-		saveSuccess = saveEpoch();
-
-		// Save mu
-		icNode.setMu(Double.parseDouble(muTextField.getText()));
+		try{
 
 		// Wich coordinate system
 		icNode.setCoordinate(iniTabbedPane.getSelectedIndex());
 
-		try {
+		//if not TLE
+		if(iniTabbedPane.getSelectedIndex()!=4){
+			// save epoch
+			saveSuccess = saveEpoch();
 
-			switch (inputComboBox.getSelectedIndex()) {
+			// Save mu
+			icNode.setMu(Double.parseDouble(muTextField.getText()));
 
-			case 0:
+				switch (inputComboBox.getSelectedIndex()) {
 
-				icNode.setFrame(FramesFactory.getEME2000());
-				break;
+				case 0:
 
-			case 1:
-				icNode.setFrame(FramesFactory.getCIRF2000());
-				break;
+					icNode.setFrame(FramesFactory.getEME2000());
+					break;
 
-			case 2:
-				icNode.setFrame(FramesFactory.getGCRF());
-				break;
+				case 1:
+					icNode.setFrame(FramesFactory.getCIRF2000());
+					break;
 
-			case 3:
-				icNode.setFrame(FramesFactory.getMOD(true));
-				break;
-			case 4:
-				icNode.setFrame(FramesFactory.getTEME());
-				break;
-			case 5:
-				icNode.setFrame(FramesFactory.getTOD(true));
-				break;
-			case 6:
-				icNode.setFrame(FramesFactory.getVeis1950());
-				break;
-			}
+				case 2:
+					icNode.setFrame(FramesFactory.getGCRF());
+					break;
+
+				case 3:
+					icNode.setFrame(FramesFactory.getMOD(true));
+					break;
+				case 4:
+					icNode.setFrame(FramesFactory.getTEME());
+					break;
+				case 5:
+					icNode.setFrame(FramesFactory.getTOD(true));
+					break;
+				case 6:
+					icNode.setFrame(FramesFactory.getVeis1950());
+					break;
+				
+		}}
 
 			// get correct coordinate system elements & save them
 			switch (iniTabbedPane.getSelectedIndex()) {
-
+			
 			case 0:
 				// Keplerian system
 
@@ -1585,6 +1834,16 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				double[] equi = this.getEquinoctialElementsFromGUI();
 				icNode.setEquinoctialElements(equi);
 
+				break;
+
+			case 4:
+				icNode.setSatelliteTleElements(tleHash.get(satTree
+						.getLastSelectedPathComponent().toString()));
+				icNode.setSatelliteTleName(satTree
+				.getLastSelectedPathComponent().toString());
+				break;
+				
+			default:
 				break;
 
 			}
@@ -1727,6 +1986,9 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	private javax.swing.JPanel equiPanel;
 
+	// TLE orbit
+	private javax.swing.JPanel tlePanel;
+
 	// MU
 	private javax.swing.JLabel jLabel31;
 	private javax.swing.JTextField muTextField;
@@ -1749,6 +2011,20 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 	private javax.swing.JTextField xTextField;
 	private javax.swing.JTextField yTextField;
 	private javax.swing.JTextField zTextField;
+
+	// tle components
+	private javax.swing.JMenuItem createCustomSatMenuItem;
+	private javax.swing.JMenu jMenu1;
+	private javax.swing.JMenuBar jMenuBar1;
+	private javax.swing.JPanel jPanel1;
+	private javax.swing.JPanel jPanelTle;
+	private javax.swing.JScrollPane jScrollPane1;
+	private javax.swing.JScrollPane jScrollPane3;
+	private javax.swing.JMenuItem loadCustomTLEMenuItem;
+	private javax.swing.JPanel mainPanel;
+	private javax.swing.JPanel outsidePanel;
+	private javax.swing.JTree satTree;
+	private javax.swing.JTextArea tleOutputTextArea;
 
 	// End of variables declaration//GEN-END:variables
 

@@ -1,6 +1,6 @@
 package name.gano.eventsorekit;
 
-import jsattrak.objects.CustomSatellite;
+import jsattrak.objects.AbstractSatellite;
 
 import org.orekit.errors.OrekitException;
 import org.orekit.propagation.SpacecraftState;
@@ -9,9 +9,9 @@ import org.orekit.time.AbsoluteDate;
 
 public class DateDetectorJsat extends DateDetector {
 
-	private CustomSatellite satellite = null;
+	private AbstractSatellite satellite = null;
 
-	public DateDetectorJsat(CustomSatellite sat, AbsoluteDate target) {
+	public DateDetectorJsat(AbstractSatellite sat, AbsoluteDate target) {
 		super(target);
 		this.satellite = sat;
 	}
@@ -26,7 +26,6 @@ public class DateDetectorJsat extends DateDetector {
 				new double[] { satellite.getCurrentJulDate(), LLA[0], LLA[1],
 						LLA[2] });
 		satellite.getEventName().add("Date point");
-
 
 		return Action.CONTINUE;
 	}

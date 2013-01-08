@@ -45,9 +45,9 @@ public class PropagatorPanel extends javax.swing.JPanel {
 
 		initComponents();
 
-		//Reload the panel with good propogator
+		// Reload the panel with good propogator
 		propTabbedPane.setSelectedIndex(pNode.getPropogator());
-		
+
 		// fill in fields with saved values
 		jSpinner1.setValue(pNode.getN_max());
 		jSpinner2.setValue(pNode.getM_max());
@@ -152,6 +152,7 @@ public class PropagatorPanel extends javax.swing.JPanel {
 		jPanel11 = new javax.swing.JPanel();
 		jPanel12 = new javax.swing.JPanel();
 		jPanel13 = new javax.swing.JPanel();
+		jPanel14 = new javax.swing.JPanel();
 		jLabel13 = new javax.swing.JLabel();
 		jLabel14 = new javax.swing.JLabel();
 		jLabel15 = new javax.swing.JLabel();
@@ -932,6 +933,26 @@ public class PropagatorPanel extends javax.swing.JPanel {
 
 		propTabbedPane.addTab("Semi-Analytical", jPanel10);
 
+		javax.swing.GroupLayout jPanel14Layout = new javax.swing.GroupLayout(
+				jPanel14);
+		jPanel14.setLayout(jPanel14Layout);
+		jPanel14Layout.setHorizontalGroup(jPanel14Layout.createParallelGroup(
+				javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+				jPanel14Layout.createSequentialGroup().addContainerGap()
+				// .addGroup(jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+				// .addComponent(perigeeCheckBox)
+				// .addComponent(apogeeCheckBox))
+						.addContainerGap(210, Short.MAX_VALUE)));
+		jPanel14Layout.setVerticalGroup(jPanel14Layout.createParallelGroup(
+				javax.swing.GroupLayout.Alignment.LEADING).addGroup(
+				jPanel14Layout.createSequentialGroup().addContainerGap()
+				// .addComponent(perigeeCheckBox)
+				// .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+				// .addComponent(apogeeCheckBox)
+						.addContainerGap(243, Short.MAX_VALUE)));
+
+		propTabbedPane.addTab("TLE", jPanel14);
+
 		jPanel6.setBorder(javax.swing.BorderFactory
 				.createTitledBorder("Display Settings"));
 
@@ -1177,6 +1198,7 @@ public class PropagatorPanel extends javax.swing.JPanel {
 	private javax.swing.JPanel jPanel11;
 	private javax.swing.JPanel jPanel12;
 	private javax.swing.JPanel jPanel13;
+	private javax.swing.JPanel jPanel14;
 	private javax.swing.JSpinner jSpinner1;
 	private javax.swing.JSpinner jSpinner2;
 	private javax.swing.JTextField jTextField1;
@@ -1272,6 +1294,8 @@ public class PropagatorPanel extends javax.swing.JPanel {
 
 				JOptionPane.showMessageDialog(this, "Not implemented yet",
 						"Warning", JOptionPane.WARNING_MESSAGE);
+				break;
+			default:
 				break;
 
 			}

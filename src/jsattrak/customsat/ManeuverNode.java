@@ -135,7 +135,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 	final SimpleDateFormat dateformatShort = new SimpleDateFormat(
 			"dd MMM yyyy HH:mm:ss z");
 
-	private CustomSatellite currentSat = null;
+	private AbstractSatellite currentSat = null;
 	private Hashtable<String, AbstractSatellite> userSatList = null;
 	private Hashtable<String, GroundStation> userGroundStationsList = null;
 
@@ -165,7 +165,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 	// ========================================
 
 	public ManeuverNode(CustomTreeTableNode parentNode,
-			CustomSatellite currentSat,
+			AbstractSatellite currentSat,
 			Hashtable<String, AbstractSatellite> satList,
 			Hashtable<String, GroundStation> groundStations) {
 		super(new String[] { "Event", "", "" }); // initialize node, default
@@ -825,7 +825,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 		this.userGroundStationsList = userGroundStationsList;
 	}
 
-	public CustomSatellite getCurrentSat() {
+	public AbstractSatellite getCurrentSat() {
 		return currentSat;
 	}
 

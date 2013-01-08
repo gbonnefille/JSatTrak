@@ -28,7 +28,6 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
@@ -51,7 +50,7 @@ import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
-import org.orekit.propagation.BoundedPropagator;
+import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
@@ -70,8 +69,8 @@ public class CustomSatellite extends AbstractSatellite {
 	// internal ephemeris (Time store in TT)
 	// private Vector<StateVector> ephemeris = new Vector<StateVector>(
 	// ephemerisIncrement, ephemerisIncrement); // array to store ephemeris
-	private BoundedPropagator ephemeris = null;
-	
+	private AbstractPropagator ephemeris = null;
+
 	private CustomTreeTableNode rootNode = null;
 
 	private InitialConditionsNode initNode = null;
@@ -79,7 +78,7 @@ public class CustomSatellite extends AbstractSatellite {
 	private PropagatorNode propNode = null;
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
-	
+
 	private ArrayList<String> eventName = new ArrayList<String>();
 
 	private boolean lastStepInitGroundTrack = false;
@@ -181,9 +180,8 @@ public class CustomSatellite extends AbstractSatellite {
 													// TOO MUCH DATA!
 	private double threeDModelSizeFactor = 300000;
 
-	public CustomSatellite( Time scenarioEpochDate)
-			throws OrekitException {
-	
+	public CustomSatellite(Time scenarioEpochDate) throws OrekitException {
+
 		iniMissionTableModel(scenarioEpochDate);
 	}
 
@@ -260,10 +258,8 @@ public class CustomSatellite extends AbstractSatellite {
 		if (ephemeris != null) //
 		{
 
-			
-
-			minTime = ephemeris.getMinDate();
-			maxTime = ephemeris.getMaxDate();
+			minTime = ephemeris.getGeneratedEphemeris().getMinDate();
+			maxTime = ephemeris.getGeneratedEphemeris().getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
@@ -277,8 +273,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 					this.getEventPositions().remove(
 							this.getEventPositions().size() - 1);
-					this.getEventName().remove(
-							this.getEventName().size() - 1);
+					this.getEventName().remove(this.getEventName().size() - 1);
 					if (this.getEventPositions().isEmpty())
 						this.eventDetected = false;
 
@@ -292,18 +287,19 @@ public class CustomSatellite extends AbstractSatellite {
 					//
 					// }
 				}
-				
 
-				// Au step qui suit le calcul de la trace au sol il faut desactiver
+				// Au step qui suit le calcul de la trace au sol il faut
+				// desactiver
 				// la detection d'evenement car s'il y a eut un evenement
 				// precedement il sera redétecté car au premier tour qui suit le
 				// calcul
-				// de la trace au sol la propagation se fait depuis la "date début"
+				// de la trace au sol la propagation se fait depuis la
+				// "date début"
 				if (lastStepInitGroundTrack) {
 					eventDetector = false;
 					lastStepInitGroundTrack = false;
 				}
-				// Retrait des evenements 
+				// Retrait des evenements
 				if (!eventDetector) {
 					events = ephemeris.getEventsDetectors();
 					ephemeris.clearEventsDetectors();
@@ -315,7 +311,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 				PVCoordinates pvCoordinateEarthFrame = ephemeris
 						.getPVCoordinates(orekitJulDate, ITRF2005);
-				
+
 				// Restauration des evenements
 				if (!eventDetector) {
 					for (EventDetector event : events)
@@ -345,22 +341,21 @@ public class CustomSatellite extends AbstractSatellite {
 
 				// Check to see if the ascending node has been passed
 				if (showGroundTrack == true) {
-					
-					
-					
+
 					if (groundTrackIni == false || oldLLA == null) // update
 																	// ground
 																	// track
 																	// needed
 					{
-						// Retrait des evenements pour le calcul de la trace au sol
+						// Retrait des evenements pour le calcul de la trace au
+						// sol
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
-						
+
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
-						
-						//Restauration des evenements
+
+						// Restauration des evenements
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
@@ -371,14 +366,15 @@ public class CustomSatellite extends AbstractSatellite {
 						// System.out.println("Ascending NODE passed: " +
 						// tle.getSatName() );
 
-						// Retrait des evenements pour le calcul de la trace au sol
+						// Retrait des evenements pour le calcul de la trace au
+						// sol
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
-						
+
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
-						
-						//Restauration des evenements
+
+						// Restauration des evenements
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
@@ -387,21 +383,21 @@ public class CustomSatellite extends AbstractSatellite {
 						// reinintialize it
 					else if (timeLead[timeLead.length - 1] < julDate
 							|| timeLag[0] > julDate) {
-						
-						// Retrait des evenements pour le calcul de la trace au sol
+
+						// Retrait des evenements pour le calcul de la trace au
+						// sol
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
-						
+
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
-						
-						//Restauration des evenements
+
+						// Restauration des evenements
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
 					}
-					
-					
+
 				} // if show ground track is true
 
 				// isInTime = true;
@@ -428,12 +424,10 @@ public class CustomSatellite extends AbstractSatellite {
 				// isInTime = false;
 				// System.out.println("false1");
 			}
-			
+
 		}
 
 	} // propogate2JulDate
-
-
 
 	/**
 	 * Calculate position of this sat at a given JulDateTime (doesn't save the
@@ -460,8 +454,8 @@ public class CustomSatellite extends AbstractSatellite {
 		if (ephemeris != null) //
 		{
 
-			minTime = ephemeris.getMinDate();
-			maxTime = ephemeris.getMaxDate();
+			minTime = ephemeris.getGeneratedEphemeris().getMinDate();
+			maxTime = ephemeris.getGeneratedEphemeris().getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
@@ -555,8 +549,10 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
-					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
+			if (absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
+					.getMinDate()) >= 0
+					&& absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
+							.getMaxDate()) <= 0) {
 
 				// PUT HERE calculate lat lon
 				double[] ptLlaXyz = calculateLatLongAltXyz(ptTime);
@@ -597,8 +593,10 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
-					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
+			if (absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
+					.getMinDate()) >= 0
+					&& absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
+							.getMaxDate()) <= 0) {
 
 				double[] ptLlaXyz = calculateLatLongAltXyz(ptTime);
 
@@ -628,7 +626,7 @@ public class CustomSatellite extends AbstractSatellite {
 	// takes in JulDate
 	private double[] calculateLatLongAltXyz(double julDate)
 			throws OrekitException {
-		
+
 		Vector3D ptPos = calculatePositionFromUT(julDate);
 
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
@@ -638,8 +636,10 @@ public class CustomSatellite extends AbstractSatellite {
 		if (ephemeris != null) //
 		{
 
-			AbsoluteDate minTime = ephemeris.getMinDate();
-			AbsoluteDate maxTime = ephemeris.getMaxDate();
+			AbsoluteDate minTime = ephemeris.getGeneratedEphemeris()
+					.getMinDate();
+			AbsoluteDate maxTime = ephemeris.getGeneratedEphemeris()
+					.getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
@@ -961,57 +961,6 @@ public class CustomSatellite extends AbstractSatellite {
 		return missionTableModel;
 	}
 
-	public BoundedPropagator getEphemeris() {
-		return ephemeris;
-	}
-
-	// set ephemeris
-	public void setEphemeris(BoundedPropagator e) {
-		this.ephemeris = e;
-
-		// // fill out all needed arrays (such as lead or lag etc) in MOD
-		// coordinates as needed
-		// // latLongLead // lla
-		// // modPosLead // x/y/z
-		// // timeLead; // array for holding times associated with lead
-		// coordinates (Jul Date) - UTC?
-		//
-		// int ephemerisSize = ephemeris.size();
-		//
-		// // create Lead (only for now -- all of ephemeris)
-		// latLongLead = new double[ephemerisSize][3];
-		// modPosLead = new double[ephemerisSize][3];
-		// timeLead = new double[ephemerisSize];
-		//
-		// double[] currentJ2kPos = new double[3];
-		//
-		// for(int i=0;i<ephemerisSize;i++)
-		// {
-		// StateVector sv = ephemeris.elementAt(i);
-		//
-		// // get current j2k pos
-		// currentJ2kPos[0] = sv.state[1];
-		// currentJ2kPos[1] = sv.state[2];
-		// currentJ2kPos[2] = sv.state[3];
-		//
-		// // save time
-		// timeLead[i] = sv.state[0];
-		// // mod pos
-		// modPosLead[i] =
-		// CoordinateConversion.EquatorialEquinoxFromJ2K(sv.state[0] -
-		// AstroConst.JDminusMJD, currentJ2kPos);
-		// // lla (submit time in UTC)
-		// double deltaTT2UTC = Time.deltaT(sv.state[0] -
-		// AstroConst.JDminusMJD); // = TT - UTC
-		// latLongLead[i] = GeoFunctions.GeodeticLLA(modPosLead[i], sv.state[0]
-		// - AstroConst.JDminusMJD - deltaTT2UTC); // tt-UTC = deltaTT2UTC
-		//
-		// }
-		//
-		// groundTrackIni = true; // okay ground track has been ini01
-
-	} // set ephemeris
-
 	public boolean isShowConsoleOnPropogate() {
 		return showConsoleOnPropogate;
 	}
@@ -1195,6 +1144,16 @@ public class CustomSatellite extends AbstractSatellite {
 	public void setName(String name) {
 		this.name = name;
 		this.rootNode.setValueAt(name, 0);
+	}
+
+	@Override
+	public void setEphemeris(AbstractPropagator ephemeris) {
+		this.ephemeris = ephemeris;
+
+	}
+
+	public AbstractPropagator getEphemeris() {
+		return ephemeris;
 	}
 
 }
