@@ -38,177 +38,148 @@ import org.orekit.errors.OrekitException;
 import org.orekit.time.AbsoluteDate;
 
 /**
- *
+ * 
  * @author Shawn
  */
-public class CustomTreeTableNode extends DefaultMutableTreeTableNode implements Serializable
-{
-    private String nodeType = "default";
-    
-    protected Icon icon;
-    protected String iconName;
-    
-    Object[] userObject;
-        
-    private AbsoluteDate startTTjulDate = AbsoluteDate.PAST_INFINITY; // save julian date when this node starts (-infinity) if not set yet.
-    
-    
-    public CustomTreeTableNode(Object[] userObject) 
-    {
-        super(userObject);
-        
-        this.userObject = userObject;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setValueAt(Object aValue, int column) 
-    {
-        if( column > (getColumnCount()-1) )
-        {
-            // no nothing
-        }
-        else
-        {
-            //((Object[])getUserObject())[column] = aValue;
-            userObject[column] = aValue;
-        }
-        
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public int getColumnCount() 
-    {      
-        //return  ((Object[])getUserObject()).length;
-        return  userObject.length;
-    }
-    
-    /**
-     * {@inheritDoc}
-     */
-    public Object getValueAt(int column) 
-    {
-        if( column > (getColumnCount()-1) )
-        {
-            return "";
-        }
-        else
-        {
-            //return ((Object[])getUserObject())[column];
-            return userObject[column];
-        }
-    }
-    
-    // newNode.setIcon( new ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/toolbarButtonGraphics/treeicons/Satellite_TLE.png")) ) );
-    public void setIcon(Icon icon)
-    {
-        this.icon = icon;
-    }
+public class CustomTreeTableNode extends DefaultMutableTreeTableNode implements
+		Serializable {
+	private String nodeType = "default";
 
-    public Icon getIcon()
-    {
-        return icon;
-    }
+	protected Icon icon;
+	protected String iconName;
 
-    public String getIconName()
-    {
-        if (iconName != null)
-        {
-            return iconName;
-        }
-        else
-        {
-            String str = userObject.toString();
-            int index = str.lastIndexOf(".");
-            if (index != -1)
-            {
-                return str.substring(++index);
-            }
-            else
-            {
-                return null;
-            }
-        }
-    }
+	Object[] userObject;
+	
+	// save	 julian	 date when this node starts (-infinity)if not set yet.
+	private AbsoluteDate startTTjulDate = AbsoluteDate.PAST_INFINITY; 
 
-    public void setIconName(String name)
-    {
-        iconName = name;
-    }
+	public CustomTreeTableNode(Object[] userObject) {
+		super(userObject);
 
-    public String getNodeType()
-    {
-        return nodeType;
-    }
+		this.userObject = userObject;
+	}
 
-    protected void setNodeType(String nodeType)
-    {
-        this.nodeType = nodeType;
-    }
-    
-    // meant to be overridden by implementing classes
-    // passes in main app to add the internal frame to
-    public void displaySettings(JSatTrak app)
-    {
-        // dummy should open a window for node settings
-        //System.out.println("Should open settings for : " + getValueAt(0) );
-    }
-    
-    // meant to be overridden by implementing classes
-    public void execute(MissionDesignPropagator missionDesign) throws IOException, ParseException, OrekitException
-    {
-         // dummy but should do something based on input ephemeris
-        //System.out.println("Executing : " + getValueAt(0) );
-        
-        // save initial time of the node ( TT)
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setValueAt(Object aValue, int column) {
+		if (column > (getColumnCount() - 1)) {
+			// no nothing
+		} else {
+			// ((Object[])getUserObject())[column] = aValue;
+			userObject[column] = aValue;
+		}
 
-    	this.setStartTTjulDate(missionDesign.getEphemeris().getGeneratedEphemeris().getMaxDate());
-//        this.setStartTTjulDate(ephemeris.lastElement().state[0]);
-        
-    }// execute
+	}
 
-    // meant to be over ridden if there are any input vars
-    public double getVar(int varInt)
-    {
-        return 0;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public int getColumnCount() {
+		// return ((Object[])getUserObject()).length;
+		return userObject.length;
+	}
 
-    // meant to be over ridden if there are any input vars
-    public void setVar(int varInt, double val)
-    {
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	public Object getValueAt(int column) {
+		if (column > (getColumnCount() - 1)) {
+			return "";
+		} else {
+			// return ((Object[])getUserObject())[column];
+			return userObject[column];
+		}
+	}
 
-    // meant to be over ridden if there are any input vars
-    public Vector<InputVariable> getInputVarVector()
-    {
-        return new Vector<InputVariable>(1);
-    }
-    
-    
-    // meant to be over ridden if there are any input vars
-    public Double getGoal(int goalInt)
-    {
-        return new Double(0);
-    }
+	// newNode.setIcon( new
+	// ImageIcon(Toolkit.getDefaultToolkit().getImage(getClass().getResource("/toolbarButtonGraphics/treeicons/Satellite_TLE.png"))
+	// ) );
+	public void setIcon(Icon icon) {
+		this.icon = icon;
+	}
 
-    // meant to be over ridden if there are any input vars
-    public Vector<GoalParameter> getGoalParamVector()
-    {
-        return new Vector<GoalParameter>(1);
-    }
+	public Icon getIcon() {
+		return icon;
+	}
 
-    public AbsoluteDate getStartTTjulDate()
-    {
-        return startTTjulDate;
-    }
+	public String getIconName() {
+		if (iconName != null) {
+			return iconName;
+		} else {
+			String str = userObject.toString();
+			int index = str.lastIndexOf(".");
+			if (index != -1) {
+				return str.substring(++index);
+			} else {
+				return null;
+			}
+		}
+	}
 
-    public void setStartTTjulDate(AbsoluteDate startTTjulDate)
-    {
-        this.startTTjulDate = startTTjulDate;
-    }
-    
+	public void setIconName(String name) {
+		iconName = name;
+	}
+
+	public String getNodeType() {
+		return nodeType;
+	}
+
+	protected void setNodeType(String nodeType) {
+		this.nodeType = nodeType;
+	}
+
+	// meant to be overridden by implementing classes
+	// passes in main app to add the internal frame to
+	public void displaySettings(JSatTrak app) {
+		// dummy should open a window for node settings
+		// System.out.println("Should open settings for : " + getValueAt(0) );
+	}
+
+	// meant to be overridden by implementing classes
+	public void execute(MissionDesignPropagator missionDesign)
+			throws IOException, ParseException, OrekitException {
+		// dummy but should do something based on input ephemeris
+		// System.out.println("Executing : " + getValueAt(0) );
+
+		// save initial time of the node ( TT)
+
+		this.setStartTTjulDate(missionDesign.getEphemeris()
+				.getGeneratedEphemeris().getMaxDate());
+
+	}// execute
+
+	// meant to be over ridden if there are any input vars
+	public double getVar(int varInt) {
+		return 0;
+	}
+
+	// meant to be over ridden if there are any input vars
+	public void setVar(int varInt, double val) {
+	}
+
+	// meant to be over ridden if there are any input vars
+	public Vector<InputVariable> getInputVarVector() {
+		return new Vector<InputVariable>(1);
+	}
+
+	// meant to be over ridden if there are any input vars
+	public Double getGoal(int goalInt) {
+		return new Double(0);
+	}
+
+	// meant to be over ridden if there are any input vars
+	public Vector<GoalParameter> getGoalParamVector() {
+		return new Vector<GoalParameter>(1);
+	}
+
+	public AbsoluteDate getStartTTjulDate() {
+		return startTTjulDate;
+	}
+
+	public void setStartTTjulDate(AbsoluteDate startTTjulDate) {
+		this.startTTjulDate = startTTjulDate;
+	}
+
 }

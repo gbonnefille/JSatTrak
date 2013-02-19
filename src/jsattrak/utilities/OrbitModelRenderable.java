@@ -118,13 +118,13 @@ public class OrbitModelRenderable implements Renderable {
 														// nodes
 		{
 			// set color
-			Color satColor = sat.getSatColor();
+			Color satColor = sat.getSatOptions().getSatColor();
 			gl.glColor3f(satColor.getRed() / 255.0f,
 					satColor.getGreen() / 255.0f, satColor.getBlue() / 255.0f); // COLOR
 
 			Double nanDbl = new Double(Double.NaN);
 
-			if (sat.isShow3DOrbitTrace() && sat.isShow3DOrbitTraceECI()) {
+			if (sat.getSatOptions().isShow3DOrbitTrace() && sat.getSatOptions().isShow3DOrbitTraceECI()) {
 				// plot lag orbit
 				gl.glBegin(GL.GL_LINE_STRIP); // GL_LINE_STRIP
 				for (int i = 0; i < sat.getNumGroundTrackLagPts(); i++) {
@@ -156,13 +156,13 @@ public class OrbitModelRenderable implements Renderable {
 			double[] xyz = sat.getJ2000Position().toArray();
 			if (xyz != null) {
 				// 3D model is rendered Here
-				if (sat.isUse3dModel()) {
+				if (sat.getSatOptions().isUse3dModel()) {
 					// custom 3D object
-					if (sat.getThreeDModel() != null) // make sure it is not
+					if (sat.getSatOptions().getThreeDModel() != null) // make sure it is not
 														// null
 					{
 						// -
-						sat.getThreeDModel().render(dc); // render model
+						sat.getSatOptions().getThreeDModel().render(dc); // render model
 					}
 				} else {
 					// default "sphere" for model
@@ -172,10 +172,10 @@ public class OrbitModelRenderable implements Renderable {
 			} // if pos is not null
 
 			// draw name
-			if (sat.isShow3DName()) {
+			if (sat.getSatOptions().isShow3DName()) {
 				// this may be REALLY slow creating this every repaint! - maybe
 				// store in sat object and update its position?
-				AnnotationAttributes geoAttr = createFontAttribs(sat
+				AnnotationAttributes geoAttr = createFontAttribs(sat.getSatOptions()
 						.getSatColor());
 				GlobeAnnotation an = new GlobeAnnotation(sat.getName(),
 						Position.fromRadians(sat.getLatitude(),
@@ -191,7 +191,7 @@ public class OrbitModelRenderable implements Renderable {
 			}
 
 			// draw earth footprint
-			if (sat.isShow3DFootprint()) {
+			if (sat.getSatOptions().isShow3DFootprint()) {
 				double[] lla = sat.getLLA();
 				if (lla != null) {
 					// surfCirc.setCenter(LatLon.fromRadians(lla[0], lla[1]));
@@ -276,9 +276,9 @@ public class OrbitModelRenderable implements Renderable {
 		{
 			// set position
 			// DIES HERE IF NO 3D MODEL - I.E. 3D model not selected either!
-			if (sat.isUse3dModel()) {
-				if (sat.getThreeDModel() != null) {
-					sat.getThreeDModel().setPosition(
+			if (sat.getSatOptions().isUse3dModel()) {
+				if (sat.getSatOptions().getThreeDModel() != null) {
+					sat.getSatOptions().getThreeDModel().setPosition(
 							new Position(Angle.fromRadians(sat.getLatitude()),
 									Angle.fromRadians(sat.getLongitude()), sat
 											.getAltitude()));
@@ -287,17 +287,17 @@ public class OrbitModelRenderable implements Renderable {
 
 					// calculate TEME velocity and set rotation angles and axis
 					if (sat.getJ2000Position() != null) {
-						sat.getThreeDModel().setMainRotationAngleAxis(
+						sat.getSatOptions().getThreeDModel().setMainRotationAngleAxis(
 								sat.getJ2000Velocity().toArray(),
 								sat.getJ2000Position().toArray());
 
 						// set velcoity for test plotting
-						sat.getThreeDModel().velUnitVec = MathUtils
+						sat.getSatOptions().getThreeDModel().velUnitVec = MathUtils
 								.UnitVector(sat.getJ2000Velocity().toArray());
 					}
 
 					// Set ECI angle
-					sat.getThreeDModel().setEciRotAngleDeg(eciRotDeg);
+					sat.getSatOptions().getThreeDModel().setEciRotAngleDeg(eciRotDeg);
 				}
 
 			} // 3D model

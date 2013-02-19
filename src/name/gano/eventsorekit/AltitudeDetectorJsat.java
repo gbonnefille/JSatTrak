@@ -24,10 +24,10 @@ public class AltitudeDetectorJsat extends AltitudeDetector {
 			throws OrekitException {
 
 		if (increasing) {
-			satellite.setSatColor(Color.RED);
+			satellite.getSatOptions().setSatColor(Color.RED);
 
 		} else {
-			satellite.setSatColor(Color.BLUE);
+			satellite.getSatOptions().setSatColor(Color.BLUE);
 		}
 
 		return Action.CONTINUE;

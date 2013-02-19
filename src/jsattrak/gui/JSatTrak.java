@@ -211,6 +211,8 @@ import jguiserver.GuiServer;
 import jsattrak.about.AboutDialog;
 import jsattrak.coverage.CoverageAnalyzer;
 import jsattrak.coverage.JSatTrakTimeDependent;
+import jsattrak.customsat.MissionTableModel;
+import jsattrak.customsat.SatOption;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
@@ -1985,9 +1987,9 @@ public class JSatTrak extends javax.swing.JFrame implements
 		if (timeDiffDays > 91.0 / 1440.0) {
 			// big time jump
 			for (AbstractSatellite sat : satHash.values()) {
-				if (sat.getShowGroundTrack()
+				if (sat.getSatOptions().isShowGroundTrack()
 						&& (sat.getPeriod() <= (timeDiffDays * 24.0 * 60.0))) {
-					sat.setGroundTrackIni2False();
+					sat.getSatOptions().setGroundTrackIni2False();
 					// System.out.println(sat.getName()
 					// +" - Groundtrack Iniated");
 				}
@@ -2926,7 +2928,7 @@ public class JSatTrak extends javax.swing.JFrame implements
 			try {
 				SatelliteTleSGP4 prop = new SatelliteTleSGP4(
 						newTLE.getSatName(), newTLE.getLine1(),
-						newTLE.getLine2());
+						newTLE.getLine2(),new SatOption());
 
 				// add sat to list
 				objListPanel.addSat2List(prop);
@@ -3360,8 +3362,8 @@ public class JSatTrak extends javax.swing.JFrame implements
 							.getSatHash();
 					for (String key : tempHash.keySet()) {
 						satHash.put(key, tempHash.get(key)); // copy manually
-						satHash.get(key).setUse3dModel(
-								satHash.get(key).isUse3dModel()); // auto-loads
+						satHash.get(key).getSatOptions().setUse3dModel(
+								satHash.get(key).getSatOptions().isUse3dModel()); // auto-loads
 																	// 3D models
 																	// if they
 																	// are used
@@ -3922,11 +3924,9 @@ public class JSatTrak extends javax.swing.JFrame implements
 //					"This custom satellite name already exists"));
 //		}
 		
-		CustomSatellite prop = new CustomSatellite(
-				this.getScenarioEpochDate());
 		
 		// open properties panel
-				objListPanel.openCurrentOptions(prop,true);
+				objListPanel.openCurrentOptions(new MissionTableModel(scenarioEpochDate));
 
 //		satHash.put(prop.getName(), prop);
 //

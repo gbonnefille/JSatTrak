@@ -94,7 +94,7 @@ public class JSatBrowserInternalFrame extends javax.swing.JInternalFrame {
 		satTree.setModel(treeModel); // set the tree's model
 
 		sbtdl = new SatBrowserTleDataLoader(app, topTreeNode, tleHash,
-				tleOutputTextArea, satTree);
+				tleOutputTextArea, satTree,null);
 
 		sbtdl.execute();
 

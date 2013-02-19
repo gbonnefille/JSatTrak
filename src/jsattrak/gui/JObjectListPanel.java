@@ -38,6 +38,7 @@ import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import jsattrak.customsat.MissionTableModel;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
@@ -301,10 +302,10 @@ public class JObjectListPanel extends javax.swing.JPanel {
 
 	private void optionsSatButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_optionsSatButtonActionPerformed
 	{// GEN-HEADEREND:event_optionsSatButtonActionPerformed
-		openCurrentOptions(false);
+		openCurrentOptions();
 	}// GEN-LAST:event_optionsSatButtonActionPerformed
 
-	public void openCurrentOptions(boolean newSat) {
+	public void openCurrentOptions() {
 		// by default open options for first selected object
 
 		// first make sure at least one sat is selected
@@ -315,39 +316,44 @@ public class JObjectListPanel extends javax.swing.JPanel {
 		// get name of selected satellite
 		Object obj = objectTree.getSelectionPath().getLastPathComponent();
 
-		openCurrentOptions(obj,newSat);
+		openCurrentOptions(obj);
 	}
 
-	public void openCurrentOptions(Object obj,boolean newSat) {
+	public void openCurrentOptions(Object obj) {
 		// try to see if obj is in a current list
 
-		if(obj!=null){
-			
-				
-		}
+		
 		
 		String nameSelected = obj.toString();
 
-		if (satHash.containsKey(nameSelected)
-				|| obj instanceof AbstractSatellite) {
+			if (satHash.containsKey(nameSelected)
+					|| obj instanceof MissionTableModel) {
+				
+				String windowName = null;
+				SatSettingsPanel newPanel = null;
 
-			AbstractSatellite prop;
+				//Existing satellite
+				if (satHash.containsKey(nameSelected)) {
+					AbstractSatellite prop = satHash.get(nameSelected);				
 
-			if (satHash.containsKey(nameSelected)) {
-				prop = satHash.get(nameSelected);
-			} else {
-				prop = (AbstractSatellite) obj;
-			}
+					// create create Sat Settings panel
+					newPanel = new SatSettingsPanel(prop, parentApp);
 
-			// create create Sat Settings panel
-			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp,newSat);
+					 windowName = prop.getName().trim() + " - Settings";				
+				}	
 
-			String windowName = prop.getName().trim() + " - Settings"; // set
-																		// name
-																		// -
-																		// trim
-																		// excess
-																		// spaces
+				//New satellite
+				else if(obj instanceof MissionTableModel){
+					windowName = "New Satellite";
+					MissionTableModel MissionTable = (MissionTableModel) obj;
+					try {
+						newPanel = new SatSettingsPanel(MissionTable, parentApp);
+					} catch (OrekitException e) {
+						JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}	
+																		
 
 			// create new internal frame window
 			JInternalFrame iframe = new JInternalFrame(windowName, true, true,
@@ -359,11 +365,11 @@ public class JObjectListPanel extends javax.swing.JPanel {
 			iframe.setContentPane(newPanel); // set contents pane
 			iframe.setSize(340, 380 + 80); // set size w,h (+80 for Nimbus)
 
-			if (prop instanceof CustomSatellite) {
+//			if (prop instanceof CustomSatellite) {
 				// it needs a bigger panel!
 				iframe.setSize(340 + 35, 380 + 80); // set size w,h (+80 for
 													// Nimbus)
-			}
+//			}
 
 			iframe.setVisible(true);
 			parentApp.addInternalFrame(iframe);
@@ -457,7 +463,7 @@ public class JObjectListPanel extends javax.swing.JPanel {
 	private void objectTreeMouseClicked(java.awt.event.MouseEvent evt) {// GEN-FIRST:event_objectTreeMouseClicked
 		// check for a double click
 		if (evt.getClickCount() == 2) {
-			openCurrentOptions(false);
+			openCurrentOptions();
 		}
 	}// GEN-LAST:event_objectTreeMouseClicked
 

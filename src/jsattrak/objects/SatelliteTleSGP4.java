@@ -32,8 +32,8 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Random;
 
-import jsattrak.customsat.InitialConditionsNode;
-import jsattrak.customsat.PropagatorNode;
+import jsattrak.customsat.MissionTableModel;
+import jsattrak.customsat.SatOption;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
 import name.gano.astro.Kepler;
@@ -42,13 +42,12 @@ import name.gano.worldwind.modelloader.WWModel3D_new;
 import net.java.joglutils.model.ModelFactory;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
-import org.orekit.propagation.AbstractPropagator;
+import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
@@ -62,20 +61,16 @@ import org.orekit.utils.PVCoordinates;
 public class SatelliteTleSGP4 extends AbstractSatellite {
 	private TLElements tle;
 
+	private SatOption satOption = null;
+
 	String name;
 
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
 
 	private SGP4SatData sgp4SatData; // sgp4 propogator data
-	private TLEPropagator orekitTlePropagator;
+	private BoundedPropagator orekitTlePropagator;
 
-	private InitialConditionsNode initNode = null;
-
-	private PropagatorNode propNode = null;
-
-	private DefaultTreeTableModel missionTableModel = new DefaultTreeTableModel();
-
-	private boolean showConsoleOnPropogate = true;
+	private MissionTableModel missionTree = null;
 
 	// current time - julian date
 	double currentJulianDate = -1;
@@ -97,19 +92,11 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	private int eventPosition2DPixelSize = 6;
 
 	// plot options
-	private boolean plot2d = true;
-	private Color satColor = Color.RED; // randomize in future
-	private Color groundTrackColor = Color.RED;
-
-	private boolean plot2DFootPrint = true;
-	private boolean fillFootPrint = true;
-	private int numPtsFootPrint = 41; // number of points in footprint, used to
-										// be 101
 
 	private boolean node = false;
 	// ground track options -- grounds tracks draw to asending nodes,
 	// re-calculated at acending nodes
-	boolean showGroundTrack = true;
+
 	private int grnTrkPointsPerPeriod = 81; // equally space in time >=2 // used
 											// to be 121
 	private double groundTrackLeadPeriodMultiplier = 2.0; // how far forward to
@@ -130,33 +117,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 								// coordinates (Jul Date)
 	private double[] timeLag; // array - times associated with lag coordinates
 								// (Jul Date)
-	boolean groundTrackIni = false; // if ground track has been initialized
-
-	private boolean showName2D = true; // show name in 2D plots
-
-	// 3D Options
-	private boolean show3DOrbitTrace = true;
-	private boolean show3DFootprint = true;
-	private boolean show3DName = true; // not implemented to change yet
-	private boolean show3D = true; // no implemented to change yet, or to modify
-									// showing of sat
-	private boolean showGroundTrack3d = false;
-	private boolean show3DOrbitTraceECI = true; // show orbit in ECI mode
-												// otherwise , ECEF
-
-	// 3D model parameters
-	private boolean use3dModel = false; // use custom 3D model (or default
-										// sphere)
-	private String threeDModelPath = "globalstar/Globalstar.3ds"; // path to the
-																	// custom
-																	// model,
-																	// default=
-																	// globalstar/Globalstar.3ds
-																	// ?
-	private transient WWModel3D_new threeDModel; // DO NOT STORE when saving --
-													// need to reload this --
-													// TOO MUCH DATA!
-	private double threeDModelSizeFactor = 300000;
 
 	/**
 	 * Creates a new instance of SatelliteProps - default properties with given
@@ -171,9 +131,12 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	 * @throws Exception
 	 *             if TLE data is bad
 	 */
-	public SatelliteTleSGP4(String name, String tleLine1, String tleLine2)
-			throws OrekitException {
+	public SatelliteTleSGP4(String name, String tleLine1, String tleLine2,
+			SatOption satOptions) throws OrekitException {
 		// create internal Orekit TLE object
+
+		this.satOption = satOptions;
+
 		tle = new TLElements(name, tleLine1, tleLine2);
 
 		name = tle.getSatName();
@@ -182,36 +145,37 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		sgp4SatData = new SGP4SatData();
 
 		// modele de propa sgp4 Orekit
-		orekitTlePropagator = TLEPropagator.selectExtrapolator(tle);
+		orekitTlePropagator = TLEPropagator.selectExtrapolator(tle)
+				.getGeneratedEphemeris();
 
 		// randomly pick color for satellite
 		// === pick a random color
 		Random generator = new Random();
 		switch (generator.nextInt(6)) {
 		case 0:
-			satColor = Color.red;
+			satOption.setSatColor(Color.red);
 			break;
 		case 1:
-			satColor = Color.blue;
+			satOption.setSatColor(Color.blue);
 			break;
 		case 2:
-			satColor = Color.green;
+			satOption.setSatColor(Color.green);
 			break;
 		case 3:
-			satColor = Color.white;
+			satOption.setSatColor(Color.white);
 			break;
 		case 4:
-			satColor = Color.yellow;
+			satOption.setSatColor(Color.yellow);
 			break;
 		case 5:
-			satColor = Color.orange;
+			satOption.setSatColor(Color.orange);
 			break;
 		default:
-			satColor = Color.red;
+			satOption.setSatColor(Color.red);
 			break;
 		} // random color switch
 
-		groundTrackColor = satColor;
+		satOption.setGroundTrackColor(satOption.getSatColor());
 
 		// try to load TLE into propogator
 
@@ -242,7 +206,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		sgp4SatData = new SGP4SatData();
 
 		// modele de propa sgp4 Orekit
-		orekitTlePropagator = TLEPropagator.selectExtrapolator(tle);
+		orekitTlePropagator = TLEPropagator.selectExtrapolator(tle)
+				.getGeneratedEphemeris();
 
 		// read TLE
 
@@ -250,7 +215,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 86400;
 
 		// ground track needs to be redone with new data
-		groundTrackIni = false;
+		satOption.setGroundTrackIni(false);
 
 		// System.out.println("Updated " + tle.getSatName() );
 	}
@@ -268,8 +233,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 				AbsoluteDate.JULIAN_EPOCH, julDate * 86400,
 				TimeScalesFactory.getUTC());
 
-		PVCoordinates posVit = orekitTlePropagator
-				.getPVCoordinates(orekitJulDate);
+		PVCoordinates posVit = orekitTlePropagator.getPVCoordinates(
+				orekitJulDate, ITRF2005);
 
 		position = posVit.getPosition();
 		velocity = posVit.getVelocity();
@@ -295,8 +260,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude() };
 
 		// Check to see if the ascending node has been passed
-		if (showGroundTrack == true) {
-			if (groundTrackIni == false) // update ground track needed
+		if (satOption.isShowGroundTrack()) {
+			if (!satOption.isGroundTrackIni()) // update ground track needed
 			{
 				initializeGroundTrack();
 			} else if (oldLLA[0] < 0 && lla[0] >= 0) // check for ascending node
@@ -400,7 +365,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// fill in lead/lag arrays
 		fillGroundTrack(lastAscendingNodeTime, leadEndTime, lagEndTime);
 
-		groundTrackIni = true;
+		satOption.setGroundTrackIni(true);
 		return;
 
 	} // initializeGroundTrack
@@ -514,7 +479,7 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 		PVCoordinates posVit = null;
 
-		posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate);
+		posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate, ITRF2005);
 
 		ptPos = posVit.getPosition();
 
@@ -594,10 +559,10 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	// --------------------------------------
 
 	public void setShowGroundTrack(boolean showGrndTrk) throws OrekitException {
-		showGroundTrack = showGrndTrk;
+		satOption.setShowGroundTrack(showGrndTrk);
 
 		if (showGrndTrk == false) {
-			groundTrackIni = false;
+			satOption.setGroundTrackIni(false);
 			latLongLead = new double[][] { {} }; // save some space
 			latLongLag = new double[][] { {} }; // sace some space
 			temePosLag = new double[][] { {} };
@@ -608,10 +573,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 			// ground track needs to be initalized
 			initializeGroundTrack();
 		}
-	}
-
-	public boolean getShowGroundTrack() {
-		return showGroundTrack;
 	}
 
 	public double getLatitude() {
@@ -637,27 +598,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	public double getCurrentJulDate() {
 		return currentJulianDate;
-	}
-
-	public boolean getPlot2D() {
-		return plot2d;
-	}
-
-	public Color getSatColor() {
-		return satColor;
-	}
-
-	public boolean getPlot2DFootPrint() {
-		return plot2DFootPrint;
-	}
-
-	public boolean getGroundTrackIni() {
-		return groundTrackIni;
-	}
-
-	public void setGroundTrackIni2False() {
-		// forces repaint of ground track next update
-		groundTrackIni = false;
 	}
 
 	public int getNumGroundTrackLeadPts() {
@@ -716,30 +656,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		return currentJulianDate - tleEpochJD;
 	}
 
-	public int getNumPtsFootPrint() {
-		return numPtsFootPrint;
-	}
-
-	public void setNumPtsFootPrint(int numPtsFootPrint) {
-		this.numPtsFootPrint = numPtsFootPrint;
-	}
-
-	public boolean isShowName2D() {
-		return showName2D;
-	}
-
-	public void setShowName2D(boolean showName2D) {
-		this.showName2D = showName2D;
-	}
-
-	public boolean isFillFootPrint() {
-		return fillFootPrint;
-	}
-
-	public void setFillFootPrint(boolean fillFootPrint) {
-		this.fillFootPrint = fillFootPrint;
-	}
-
 	public int getGrnTrkPointsPerPeriod() {
 		return grnTrkPointsPerPeriod;
 	}
@@ -766,68 +682,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		this.groundTrackLagPeriodMultiplier = groundTrackLagPeriodMultiplier;
 	}
 
-	public void setPlot2d(boolean plot2d) {
-		this.plot2d = plot2d;
-	}
-
-	public void setSatColor(Color satColor) {
-		this.satColor = satColor;
-	}
-
-	public void setPlot2DFootPrint(boolean plot2DFootPrint) {
-		this.plot2DFootPrint = plot2DFootPrint;
-	}
-
 	public Vector3D getJ2000Position() {
 		return position;
-	}
-
-	public boolean isShow3DOrbitTrace() {
-		return show3DOrbitTrace;
-	}
-
-	public void setShow3DOrbitTrace(boolean show3DOrbitTrace) {
-		this.show3DOrbitTrace = show3DOrbitTrace;
-	}
-
-	public boolean isShow3DFootprint() {
-		return show3DFootprint;
-	}
-
-	public void setShow3DFootprint(boolean show3DFootprint) {
-		this.show3DFootprint = show3DFootprint;
-	}
-
-	public boolean isShow3DName() {
-		return show3DName;
-	}
-
-	public void setShow3DName(boolean show3DName) {
-		this.show3DName = show3DName;
-	}
-
-	public boolean isShowGroundTrack3d() {
-		return showGroundTrack3d;
-	}
-
-	public void setShowGroundTrack3d(boolean showGroundTrack3d) {
-		this.showGroundTrack3d = showGroundTrack3d;
-	}
-
-	public boolean isShow3DOrbitTraceECI() {
-		return show3DOrbitTraceECI;
-	}
-
-	public void setShow3DOrbitTraceECI(boolean show3DOrbitTraceECI) {
-		this.show3DOrbitTraceECI = show3DOrbitTraceECI;
-	}
-
-	public boolean isShow3D() {
-		return show3D;
-	}
-
-	public void setShow3D(boolean show3D) {
-		this.show3D = show3D;
 	}
 
 	public// laging lat/long coordinates for ground track
@@ -851,25 +707,18 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	}
 
 	// 3D model -------------------------
-	public boolean isUse3dModel() {
-		return use3dModel;
-	}
 
 	public void setUse3dModel(boolean use3dModel) {
-		this.use3dModel = use3dModel;
+		this.satOption.setUse3dModel(use3dModel);
 
-		if (use3dModel && threeDModelPath.length() > 0) {
+		if (use3dModel && satOption.getThreeDModelPath().length() > 0) {
 			// check that file exsists? - auto done in loader
 
 			// String path = "data/models/globalstar/Globalstar.3ds";
 			// String path = "data/models/isscomplete/iss_complete.3ds";
 
-			loadNewModel(threeDModelPath);
+			loadNewModel(satOption.getThreeDModelPath());
 		}
-	}
-
-	public String getThreeDModelPath() {
-		return threeDModelPath;
 	}
 
 	/**
@@ -878,12 +727,13 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	 * @param path
 	 */
 	public void setThreeDModelPath(String path) {
-		if (use3dModel && !(path.equalsIgnoreCase(this.threeDModelPath))) {
+		if (satOption.isUse3dModel()
+				&& !(path.equalsIgnoreCase(this.satOption.getThreeDModelPath()))) {
 			// need to load the model
 			loadNewModel(path);// "test/data/globalstar/Globalstar.3ds");
 		}
 
-		this.threeDModelPath = path; // save path no matter
+		this.satOption.setThreeDModelPath(path); // save path no matter
 	}
 
 	private void loadNewModel(String path) {
@@ -894,56 +744,50 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 					.createModel(localPath + path);
 			// model3DS.setUseLighting(false); // turn off lighting!
 
-			threeDModel = new WWModel3D_new(model3DS, new Position(
-					Angle.fromRadians(this.getLatitude()),
-					Angle.fromRadians(this.getLongitude()), this.getAltitude()));
+			this.satOption.setThreeDModel(new WWModel3D_new(model3DS,
+					new Position(Angle.fromRadians(this.getLatitude()), Angle
+							.fromRadians(this.getLongitude()), this
+							.getAltitude())));
 
-			threeDModel.setMaitainConstantSize(true);
-			threeDModel.setSize(threeDModelSizeFactor); // this needs to be a
-														// property!
+			this.satOption.getThreeDModel().setMaitainConstantSize(true);
+			this.satOption.getThreeDModel().setSize(
+					this.satOption.getThreeDModelSizeFactor()); // this needs to
+																// be a
+			// property!
 
-			threeDModel.updateAttitude(this); // fixes attitude intitially
+			this.satOption.getThreeDModel().updateAttitude(this); // fixes
+																	// attitude
+																	// intitially
 
 		} catch (Exception e) {
 			System.out.println("ERROR LOADING 3D MODEL");
 		}
 	}
 
-	public WWModel3D_new getThreeDModel() {
-		return threeDModel;
-	}
-
 	public Vector3D getJ2000Velocity() {
 		return velocity;
 	}
 
-	public double getThreeDModelSizeFactor() {
-		return threeDModelSizeFactor;
-	}
-
 	public void setThreeDModelSizeFactor(double modelSizeFactor) {
 		// should the 3D model be reloaded now?
-		if (modelSizeFactor != threeDModelSizeFactor && use3dModel
-				&& threeDModelPath.length() > 0) {
+		if (modelSizeFactor != this.satOption.getThreeDModelSizeFactor()
+				&& this.satOption.isUse3dModel()
+				&& this.satOption.getThreeDModelPath().length() > 0) {
 			// loadNewModel(threeDModelPath);
-			if (threeDModel != null) {
-				threeDModel.setSize(modelSizeFactor);
+			if (this.satOption.getThreeDModel() != null) {
+				this.satOption.getThreeDModel().setSize(modelSizeFactor);
 			}
 		}
 
-		this.threeDModelSizeFactor = modelSizeFactor;
+		this.satOption.setThreeDModelSizeFactor(modelSizeFactor);
 	}
 
-	public TLEPropagator getOrekitTlePropagator() {
+	public BoundedPropagator getOrekitTlePropagator() {
 		return orekitTlePropagator;
 	}
 
 	public boolean isEventDetected() {
 		return node;
-	}
-
-	public Color getGroundTrackColor() {
-		return groundTrackColor;
 	}
 
 	public void setEventDetected(boolean node) {
@@ -968,40 +812,26 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	}
 
 	@Override
-	public void setEphemeris(AbstractPropagator ephemeris) {
-		this.orekitTlePropagator = (TLEPropagator) ephemeris;
+	public void setEphemeris(BoundedPropagator ephemeris) {
+		this.orekitTlePropagator = ephemeris;
 
 	}
 
 	@Override
-	public PropagatorNode getPropNode() {
-		return propNode;
-	}
-
-	@Override
-	public InitialConditionsNode getInitNode() {
-		return initNode;
-	}
-
-	@Override
-	public void setShowConsoleOnPropogate(boolean showConsoleOnPropogate) {
-		this.showConsoleOnPropogate = showConsoleOnPropogate;
-
-	}
-
-	@Override
-	public boolean isShowConsoleOnPropogate() {
-		return showConsoleOnPropogate;
-	}
-
-	@Override
-	public AbstractPropagator getEphemeris() {
+	public BoundedPropagator getEphemeris() {
 		return orekitTlePropagator;
 	}
 
 	@Override
-	public DefaultTreeTableModel getMissionTableModel() {
-		return missionTableModel;
+	public SatOption getSatOptions() {
+
+		return this.satOption;
+	}
+
+	@Override
+	public MissionTableModel getMissionTree() {
+
+		return this.missionTree;
 	}
 
 } // SatelliteProps

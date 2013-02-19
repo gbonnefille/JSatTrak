@@ -23,12 +23,14 @@
 package jsattrak.customsat;
 
 import java.awt.Toolkit;
+import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
 import jsattrak.customsat.gui.InitialConditionsPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
+import jsattrak.gui.JCustomSatConfigPanel;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.time.Time;
@@ -62,14 +64,16 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	// which coord to use
 	private int coordinate = InitialConditionsNode.KEPLERIAN;
-	
+
 	private String satelliteTleName = null;
-	
+
 	private TLElements satelliteTleElements = null;
 
+	private ArrayList<Integer> lastTreeSelection = null;
+
 	private double[] keplarianElements = new double[] { 6678140, 0.01,
-			45.0 * Math.PI / 180.0, 0.0, 0.0, 0.0 }; 
-	
+			45.0 * Math.PI / 180.0, 0.0, 0.0, 0.0 };
+
 	private PVCoordinates cartesianElements = new PVCoordinates();; // x,y,z,dx,dy,dz
 	private double[] circularElements = new double[6];
 	private double[] equinoctialElements = new double[6];
@@ -92,12 +96,13 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	private Frame frame = FramesFactory.getEME2000();
 
+	private JCustomSatConfigPanel jSatConfigPanel = null;
+
 	public InitialConditionsNode(CustomTreeTableNode parentNode,
 			Time scenarioEpochDate) throws OrekitException {
 		super(new String[] { "Initial Conditions", "", "" }); // initialize
 																// node, default
 																// values
-
 		this.scenarioEpochDate = scenarioEpochDate;
 		iniJulDate = scenarioEpochDate.getJulianDate();
 
@@ -106,20 +111,21 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 				getClass().getResource("/icons/customSatIcons/ini.png"))));
 		// set Node Type
 		setNodeType("Initial Conditions");
-		
-//		AbsoluteDate absoluteDateTest = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
+
+		// AbsoluteDate absoluteDateTest =
+		// AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
 
 		absoluteDate = AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400);
 
-//		 absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, iniJulDate * 86400, TimeScalesFactory.getUTC());
+		// absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, iniJulDate
+		// * 86400, TimeScalesFactory.getUTC());
 
-		//Setup the keplerian orbit
-		 this.orbitOrekit = new KeplerianOrbit(this.keplarianElements[0],
-		 this.keplarianElements[1], this.keplarianElements[2],
-		 this.keplarianElements[4], this.keplarianElements[3],
-		 this.keplarianElements[5], this.positionAngle, this.frame,
-		 this.absoluteDate, this.mu);
-
+		// Setup the keplerian orbit
+		this.orbitOrekit = new KeplerianOrbit(this.keplarianElements[0],
+				this.keplarianElements[1], this.keplarianElements[2],
+				this.keplarianElements[4], this.keplarianElements[3],
+				this.keplarianElements[5], this.positionAngle, this.frame,
+				this.absoluteDate, this.mu);
 
 		// add this node to parent - last thing
 		if (parentNode != null)
@@ -129,11 +135,9 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	// meant to be overridden by implementing classes
 	@Override
 	public void execute(MissionDesignPropagator missionDesign) {
-		
+
 		// set inial time of the node ( TT)
 		this.setStartTTjulDate(AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate));
-		
-
 
 	}// execute
 
@@ -145,8 +149,11 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 				true, true);
 
 		// show satellite browser window
-		InitialConditionsPanel gsBrowser = new InitialConditionsPanel(app,this,
-				scenarioEpochDate); // non-modal version
+		InitialConditionsPanel gsBrowser = new InitialConditionsPanel(app,
+				this, scenarioEpochDate); // non-modal version
+
+		
+		
 		gsBrowser.setIframe(iframe);
 
 		iframe.setContentPane(gsBrowser);
@@ -154,6 +161,8 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 		iframe.setLocation(5, 5);
 
 		app.addInternalFrame(iframe);
+		
+
 
 	}
 
@@ -182,13 +191,13 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public double[] convertToCircular() {
 
-
 		CircularOrbit circ = (CircularOrbit) OrbitType.CIRCULAR
 				.convertType(this.orbitOrekit);
 
-		double[] out = new double[] { circ.getA(), circ.getEquinoctialEx(), circ.getEquinoctialEy(),
-				circ.getI(),
-				circ.getRightAscensionOfAscendingNode(), circ.getAlpha(this.positionAngle) };
+		double[] out = new double[] { circ.getA(), circ.getEquinoctialEx(),
+				circ.getEquinoctialEy(), circ.getI(),
+				circ.getRightAscensionOfAscendingNode(),
+				circ.getAlpha(this.positionAngle) };
 
 		return out;
 
@@ -199,9 +208,9 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 		EquinoctialOrbit equi = (EquinoctialOrbit) OrbitType.EQUINOCTIAL
 				.convertType(this.orbitOrekit);
 
-		double[] out = new double[] { equi.getA(), equi.getEquinoctialEx(), equi.getEquinoctialEy(),
-				equi.getHx(),
-				equi.getHy(), equi.getL(this.positionAngle) };
+		double[] out = new double[] { equi.getA(), equi.getEquinoctialEx(),
+				equi.getEquinoctialEy(), equi.getHx(), equi.getHy(),
+				equi.getL(this.positionAngle) };
 
 		return out;
 
@@ -258,10 +267,12 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public void setIniJulDate(double iniJulDate) {
 		this.iniJulDate = iniJulDate;
 	}
-	
-	public void setAbsoluteDate(double date) throws OrekitException{
-//		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date * 86400, TimeScalesFactory.getUTC());
-		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date * 86400);
+
+	public void setAbsoluteDate(double date) throws OrekitException {
+		// this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, date
+		// * 86400, TimeScalesFactory.getUTC());
+		this.absoluteDate = new AbsoluteDate(AbsoluteDate.JULIAN_EPOCH,
+				date * 86400);
 	}
 
 	public Orbit getOrbitOrekit() {
@@ -290,8 +301,10 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public void setCircularElements(double[] circularElements) {
 		this.circularElements = circularElements;
-		this.orbitOrekit = new CircularOrbit(circularElements[0], circularElements[1],circularElements[2],circularElements[3],
-				circularElements[4],circularElements[5], this.positionAngle, this.frame, this.absoluteDate, this.mu);
+		this.orbitOrekit = new CircularOrbit(circularElements[0],
+				circularElements[1], circularElements[2], circularElements[3],
+				circularElements[4], circularElements[5], this.positionAngle,
+				this.frame, this.absoluteDate, this.mu);
 	}
 
 	public double[] getEquinoctialElements() {
@@ -300,8 +313,11 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public void setEquinoctialElements(double[] equinoctialElements) {
 		this.equinoctialElements = equinoctialElements;
-		this.orbitOrekit = new EquinoctialOrbit(equinoctialElements[0], equinoctialElements[1],equinoctialElements[2],equinoctialElements[3],
-				equinoctialElements[4],equinoctialElements[5], this.positionAngle, this.frame, this.absoluteDate, this.mu);
+		this.orbitOrekit = new EquinoctialOrbit(equinoctialElements[0],
+				equinoctialElements[1], equinoctialElements[2],
+				equinoctialElements[3], equinoctialElements[4],
+				equinoctialElements[5], this.positionAngle, this.frame,
+				this.absoluteDate, this.mu);
 	}
 
 	public int getCoordinate() {
@@ -326,6 +342,15 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public void setSatelliteTleName(String satelliteTleName) {
 		this.satelliteTleName = satelliteTleName;
+
+	}
+
+	public void setJcustomSatConfigPanel(JCustomSatConfigPanel jSatConfigPanel) {
+		this.jSatConfigPanel = jSatConfigPanel;
+	}
+
+	public JCustomSatConfigPanel getjSatConfigPanel() {
+		return jSatConfigPanel;
 	}
 
 	public TLElements getSatelliteTleElements() {
@@ -334,7 +359,15 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 
 	public void setSatelliteTleElements(TLElements satelliteTleElements) {
 		this.satelliteTleElements = satelliteTleElements;
-		
+
+	}
+
+	public ArrayList<Integer> getLastTreeSelection() {
+		return lastTreeSelection;
+	}
+
+	public void setLastTreeSelection(ArrayList<Integer> lastTreeSelection) {
+		this.lastTreeSelection = lastTreeSelection;
 	}
 
 }

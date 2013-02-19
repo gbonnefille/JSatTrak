@@ -24,33 +24,24 @@ package jsattrak.objects;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.Position;
 
-import java.awt.Color;
-import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Vector;
 
-import javax.swing.ImageIcon;
-
-import jsattrak.customsat.InitialConditionsNode;
-import jsattrak.customsat.PropagatorNode;
-import jsattrak.customsat.StopNode;
+import jsattrak.customsat.MissionTableModel;
+import jsattrak.customsat.SatOption;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
 import name.gano.astro.Kepler;
-import name.gano.astro.time.Time;
-import name.gano.swingx.treetable.CustomTreeTableNode;
 import name.gano.worldwind.modelloader.WWModel3D_new;
 import net.java.joglutils.model.ModelFactory;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
-import org.orekit.propagation.AbstractPropagator;
+import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
@@ -69,13 +60,13 @@ public class CustomSatellite extends AbstractSatellite {
 	// internal ephemeris (Time store in TT)
 	// private Vector<StateVector> ephemeris = new Vector<StateVector>(
 	// ephemerisIncrement, ephemerisIncrement); // array to store ephemeris
-	private AbstractPropagator ephemeris = null;
+	private BoundedPropagator ephemeris = null;
 
-	private CustomTreeTableNode rootNode = null;
+	// private CustomTreeTableNode rootNode = null;
 
-	private InitialConditionsNode initNode = null;
+	// private InitialConditionsNode initNode = null;
 
-	private PropagatorNode propNode = null;
+	// private PropagatorNode propNode = null;
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
 
@@ -95,11 +86,11 @@ public class CustomSatellite extends AbstractSatellite {
 
 	// ====================================
 
-	// table model for the custom config panel and holds all the mission Nodes
-	private DefaultTreeTableModel missionTableModel = new DefaultTreeTableModel(); // any
-																					// TreeTableModel
+	String name = "New Satellite";
 
-	String name = "Default name";
+	private MissionTableModel missionTree = null;
+
+	private SatOption satOptions = null;
 
 	// current time - julian date
 	double currentJulianDate = -1;
@@ -118,27 +109,6 @@ public class CustomSatellite extends AbstractSatellite {
 
 	private boolean eventDetected = false;
 
-	// plot options
-	private boolean plot2d = true;
-	private Color satColor = Color.RED; // randomize in future
-	private Color groundTrackColor = Color.RED;
-	private boolean plot2DFootPrint = true;
-	private boolean fillFootPrint = true;
-	private int numPtsFootPrint = 101; // number of points in footprint
-
-	// ground track options -- grounds tracks draw to asending nodes,
-	// re-calculated at acending nodes
-	boolean showGroundTrack = true;
-	private int grnTrkPointsPerPeriod = 121; // equally space in time >=2
-	private double groundTrackLeadPeriodMultiplier = 2.0; // how far forward to
-															// draw ground track
-															// - in terms of
-															// periods
-	private double groundTrackLagPeriodMultiplier = 1.0; // how far behind to
-															// draw ground track
-															// - in terms of
-															// periods
-
 	double[][] latLongLead; // leading lat/long coordinates for ground track
 	double[][] latLongLag; // laging lat/long coordinates for ground track
 	private double[][] temePosLead; // leading Mean of date position coordinates
@@ -150,87 +120,60 @@ public class CustomSatellite extends AbstractSatellite {
 	private double[] timeLag; // array - times associated with lag coordinates
 								// (Jul Date)
 
-	boolean groundTrackIni = false; // if ground track has been initialized
-
-	private boolean showName2D = true; // show name in 2D plots
-
-	// 3D Options
-	private boolean show3DOrbitTrace = true;
-	private boolean show3DFootprint = true;
-	private boolean show3DName = true; // not implemented to change yet
-	private boolean show3D = true; // no implemented to change yet, or to modify
-									// showing of sat
-	private boolean showGroundTrack3d = false;
-	private boolean show3DOrbitTraceECI = true; // show orbit in ECI mode
-												// otherwise , ECEF
-
-	private boolean showConsoleOnPropogate = true;
-
-	// 3D model parameters
-	private boolean use3dModel = false; // use custom 3D model (or default
-										// sphere)
-	private String threeDModelPath = "globalstar/Globalstar.3ds"; // path to the
-																	// custom
-																	// model,
-																	// default=
-																	// globalstar/Globalstar.3ds
-																	// ?
-	private transient WWModel3D_new threeDModel; // DO NOT STORE when saving --
-													// need to reload this --
-													// TOO MUCH DATA!
-	private double threeDModelSizeFactor = 300000;
-
-	public CustomSatellite(Time scenarioEpochDate) throws OrekitException {
-
-		iniMissionTableModel(scenarioEpochDate);
-	}
-
-	// initalizes the mission Table Model
-	private void iniMissionTableModel(Time scenarioEpochDate)
+	public CustomSatellite(MissionTableModel missionTree, SatOption satOptions)
 			throws OrekitException {
-		// set names of columns
-		Vector<String> tableHeaders = new Vector<String>();
-		tableHeaders.add("Mission Objects");
-		// tableHeaders.add("Time Start?");
-		// tableHeaders.add("Time Stop?");
 
-		missionTableModel.setColumnIdentifiers(tableHeaders);
-
-		// Add root Node
-		String[] str = new String[3];
-		str[0] = name;
-
-		// DefaultMutableTreeTableNode ttn = new
-		// DefaultMutableTreeTableNode(str);
-		rootNode = new CustomTreeTableNode(str);
-		rootNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-				getClass().getResource("/icons/custom/sat_icon.png"))));
-		missionTableModel.setRoot(rootNode);
-
-		// must add Initial conditions
-		// Initial Node
-		this.initNode = new InitialConditionsNode(rootNode, scenarioEpochDate);
-
-		// by default also add a propogator node
-		// Propogator Node
-		this.propNode = new PropagatorNode(rootNode, initNode);
-
-		// ADD SOME NODES (example) -----
-		// CustomTreeTableNode ttn2 = new PropogatorNode(rootNode);
-		// ttn2.setValueAt("3 Jan 2008", 1); // example at setting a columns
-		// value
-		//
-		// ttn2 = new SolverNode(rootNode, true); // parent / add default
-		// children
-		//
-		// ttn2 = new StopNode(rootNode);
-		//
-		// ------------------------------
-
-		// must add stop node
-		new StopNode(rootNode);
-
+		this.missionTree = missionTree;
+		this.satOptions = satOptions;
+		// iniMissionTableModel(scenarioEpochDate);
 	}
+
+	// // initalizes the mission Table Model
+	// private void iniMissionTableModel(Time scenarioEpochDate)
+	// throws OrekitException {
+	// // set names of columns
+	// Vector<String> tableHeaders = new Vector<String>();
+	// tableHeaders.add("Mission Objects");
+	// // tableHeaders.add("Time Start?");
+	// // tableHeaders.add("Time Stop?");
+	//
+	// missionTableModel.setColumnIdentifiers(tableHeaders);
+	//
+	// // Add root Node
+	// String[] str = new String[3];
+	// str[0] = name;
+	//
+	// // DefaultMutableTreeTableNode ttn = new
+	// // DefaultMutableTreeTableNode(str);
+	// rootNode = new CustomTreeTableNode(str);
+	// rootNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
+	// getClass().getResource("/icons/custom/sat_icon.png"))));
+	// missionTableModel.setRoot(rootNode);
+	//
+	// // must add Initial conditions
+	// // Initial Node
+	// this.initNode = new InitialConditionsNode(rootNode, scenarioEpochDate);
+	//
+	// // by default also add a propogator node
+	// // Propogator Node
+	// this.propNode = new PropagatorNode(rootNode, initNode);
+	//
+	// // ADD SOME NODES (example) -----
+	// // CustomTreeTableNode ttn2 = new PropogatorNode(rootNode);
+	// // ttn2.setValueAt("3 Jan 2008", 1); // example at setting a columns
+	// // value
+	// //
+	// // ttn2 = new SolverNode(rootNode, true); // parent / add default
+	// // children
+	// //
+	// // ttn2 = new StopNode(rootNode);
+	// //
+	// // ------------------------------
+	//
+	// // must add stop node
+	// new StopNode(rootNode);
+	//
+	// }
 
 	// ================================================================
 	// functions that have to be fixed yet =========================
@@ -247,10 +190,6 @@ public class CustomSatellite extends AbstractSatellite {
 		AbsoluteDate minTime;
 		Collection<EventDetector> events = null;
 
-		// AbsoluteDate orekitJulDate = new
-		// AbsoluteDate(AbsoluteDate.JULIAN_EPOCH, julDate * 86400,
-		// TimeScalesFactory.getUTC());
-
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -258,8 +197,8 @@ public class CustomSatellite extends AbstractSatellite {
 		if (ephemeris != null) //
 		{
 
-			minTime = ephemeris.getGeneratedEphemeris().getMinDate();
-			maxTime = ephemeris.getGeneratedEphemeris().getMaxDate();
+			minTime = ephemeris.getMinDate();
+			maxTime = ephemeris.getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
@@ -306,8 +245,8 @@ public class CustomSatellite extends AbstractSatellite {
 				}
 
 				PVCoordinates pvCoordinateInertialFrame = ephemeris
-						.getPVCoordinates(orekitJulDate,
-								this.initNode.getFrame());
+						.getPVCoordinates(orekitJulDate, this.missionTree
+								.getInitNode().getFrame());
 
 				PVCoordinates pvCoordinateEarthFrame = ephemeris
 						.getPVCoordinates(orekitJulDate, ITRF2005);
@@ -340,12 +279,13 @@ public class CustomSatellite extends AbstractSatellite {
 						geodeticPoint.getAltitude() };
 
 				// Check to see if the ascending node has been passed
-				if (showGroundTrack == true) {
+				if (satOptions.isShowGroundTrack() == true) {
 
-					if (groundTrackIni == false || oldLLA == null) // update
-																	// ground
-																	// track
-																	// needed
+					if (satOptions.isGroundTrackIni() == false
+							|| oldLLA == null) // update
+					// ground
+					// track
+					// needed
 					{
 						// Retrait des evenements pour le calcul de la trace au
 						// sol
@@ -412,7 +352,7 @@ public class CustomSatellite extends AbstractSatellite {
 					lla = null;
 
 					// clear ground track
-					groundTrackIni = false;
+					satOptions.setGroundTrackIni(false);
 					latLongLead = null; // save some space
 					latLongLag = null; // sace some space
 					temePosLag = null;
@@ -454,15 +394,16 @@ public class CustomSatellite extends AbstractSatellite {
 		if (ephemeris != null) //
 		{
 
-			minTime = ephemeris.getGeneratedEphemeris().getMinDate();
-			maxTime = ephemeris.getGeneratedEphemeris().getMaxDate();
+			minTime = ephemeris.getMinDate();
+			maxTime = ephemeris.getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
 				ptPos = ephemeris.getPVCoordinates(orekitJulDate,
-						this.initNode.getFrame()).getPosition();
+						this.missionTree.getInitNode().getFrame())
+						.getPosition();
 
 			}
 		} // if epeheris contains anything
@@ -500,31 +441,33 @@ public class CustomSatellite extends AbstractSatellite {
 		lastAscendingNodeTime = currentJulianDate;
 
 		double leadEndTime = lastAscendingNodeTime
-				+ groundTrackLeadPeriodMultiplier * periodMin / (60.0 * 24); // Julian
-																				// Date
-																				// for
-																				// last
-																				// lead
-																				// point
-																				// (furthest
-																				// in
-																				// future)
+				+ satOptions.getGroundTrackLeadPeriodMultiplier() * periodMin
+				/ (60.0 * 24); // Julian
+		// Date
+		// for
+		// last
+		// lead
+		// point
+		// (furthest
+		// in
+		// future)
 		double lagEndTime = lastAscendingNodeTime
-				- groundTrackLagPeriodMultiplier * periodMin / (60.0 * 24); // Julian
-																			// Date
-																			// for
-																			// the
-																			// last
-																			// lag
-																			// point
-																			// (furthest
-																			// in
-																			// past)
+				- satOptions.getGroundTrackLagPeriodMultiplier() * periodMin
+				/ (60.0 * 24); // Julian
+		// Date
+		// for
+		// the
+		// last
+		// lag
+		// point
+		// (furthest
+		// in
+		// past)
 
 		// fill in lead/lag arrays
 		fillGroundTrack(lastAscendingNodeTime, leadEndTime, lagEndTime);
 
-		groundTrackIni = true;
+		satOptions.setGroundTrackIni(true);
 		return;
 
 	} // initializeGroundTrack
@@ -536,8 +479,8 @@ public class CustomSatellite extends AbstractSatellite {
 	private void fillGroundTrack(double lastAscendingNodeTime,
 			double leadEndTime, double lagEndTime) throws OrekitException {
 		// points in the lead direction
-		int ptsLead = (int) Math.ceil(grnTrkPointsPerPeriod
-				* groundTrackLeadPeriodMultiplier);
+		int ptsLead = (int) Math.ceil(satOptions.getGrnTrkPointsPerPeriod()
+				* satOptions.getGroundTrackLeadPeriodMultiplier());
 		latLongLead = new double[ptsLead][3];
 		temePosLead = new double[ptsLead][3];
 		timeLead = new double[ptsLead];
@@ -549,10 +492,8 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-			if (absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
-					.getMinDate()) >= 0
-					&& absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
-							.getMaxDate()) <= 0) {
+			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
+					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
 
 				// PUT HERE calculate lat lon
 				double[] ptLlaXyz = calculateLatLongAltXyz(ptTime);
@@ -580,8 +521,8 @@ public class CustomSatellite extends AbstractSatellite {
 		} // for each lead point
 
 		// points in the lag direction
-		int ptsLag = (int) Math.ceil(grnTrkPointsPerPeriod
-				* groundTrackLagPeriodMultiplier);
+		int ptsLag = (int) Math.ceil(satOptions.getGrnTrkPointsPerPeriod()
+				* satOptions.getGroundTrackLagPeriodMultiplier());
 		latLongLag = new double[ptsLag][3];
 		temePosLag = new double[ptsLag][3];
 		timeLag = new double[ptsLag];
@@ -593,10 +534,8 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
 
-			if (absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
-					.getMinDate()) >= 0
-					&& absPtTime.compareTo(ephemeris.getGeneratedEphemeris()
-							.getMaxDate()) <= 0) {
+			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
+					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
 
 				double[] ptLlaXyz = calculateLatLongAltXyz(ptTime);
 
@@ -636,10 +575,8 @@ public class CustomSatellite extends AbstractSatellite {
 		if (ephemeris != null) //
 		{
 
-			AbsoluteDate minTime = ephemeris.getGeneratedEphemeris()
-					.getMinDate();
-			AbsoluteDate maxTime = ephemeris.getGeneratedEphemeris()
-					.getMaxDate();
+			AbsoluteDate minTime = ephemeris.getMinDate();
+			AbsoluteDate maxTime = ephemeris.getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
@@ -694,10 +631,10 @@ public class CustomSatellite extends AbstractSatellite {
 	// GET SET methods =================
 
 	public void setShowGroundTrack(boolean showGrndTrk) throws OrekitException {
-		showGroundTrack = showGrndTrk;
+		satOptions.setShowGroundTrack(showGrndTrk);
 
 		if (showGrndTrk == false) {
-			groundTrackIni = false;
+			satOptions.setGroundTrackIni(false);
 			latLongLead = new double[][] { {} }; // save some space
 			latLongLag = new double[][] { {} }; // sace some space
 			temePosLag = new double[][] { {} };
@@ -708,10 +645,6 @@ public class CustomSatellite extends AbstractSatellite {
 			// ground track needs to be initalized
 			initializeGroundTrack();
 		}
-	}
-
-	public boolean getShowGroundTrack() {
-		return showGroundTrack;
 	}
 
 	public double getLatitude() {
@@ -745,27 +678,6 @@ public class CustomSatellite extends AbstractSatellite {
 
 	public double getCurrentJulDate() {
 		return currentJulianDate;
-	}
-
-	public boolean getPlot2D() {
-		return plot2d;
-	}
-
-	public Color getSatColor() {
-		return satColor;
-	}
-
-	public boolean getPlot2DFootPrint() {
-		return plot2DFootPrint;
-	}
-
-	public boolean getGroundTrackIni() {
-		return groundTrackIni;
-	}
-
-	public void setGroundTrackIni2False() {
-		// forces repaint of ground track next update
-		groundTrackIni = false;
 	}
 
 	public int getNumGroundTrackLeadPts() {
@@ -815,68 +727,6 @@ public class CustomSatellite extends AbstractSatellite {
 					// really there is not TLE!!
 	}
 
-	public int getNumPtsFootPrint() {
-		return numPtsFootPrint;
-	}
-
-	public void setNumPtsFootPrint(int numPtsFootPrint) {
-		this.numPtsFootPrint = numPtsFootPrint;
-	}
-
-	public boolean isShowName2D() {
-		return showName2D;
-	}
-
-	public void setShowName2D(boolean showName2D) {
-		this.showName2D = showName2D;
-	}
-
-	public boolean isFillFootPrint() {
-		return fillFootPrint;
-	}
-
-	public void setFillFootPrint(boolean fillFootPrint) {
-		this.fillFootPrint = fillFootPrint;
-	}
-
-	public int getGrnTrkPointsPerPeriod() {
-		return grnTrkPointsPerPeriod;
-	}
-
-	public void setGrnTrkPointsPerPeriod(int grnTrkPointsPerPeriod) {
-		this.grnTrkPointsPerPeriod = grnTrkPointsPerPeriod;
-	}
-
-	public double getGroundTrackLeadPeriodMultiplier() {
-		return groundTrackLeadPeriodMultiplier;
-	}
-
-	public void setGroundTrackLeadPeriodMultiplier(
-			double groundTrackLeadPeriodMultiplier) {
-		this.groundTrackLeadPeriodMultiplier = groundTrackLeadPeriodMultiplier;
-	}
-
-	public double getGroundTrackLagPeriodMultiplier() {
-		return groundTrackLagPeriodMultiplier;
-	}
-
-	public void setGroundTrackLagPeriodMultiplier(
-			double groundTrackLagPeriodMultiplier) {
-		this.groundTrackLagPeriodMultiplier = groundTrackLagPeriodMultiplier;
-	}
-
-	public void setPlot2d(boolean plot2d) {
-		this.plot2d = plot2d;
-	}
-
-	public void setSatColor(Color satColor) {
-		this.satColor = satColor;
-	}
-
-	public void setPlot2DFootPrint(boolean plot2DFootPrint) {
-		this.plot2DFootPrint = plot2DFootPrint;
-	}
-
 	@Override
 	public Vector3D getJ2000Position() {
 		if (position == null) {
@@ -884,54 +734,6 @@ public class CustomSatellite extends AbstractSatellite {
 		}
 
 		return position;
-	}
-
-	public boolean isShow3DOrbitTrace() {
-		return show3DOrbitTrace;
-	}
-
-	public void setShow3DOrbitTrace(boolean show3DOrbitTrace) {
-		this.show3DOrbitTrace = show3DOrbitTrace;
-	}
-
-	public boolean isShow3DFootprint() {
-		return show3DFootprint;
-	}
-
-	public void setShow3DFootprint(boolean show3DFootprint) {
-		this.show3DFootprint = show3DFootprint;
-	}
-
-	public boolean isShow3DName() {
-		return show3DName;
-	}
-
-	public void setShow3DName(boolean show3DName) {
-		this.show3DName = show3DName;
-	}
-
-	public boolean isShowGroundTrack3d() {
-		return showGroundTrack3d;
-	}
-
-	public void setShowGroundTrack3d(boolean showGroundTrack3d) {
-		this.showGroundTrack3d = showGroundTrack3d;
-	}
-
-	public boolean isShow3DOrbitTraceECI() {
-		return show3DOrbitTraceECI;
-	}
-
-	public void setShow3DOrbitTraceECI(boolean show3DOrbitTraceECI) {
-		this.show3DOrbitTraceECI = show3DOrbitTraceECI;
-	}
-
-	public boolean isShow3D() {
-		return show3D;
-	}
-
-	public void setShow3D(boolean show3D) {
-		this.show3D = show3D;
 	}
 
 	// laging lat/long coordinates for ground track
@@ -952,21 +754,6 @@ public class CustomSatellite extends AbstractSatellite {
 	public// array for holding times associated with lead coordinates (Jul Date)
 	double[] getTimeLag() {
 		return timeLag;
-	}
-
-	public// array to store ephemeris
-	// ====================================
-	// table model for the custom config panel and holds all the mission Nodes
-	DefaultTreeTableModel getMissionTableModel() {
-		return missionTableModel;
-	}
-
-	public boolean isShowConsoleOnPropogate() {
-		return showConsoleOnPropogate;
-	}
-
-	public void setShowConsoleOnPropogate(boolean showConsoleOnPropogate) {
-		this.showConsoleOnPropogate = showConsoleOnPropogate;
 	}
 
 	// ---------------------------------------
@@ -1010,25 +797,18 @@ public class CustomSatellite extends AbstractSatellite {
 	} // secantMethod
 
 	// 3D model -------------------------
-	public boolean isUse3dModel() {
-		return use3dModel;
-	}
 
 	public void setUse3dModel(boolean use3dModel) {
-		this.use3dModel = use3dModel;
+		this.satOptions.setUse3dModel(use3dModel);
 
-		if (use3dModel && threeDModelPath.length() > 0) {
+		if (use3dModel && satOptions.getThreeDModelPath().length() > 0) {
 			// check that file exsists? - auto done in loader
 
 			// String path = "data/models/globalstar/Globalstar.3ds";
 			// String path = "data/models/isscomplete/iss_complete.3ds";
 
-			loadNewModel(threeDModelPath);
+			loadNewModel(satOptions.getThreeDModelPath());
 		}
-	}
-
-	public String getThreeDModelPath() {
-		return threeDModelPath;
 	}
 
 	/**
@@ -1037,12 +817,14 @@ public class CustomSatellite extends AbstractSatellite {
 	 * @param path
 	 */
 	public void setThreeDModelPath(String path) {
-		if (use3dModel && !(path.equalsIgnoreCase(this.threeDModelPath))) {
+		if (this.satOptions.isUse3dModel()
+				&& !(path
+						.equalsIgnoreCase(this.satOptions.getThreeDModelPath()))) {
 			// need to load the model
 			loadNewModel(path);// "test/data/globalstar/Globalstar.3ds");
 		}
 
-		this.threeDModelPath = path; // save path no matter
+		this.satOptions.setThreeDModelPath(path); // save path no matter
 	}
 
 	private void loadNewModel(String path) {
@@ -1053,23 +835,24 @@ public class CustomSatellite extends AbstractSatellite {
 					.createModel(localPath + path);
 			// model3DS.setUseLighting(false); // turn off lighting!
 
-			threeDModel = new WWModel3D_new(model3DS, new Position(
-					Angle.fromRadians(this.getLatitude()),
-					Angle.fromRadians(this.getLongitude()), this.getAltitude()));
+			this.satOptions.setThreeDModel(new WWModel3D_new(model3DS,
+					new Position(Angle.fromRadians(this.getLatitude()), Angle
+							.fromRadians(this.getLongitude()), this
+							.getAltitude())));
 
-			threeDModel.setMaitainConstantSize(true);
-			threeDModel.setSize(threeDModelSizeFactor); // this needs to be a
-														// property!
+			this.satOptions.getThreeDModel().setMaitainConstantSize(true);
+			this.satOptions.getThreeDModel().setSize(
+					this.satOptions.getThreeDModelSizeFactor()); // this needs
+																	// to be a
+			// property!
 
-			threeDModel.updateAttitude(this); // fixes attitude intitially
+			this.satOptions.getThreeDModel().updateAttitude(this); // fixes
+																	// attitude
+																	// intitially
 
 		} catch (Exception e) {
 			System.out.println("ERROR LOADING 3D MODEL");
 		}
-	}
-
-	public WWModel3D_new getThreeDModel() {
-		return threeDModel;
 	}
 
 	@Override
@@ -1080,37 +863,22 @@ public class CustomSatellite extends AbstractSatellite {
 		return velocity;
 	}
 
-	public double getThreeDModelSizeFactor() {
-		return threeDModelSizeFactor;
-	}
-
 	public void setThreeDModelSizeFactor(double modelSizeFactor) {
 		// should the 3D model be reloaded now?
-		if (modelSizeFactor != threeDModelSizeFactor && use3dModel
-				&& threeDModelPath.length() > 0) {
+		if (modelSizeFactor != this.satOptions.getThreeDModelSizeFactor()
+				&& this.satOptions.isUse3dModel()
+				&& this.satOptions.getThreeDModelPath().length() > 0) {
 			// loadNewModel(threeDModelPath);
-			if (threeDModel != null) {
-				threeDModel.setSize(modelSizeFactor);
+			if (this.satOptions.getThreeDModel() != null) {
+				this.satOptions.getThreeDModel().setSize(modelSizeFactor);
 			}
 		}
 
-		this.threeDModelSizeFactor = modelSizeFactor;
-	}
-
-	public InitialConditionsNode getInitNode() {
-		return initNode;
-	}
-
-	public PropagatorNode getPropNode() {
-		return propNode;
+		this.satOptions.setThreeDModelSizeFactor(modelSizeFactor);
 	}
 
 	public boolean isEventDetected() {
 		return eventDetected;
-	}
-
-	public Color getGroundTrackColor() {
-		return groundTrackColor;
 	}
 
 	public void setEventDetected(boolean eventDetected) {
@@ -1143,17 +911,25 @@ public class CustomSatellite extends AbstractSatellite {
 	@Override
 	public void setName(String name) {
 		this.name = name;
-		this.rootNode.setValueAt(name, 0);
+		this.missionTree.getRootNode().setValueAt(name, 0);
 	}
 
 	@Override
-	public void setEphemeris(AbstractPropagator ephemeris) {
+	public void setEphemeris(BoundedPropagator ephemeris) {
 		this.ephemeris = ephemeris;
 
 	}
 
-	public AbstractPropagator getEphemeris() {
+	public BoundedPropagator getEphemeris() {
 		return ephemeris;
+	}
+
+	public SatOption getSatOptions() {
+		return satOptions;
+	}
+
+	public MissionTableModel getMissionTree() {
+		return missionTree;
 	}
 
 }

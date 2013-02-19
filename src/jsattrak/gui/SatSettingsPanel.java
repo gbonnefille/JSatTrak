@@ -32,9 +32,14 @@ import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import name.gano.astro.time.Time;
+
 import org.apache.commons.math3.exception.util.DummyLocalizable;
 import org.orekit.errors.OrekitException;
+import org.orekit.time.TimeComponents;
 
+import jsattrak.customsat.MissionTableModel;
+import jsattrak.customsat.SatOption;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
@@ -58,7 +63,8 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 
 	JSatTrak app; // used to force repaints
 
-	boolean newSat = false;
+	private boolean newSat = false;
+	
 
 	private JCustomSatConfigPanel configPanel;
 
@@ -70,68 +76,154 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 		// satProps = new SatelliteTleSGP4("test","1","2");
 	}
 
-	// constructor to pass SatelliteProps object
-	public SatSettingsPanel(AbstractSatellite satProps, JSatTrak app,
-			boolean newSat) {
+	/**
+	 * Existing satellite
+	 * @param satProps
+	 * @param app
+	 */
+	public SatSettingsPanel(AbstractSatellite satProps, JSatTrak app) {
 		initComponents();
 
 		this.satProps = satProps;
 		this.app = app;
-		this.newSat = newSat;
+		this.newSat = false;
 
 		// if this a custom sat add extra tab at the begining
-		if (satProps instanceof CustomSatellite) {
-			CustomSatellite satProp = (CustomSatellite) satProps;
+//		if (satProps instanceof CustomSatellite) {
+		
 
-			this.configPanel = new JCustomSatConfigPanel(satProp, app);
+			this.configPanel = new JCustomSatConfigPanel(satProps, app);
 			int tabIndex = 0;
 			jTabbedPane1.add(configPanel, tabIndex);
 			jTabbedPane1.setTitleAt(tabIndex, "Satellite Settings");
 
 			jTabbedPane1.setSelectedIndex(0); // select first tab
-		}
+//		}
 
 		// setup the fields
 		iniSatProps();
 	}
+	
 
+	/**
+	 * @param MissionTable
+	 * @param app
+	 * @throws OrekitException
+	 */
+	public SatSettingsPanel(MissionTableModel MissionTable, JSatTrak app) throws OrekitException {
+		initComponents();
+		
+		
+		this.satProps = new CustomSatellite(MissionTable, new SatOption());
+		this.app = app;
+		this.newSat = true;
+		int i = 1;
+		
+		//If the new satellite already exists, change the name
+		while (app.objListPanel.satHash.containsKey(satProps.getName())){
+			satProps.setName(satProps.getName().replaceAll("[\\d]", "")+i);
+			i++;
+		}
+
+//		Add item to the Object list tree	
+		app.objListPanel.addSat2List(satProps);
+
+		// if this a custom sat add extra tab at the begining
+//		if (satProps instanceof CustomSatellite) {
+		
+			this.configPanel = new JCustomSatConfigPanel(this.satProps, app);
+			int tabIndex = 0;
+			jTabbedPane1.add(configPanel, tabIndex);
+			jTabbedPane1.setTitleAt(tabIndex, "Satellite Settings");
+
+			jTabbedPane1.setSelectedIndex(0); // select first tab
+//		}
+
+		// setup the fields
+			firstTimeIniSatProps();
+	}
+
+	// ini option fields from satProps
+		private void firstTimeIniSatProps() throws OrekitException {
+			// general
+			
+			SatOption satOptions = new SatOption();
+			
+			include2DCheckBox.setSelected(satOptions.isPlot2d());
+			showNameCheckBox.setSelected(satOptions.isShowName2D());
+			colorPanel.setBackground(satOptions.getSatColor());
+
+			// footprint
+			showFootPrintCheckBox.setSelected(satOptions.isPlot2DFootPrint());
+			footPrintResTextField.setText(satOptions.getNumPtsFootPrint() + "");
+			fillFootprintCheckBox.setSelected(satOptions.isFillFootPrint());
+
+			// ground track
+			showGroundTrackCheckBox.setSelected(satOptions.isShowGroundTrack());
+			groundTrackResTextField.setText(satOptions.getGrnTrkPointsPerPeriod()
+					+ "");
+			leadTrackTextField.setText(satOptions
+					.getGroundTrackLeadPeriodMultiplier() + "");
+			lagTrackTextField.setText(satOptions.getGroundTrackLagPeriodMultiplier()
+					+ "");
+
+			// 3d view
+			showOrbit3DCheckBox.setSelected(satOptions.isShow3DOrbitTrace());
+			showfootprint3DCheckBox.setSelected(satOptions.isShow3DFootprint());
+			showName3DCheckBox.setSelected(satOptions.isShow3DName());
+			groundTrack3dCheckBox.setSelected(satOptions.isShowGroundTrack3d());
+			eciRadioButton.setSelected(satOptions.isShow3DOrbitTraceECI());
+			ecefRadioButton.setSelected(!satOptions.isShow3DOrbitTraceECI());
+
+			// 3d models
+			use3DModelCheckBox.setSelected(satOptions.isUse3dModel());
+			threeDModelTextField.setText(satOptions.getThreeDModelPath());
+			threeDModelTextField.setEditable(satOptions.isUse3dModel()); // set
+																		// editable
+			browseModelButton.setEnabled(use3DModelCheckBox.isSelected());
+			modelScaleTextField.setEditable(use3DModelCheckBox.isSelected());
+			modelScaleTextField.setText(satOptions.getThreeDModelSizeFactor() + "");
+
+		} // iniSatProps
+	
 	// ini option fields from satProps
 	private void iniSatProps() {
 		// general
-		include2DCheckBox.setSelected(satProps.getPlot2D());
-		showNameCheckBox.setSelected(satProps.isShowName2D());
-		colorPanel.setBackground(satProps.getSatColor());
+		include2DCheckBox.setSelected(satProps.getSatOptions().isPlot2d());
+		showNameCheckBox.setSelected(satProps.getSatOptions().isShowName2D());
+		colorPanel.setBackground(satProps.getSatOptions().getSatColor());
 
 		// footprint
-		showFootPrintCheckBox.setSelected(satProps.getPlot2DFootPrint());
-		footPrintResTextField.setText(satProps.getNumPtsFootPrint() + "");
-		fillFootprintCheckBox.setSelected(satProps.isFillFootPrint());
+		showFootPrintCheckBox.setSelected(satProps.getSatOptions().isPlot2DFootPrint());
+		footPrintResTextField.setText(satProps.getSatOptions().getNumPtsFootPrint() + "");
+		fillFootprintCheckBox.setSelected(satProps.getSatOptions().isFillFootPrint());
 
 		// ground track
-		showGroundTrackCheckBox.setSelected(satProps.getShowGroundTrack());
-		groundTrackResTextField.setText(satProps.getGrnTrkPointsPerPeriod()
+		showGroundTrackCheckBox.setSelected(satProps.getSatOptions().isShowGroundTrack());
+		groundTrackResTextField.setText(satProps.getSatOptions().getGrnTrkPointsPerPeriod()
 				+ "");
 		leadTrackTextField.setText(satProps
-				.getGroundTrackLeadPeriodMultiplier() + "");
-		lagTrackTextField.setText(satProps.getGroundTrackLagPeriodMultiplier()
+				.getSatOptions().getGroundTrackLeadPeriodMultiplier() + "");
+		lagTrackTextField.setText(satProps.getSatOptions().getGroundTrackLagPeriodMultiplier()
 				+ "");
 
 		// 3d view
-		showOrbit3DCheckBox.setSelected(satProps.isShow3DOrbitTrace());
-		showfootprint3DCheckBox.setSelected(satProps.isShow3DFootprint());
-		showName3DCheckBox.setSelected(satProps.isShow3DName());
-		groundTrack3dCheckBox.setSelected(satProps.isShowGroundTrack3d());
-		eciRadioButton.setSelected(satProps.isShow3DOrbitTraceECI());
-		ecefRadioButton.setSelected(!satProps.isShow3DOrbitTraceECI());
+		showOrbit3DCheckBox.setSelected(satProps.getSatOptions().isShow3DOrbitTrace());
+		showfootprint3DCheckBox.setSelected(satProps.getSatOptions().isShow3DFootprint());
+		showName3DCheckBox.setSelected(satProps.getSatOptions().isShow3DName());
+		groundTrack3dCheckBox.setSelected(satProps.getSatOptions().isShowGroundTrack3d());
+		eciRadioButton.setSelected(satProps.getSatOptions().isShow3DOrbitTraceECI());
+		ecefRadioButton.setSelected(!satProps.getSatOptions().isShow3DOrbitTraceECI());
 
 		// 3d models
-		use3DModelCheckBox.setSelected(satProps.isUse3dModel());
-		threeDModelTextField.setText(satProps.getThreeDModelPath());
-		threeDModelTextField.setEditable(satProps.isUse3dModel()); // set
+		
+		use3DModelCheckBox.setSelected(satProps.getSatOptions().isUse3dModel());
+		threeDModelTextField.setText(satProps.getSatOptions().getThreeDModelPath());
+		threeDModelTextField.setEditable(satProps.getSatOptions().isUse3dModel()); // set
 																	// editable
 		browseModelButton.setEnabled(use3DModelCheckBox.isSelected());
 		modelScaleTextField.setEditable(use3DModelCheckBox.isSelected());
-		modelScaleTextField.setText(satProps.getThreeDModelSizeFactor() + "");
+		modelScaleTextField.setText(satProps.getSatOptions().getThreeDModelSizeFactor() + "");
 
 	} // iniSatProps
 
@@ -948,6 +1040,10 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 	private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_cancelButtonActionPerformed
 	{// GEN-HEADEREND:event_cancelButtonActionPerformed
 		// close internal frame
+		
+		app.objListPanel.satHash.remove(satProps.getName());
+		app.objListPanel.refreshObjectList();
+		
 		try {
 			iframe.dispose(); // could setClosed(true)
 		} catch (Exception e) {
@@ -1119,12 +1215,21 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 		// "This custom satellite name already exists", "Error",
 		// JOptionPane.ERROR_MESSAGE);
 		// }
-
+		
+		
+		// new satellite
 		if (newSat) {
+			
+			//Delete the sat from the map to test if it already exists
+			app.objListPanel.satHash.remove(satProps.getName());
+			app.objListPanel.refreshObjectList();
+			
+			//Test if it already exists 
 			if (!app.objListPanel.satHash.containsKey(satName)) {
-				// new satellite
+				
 				try {
 
+					
 					satProps.setName(satName);
 
 					// set satellite time to current date
@@ -1164,19 +1269,19 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 
 		}
 
-		satProps.setPlot2d(include2DCheckBox.isSelected());
-		satProps.setShowName2D(showNameCheckBox.isSelected());
-		satProps.setSatColor(colorPanel.getBackground());
+		satProps.getSatOptions().setPlot2d(include2DCheckBox.isSelected());
+		satProps.getSatOptions().setShowName2D(showNameCheckBox.isSelected());
+		satProps.getSatOptions().setSatColor(colorPanel.getBackground());
 
 		// footprint
-		satProps.setPlot2DFootPrint(showFootPrintCheckBox.isSelected());
+		satProps.getSatOptions().setPlot2DFootPrint(showFootPrintCheckBox.isSelected());
 		try {
-			satProps.setNumPtsFootPrint(Integer.parseInt(footPrintResTextField
+			satProps.getSatOptions().setNumPtsFootPrint(Integer.parseInt(footPrintResTextField
 					.getText()));
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
-		satProps.setFillFootPrint(fillFootprintCheckBox.isSelected());
+		satProps.getSatOptions().setFillFootPrint(fillFootprintCheckBox.isSelected());
 
 		try {
 			// ground track
@@ -1187,13 +1292,13 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 
 		try {
 
-			int oldGRes = satProps.getGrnTrkPointsPerPeriod();
+			int oldGRes = satProps.getSatOptions().getGrnTrkPointsPerPeriod();
 
-			satProps.setGrnTrkPointsPerPeriod(Integer
+			satProps.getSatOptions().setGrnTrkPointsPerPeriod(Integer
 					.parseInt(groundTrackResTextField.getText()));
 
-			if (oldGRes != satProps.getGrnTrkPointsPerPeriod()) {
-				satProps.setGroundTrackIni2False();
+			if (oldGRes != satProps.getSatOptions().getGrnTrkPointsPerPeriod()) {
+				satProps.getSatOptions().setGroundTrackIni2False();
 				updateMapData = true;
 			}
 		} catch (Exception e) {
@@ -1201,27 +1306,27 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 		}
 
 		// save old settings to compare to see if update is needed
-		double oldLead = satProps.getGroundTrackLeadPeriodMultiplier();
-		double oldLag = satProps.getGroundTrackLagPeriodMultiplier();
+		double oldLead = satProps.getSatOptions().getGroundTrackLeadPeriodMultiplier();
+		double oldLag = satProps.getSatOptions().getGroundTrackLagPeriodMultiplier();
 
 		try {
-			satProps.setGroundTrackLeadPeriodMultiplier(Double
+			satProps.getSatOptions().setGroundTrackLeadPeriodMultiplier(Double
 					.parseDouble(leadTrackTextField.getText()));
 
-			if (oldLead != satProps.getGroundTrackLeadPeriodMultiplier()) {
+			if (oldLead != satProps.getSatOptions().getGroundTrackLeadPeriodMultiplier()) {
 				// set ground tracks ini to false
-				satProps.setGroundTrackIni2False();
+				satProps.getSatOptions().setGroundTrackIni2False();
 				updateMapData = true;
 			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
 		try {
-			satProps.setGroundTrackLagPeriodMultiplier(Double
+			satProps.getSatOptions().setGroundTrackLagPeriodMultiplier(Double
 					.parseDouble(lagTrackTextField.getText()));
-			if (oldLag != satProps.getGroundTrackLagPeriodMultiplier()) {
+			if (oldLag != satProps.getSatOptions().getGroundTrackLagPeriodMultiplier()) {
 				// set ground tracks ini to false
-				satProps.setGroundTrackIni2False();
+				satProps.getSatOptions().setGroundTrackIni2False();
 				updateMapData = true;
 			}
 		} catch (Exception e) {
@@ -1229,11 +1334,11 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 		}
 
 		// 3d view
-		satProps.setShow3DOrbitTrace(showOrbit3DCheckBox.isSelected());
-		satProps.setShow3DFootprint(showfootprint3DCheckBox.isSelected());
-		satProps.setShow3DName(showName3DCheckBox.isSelected());
-		satProps.setShowGroundTrack3d(groundTrack3dCheckBox.isSelected());
-		satProps.setShow3DOrbitTraceECI(eciRadioButton.isSelected());
+		satProps.getSatOptions().setShow3DOrbitTrace(showOrbit3DCheckBox.isSelected());
+		satProps.getSatOptions().setShow3DFootprint(showfootprint3DCheckBox.isSelected());
+		satProps.getSatOptions().setShow3DName(showName3DCheckBox.isSelected());
+		satProps.getSatOptions().setShowGroundTrack3d(groundTrack3dCheckBox.isSelected());
+		satProps.getSatOptions().setShow3DOrbitTraceECI(eciRadioButton.isSelected());
 
 		// 3d model
 		satProps.setUse3dModel(use3DModelCheckBox.isSelected());

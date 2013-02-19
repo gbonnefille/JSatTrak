@@ -36,6 +36,7 @@ import javax.swing.JInternalFrame;
 import jsattrak.customsat.gui.PropagatorPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.StateVector;
 import jsattrak.utilities.TLElements;
@@ -172,11 +173,6 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		super(new String[] { "Propagate", "", "" }); // initialize node, default
 														// values
 		this.initNode = initNode;
-
-		//If initials conditions are TLE's
-		if(initNode.getCoordinate()==InitialConditionsNode.TLE){
-			this.propogator = PropagatorNode.TLE;
-		}
 		
 		// set icon for this type
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
@@ -235,7 +231,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		// Numerical propogator///
 		// ///////////////////////
 
-		AbstractPropagator ephemeris = null;
+		BoundedPropagator ephemeris = null;
 
 		if (propogator == PropagatorNode.NUMERICAL) {
 
@@ -329,7 +325,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			ephemeris = (AbstractPropagator) prop.getGeneratedEphemeris();
+			ephemeris =  prop.getGeneratedEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -365,7 +361,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			ephemeris = (AbstractPropagator) prop.getGeneratedEphemeris();
+			ephemeris =  prop.getGeneratedEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -405,7 +401,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			ephemeris = (AbstractPropagator) prop.getGeneratedEphemeris();
+			ephemeris = prop.getGeneratedEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -445,9 +441,9 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			
 			String satName = initNode.getSatelliteTleName();
 
-			SatelliteTleSGP4 sat = new SatelliteTleSGP4(satName, tle.getLine1(), tle.getLine2());
+			SatelliteTleSGP4 sat = new SatelliteTleSGP4(satName, tle.getLine1(), tle.getLine2(),new SatOption());
 			
-			 ephemeris = sat.getOrekitTlePropagator();
+			 ephemeris = sat.getEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -464,6 +460,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			}
 
 			missionDesign.setEphemeris(ephemeris);
+	
 
 			// Reset the event if not use in the next simulation
 			this.eventDetector.clear();
@@ -955,5 +952,11 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	public void addEventDetector(AbstractDetector eventDetector) {
 		this.eventDetector.add(eventDetector);
 	}
+
+	public InitialConditionsNode getInitNode() {
+		return initNode;
+	}
+	
+	
 
 }

@@ -570,7 +570,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 			// Node detector
 			case NODE:
 				eventDetector = new NodeDetectorJsat(this.currentSat,
-						this.currentSat.getInitNode().getFrame());
+						this.currentSat.getMissionTree().getInitNode().getFrame());
 				break;
 
 			default:
@@ -585,7 +585,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 		}
 
 		// Add event to the satellite
-		this.currentSat.getPropNode().addEventDetector(eventDetector);
+		this.currentSat.getMissionTree().getPropNode().addEventDetector(eventDetector);
 
 	}// execute
 

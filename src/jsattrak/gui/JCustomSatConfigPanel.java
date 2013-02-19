@@ -36,6 +36,7 @@ import jsattrak.customsat.EphemerisFromFileNode;
 import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.customsat.InputVariable;
 import jsattrak.customsat.ManeuverNode;
+import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.PropagatorNode;
 import jsattrak.customsat.SolverNode;
 import jsattrak.customsat.StopNode;
@@ -67,16 +68,20 @@ import org.orekit.utils.PVCoordinates;
 public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	DefaultTreeTableModel treeTableModel; // any TreeTableModel
+	MissionTableModel missonTableModel;
 	CustomTreeTableNode rootNode; // root node in mission designer treetable
 	AbstractSatellite sat;
-	// private Vector<StateVector> ephemeris;
-	// private BoundedPropagator ephemeris;
+
 	JSatTrak app; // used to add message etc.
 
 	/** Creates new form JCustomSatConfigPanel */
 	public JCustomSatConfigPanel(AbstractSatellite sat, JSatTrak app) {
 
-		this.treeTableModel = sat.getMissionTableModel(); // treeTableModel;
+		this.treeTableModel = sat.getMissionTree().getMissionTableModel();
+		
+		//Link to recover the name of the satellite TLE
+		sat.getMissionTree().getInitNode().setJcustomSatConfigPanel(this);
+		
 		this.app = app;
 		this.sat = sat;
 
@@ -117,7 +122,60 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 				.setTreeCellRenderer(new IconTreeTableNodeRenderer());
 
 		// console option
-		consoleCheckBox.setSelected(sat.isShowConsoleOnPropogate());
+		consoleCheckBox.setSelected(true);
+
+	}
+	
+	/** Creates new form JCustomSatConfigPanel */
+	public JCustomSatConfigPanel(MissionTableModel MissionTable, JSatTrak app) {
+
+		this.treeTableModel = MissionTable.getMissionTableModel(); // treeTableModel;
+		
+		//Link to recover the name of the satellite TLE
+		MissionTable.getInitNode().setJcustomSatConfigPanel(this);
+		
+		this.missonTableModel = MissionTable;
+		this.app = app;
+	
+
+		initComponents();
+
+		missionDesignJXTreeTable.setTreeTableModel(treeTableModel);
+		missionDesignJXTreeTable.setRootVisible(true);
+
+		// get root node
+		rootNode = (CustomTreeTableNode) treeTableModel.getRoot();
+
+		// highlighter --same as old AlternateRowHighlighter.genericGrey
+		missionDesignJXTreeTable.addHighlighter(new ColorHighlighter(
+				HighlightPredicate.EVEN, Color.WHITE, Color.black)); // even,
+																		// background,
+																		// foregrond
+		missionDesignJXTreeTable.addHighlighter(new ColorHighlighter(
+				HighlightPredicate.ODD, new Color(229, 229, 229), Color.black)); // even,
+																					// background,
+																					// foregrond
+		// old way
+		// missionDesignJXTreeTable.addHighlighter(AlternateRowHighlighter.genericGrey);
+
+		// roll over effect? (not supported anymore in swingx?)
+		// missionDesignJXTreeTable.addHighlighter(new
+		// RolloverHighlighter(Color.BLACK, Color.WHITE));
+		// missionDesignJXTreeTable.setRolloverEnabled(true);
+
+		// expand all nodes at first
+		missionDesignJXTreeTable.expandAll(); // expand all (for now) - for some
+												// reason stops the ability to
+												// add components to treetable
+		missionDesignJXTreeTable.setColumnControlVisible(true); // column
+																// control
+
+		// for custom icons rendering
+		missionDesignJXTreeTable
+				.setTreeCellRenderer(new IconTreeTableNodeRenderer());
+
+		// console option
+		consoleCheckBox.setSelected(true);
 
 	}
 
@@ -222,8 +280,9 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 				"/icons/other/Orbit.png"))); // NOI18N
 
 		satNameTextField.setFont(new java.awt.Font("Tahoma", 1, 12));
-		satNameTextField.setText(sat.getName());
 
+		satNameTextField.setText(sat.getName());
+		
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
 				jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
@@ -241,8 +300,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 										.addComponent(
 												satNameTextField,
 												javax.swing.GroupLayout.PREFERRED_SIZE,
-												90,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
+												200,
+												Short.MAX_VALUE)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
 												262, Short.MAX_VALUE)
@@ -667,7 +726,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	private void addPropButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addPropButtonActionPerformed
 	{// GEN-HEADEREND:event_addPropButtonActionPerformed
-		addNode2MissionDesigner(new PropagatorNode(null, sat.getInitNode()));
+		addNode2MissionDesigner(new PropagatorNode(null, sat.getMissionTree().getInitNode()));
 	}// GEN-LAST:event_addPropButtonActionPerformed
 
 	private void addBurnButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addBurnButtonActionPerformed
@@ -845,6 +904,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		// thread to run in background
 		MissionDesignPropagator mdp = new MissionDesignPropagator(rootNode,
 				treeTableModel, sat, app);
+		
 		mdp.execute();
 
 	}// GEN-LAST:event_propMissionButtonActionPerformed
@@ -896,7 +956,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 				// force repaint and regeneration of ground paths - SEG 24 Sept
 				// 2008
-				sat.setGroundTrackIni2False(); // force update of ground track
+				sat.getSatOptions().setGroundTrackIni2False(); // force update of ground track
 												// data
 				app.forceRepainting(false); // repait without updating
 											// positional data
@@ -920,7 +980,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	private void consoleCheckBoxActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_consoleCheckBoxActionPerformed
 	{// GEN-HEADEREND:event_consoleCheckBoxActionPerformed
 		// save option to sat
-		sat.setShowConsoleOnPropogate(consoleCheckBox.isSelected());
+		sat.getSatOptions().setShowConsoleOnPropogate(consoleCheckBox.isSelected());
 	}// GEN-LAST:event_consoleCheckBoxActionPerformed
 
 	private void exportEphemerisButtonActionPerformed(
@@ -996,7 +1056,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		try {
 			
-				AbstractPropagator ephemeris = this.sat.getEphemeris();
+				BoundedPropagator ephemeris = this.sat.getEphemeris();
 		
 			
 
@@ -1019,9 +1079,9 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// open file for writing
 			BufferedWriter buffWriter;
 
-			int NumberOfEphemerisPoints = this.sat.getPropNode()
+			int NumberOfEphemerisPoints = this.sat.getMissionTree().getPropNode()
 					.getNumberOfStep();
-			double stepSize = this.sat.getPropNode().getStepSize();
+			double stepSize = this.sat.getMissionTree().getPropNode().getStepSize();
 
 			buffWriter = new BufferedWriter(new FileWriter(filename));
 			// add stk header
@@ -1056,7 +1116,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			PVCoordinates pvCoord = null;
 			Vector3D pos = null;
 			Vector3D vit = null;
-			Frame frame = this.sat.getInitNode().getFrame();
+			Frame frame = this.sat.getMissionTree().getInitNode().getFrame();
 
 			// for (StateVector sv : ephemeris)
 			for (int i = 0; i < NumberOfEphemerisPoints; i++) {
@@ -1135,6 +1195,10 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	public javax.swing.JTextField getSatNameTextField() {
 		return satNameTextField;
+	}
+	
+	public void setSatNameTextField(String satName) {
+		this.satNameTextField.setText(satName);
 	}
 
 	private javax.swing.JButton addBurnButton;

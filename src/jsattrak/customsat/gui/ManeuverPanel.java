@@ -1298,7 +1298,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 					.hasMoreElements();) {
 				String satName = e.nextElement();
 				// non prise en compte du sat courant
-				if (!satName.equals(mNode.getCurrentSat().getName()))
+//				if (!satName.equals(mNode.getCurrentSat().getName()))
 					satAndGroundstationList.add(satName);
 
 			}

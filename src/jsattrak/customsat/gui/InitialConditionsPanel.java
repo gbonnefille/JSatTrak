@@ -26,17 +26,21 @@ package jsattrak.customsat.gui;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 import javax.swing.JFileChooser;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import javax.swing.JTree;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 
 import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.gui.JSatTrak;
@@ -71,8 +75,8 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	// hashtable with tle's
 	private Hashtable<String, TLElements> tleHash;
-	
-	//TLE sat database
+
+	// TLE sat database
 	private SatBrowserTleDataLoader sbtdl;
 
 	private JSatTrak app;
@@ -166,22 +170,8 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 			break;
 
 		case 4:
-			// fill out equinoctial elements
+			// Select the TLE panel
 			iniTabbedPane.setSelectedIndex(4);
-			// double[] equi = icNode.getEquinoctialElements();
-			// setEquinoctialElementsInGUI(equi);
-			//
-			// switch (icNode.getPositionAngle()) {
-			// case MEAN:
-			// equiComboBox.setSelectedIndex(0);
-			// break;
-			// case TRUE:
-			// equiComboBox.setSelectedIndex(1);
-			// break;
-			// case ECCENTRIC:
-			// equiComboBox.setSelectedIndex(2);
-			// break;
-			// }
 
 			break;
 
@@ -1155,11 +1145,10 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				satTreeValueChanged(evt);
 			}
 		});
+
 		jScrollPane1.setViewportView(satTree);
-		
-		
-		
-		//Button
+
+		// Button
 		jMenu1.setText("Options");
 
 		loadCustomTLEMenuItem.setIcon(new javax.swing.ImageIcon(getClass()
@@ -1168,14 +1157,13 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		loadCustomTLEMenuItem
 				.addActionListener(new java.awt.event.ActionListener() {
 					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						 loadCustomTLEMenuItemActionPerformed(evt);
+						loadCustomTLEMenuItemActionPerformed(evt);
 					}
 				});
 		jMenu1.add(loadCustomTLEMenuItem);
 		jMenuBar1.add(jMenu1);
-		
-		
-		//panel
+
+		// panel
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
 				jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
@@ -1198,24 +1186,25 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		jPanelTle.setLayout(jPanelTextFieldTleLayout);
 		jPanelTextFieldTleLayout.setHorizontalGroup(jPanelTextFieldTleLayout
 				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				
+
 				.addComponent(jScrollPane3,
 						javax.swing.GroupLayout.Alignment.TRAILING,
 						javax.swing.GroupLayout.DEFAULT_SIZE, 384,
 						Short.MAX_VALUE));
-		jPanelTextFieldTleLayout.setVerticalGroup(jPanelTextFieldTleLayout.createParallelGroup(
-				javax.swing.GroupLayout.Alignment.LEADING)
-				
-				.addComponent(
-				jScrollPane3, javax.swing.GroupLayout.Alignment.TRAILING,
-				javax.swing.GroupLayout.DEFAULT_SIZE, 60, Short.MAX_VALUE));
+		jPanelTextFieldTleLayout.setVerticalGroup(jPanelTextFieldTleLayout
+				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+
+				.addComponent(jScrollPane3,
+						javax.swing.GroupLayout.Alignment.TRAILING,
+						javax.swing.GroupLayout.DEFAULT_SIZE, 60,
+						Short.MAX_VALUE));
 
 		javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(
 				mainPanel);
 		mainPanel.setLayout(mainPanelLayout);
 		mainPanelLayout.setHorizontalGroup(
-				
-				mainPanelLayout
+
+		mainPanelLayout
 				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
 				.addComponent(jMenuBar1)
 				.addComponent(jPanelTle, javax.swing.GroupLayout.DEFAULT_SIZE,
@@ -1226,7 +1215,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				.setVerticalGroup(mainPanelLayout
 						.createParallelGroup(
 								javax.swing.GroupLayout.Alignment.LEADING)
-						
+
 						.addGroup(
 								javax.swing.GroupLayout.Alignment.TRAILING,
 								mainPanelLayout
@@ -1251,8 +1240,6 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 		iniTabbedPane.addTab("TLE", outsidePanel);
 
-
-
 		topTreeNode = new DefaultMutableTreeNode("Satellites");
 
 		// create a hashmap of TLEs with key as text from tree
@@ -1262,8 +1249,10 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 														// using root node
 		satTree.setModel(treeModel); // set the tree's model
 
+		ArrayList<Integer> lastTreeSelection = icNode.getLastTreeSelection();
+
 		sbtdl = new SatBrowserTleDataLoader(app, topTreeNode, tleHash,
-				tleOutputTextArea, satTree);
+				tleOutputTextArea, satTree, lastTreeSelection);
 
 		sbtdl.execute();
 
@@ -1505,7 +1494,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 			}
 		} // something is selected
 	}// GEN-LAST:event_satTreeValueChanged
-	
+
 	private void loadCustomTLEMenuItemActionPerformed(
 			java.awt.event.ActionEvent evt)// GEN-FIRST:event_loadCustomTLEMenuItemActionPerformed
 	{// GEN-HEADEREND:event_loadCustomTLEMenuItemActionPerformed
@@ -1704,18 +1693,18 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		// save settings back to Node
 		boolean saveSuccess = true;
 
-		try{
+		try {
 
-		// Wich coordinate system
-		icNode.setCoordinate(iniTabbedPane.getSelectedIndex());
+			// Wich coordinate system
+			icNode.setCoordinate(iniTabbedPane.getSelectedIndex());
 
-		//if not TLE
-		if(iniTabbedPane.getSelectedIndex()!=4){
-			// save epoch
-			saveSuccess = saveEpoch();
+			// if not TLE
+			if (iniTabbedPane.getSelectedIndex() != 4) {
+				// save epoch
+				saveSuccess = saveEpoch();
 
-			// Save mu
-			icNode.setMu(Double.parseDouble(muTextField.getText()));
+				// Save mu
+				icNode.setMu(Double.parseDouble(muTextField.getText()));
 
 				switch (inputComboBox.getSelectedIndex()) {
 
@@ -1744,12 +1733,13 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				case 6:
 					icNode.setFrame(FramesFactory.getVeis1950());
 					break;
-				
-		}}
+
+				}
+			}
 
 			// get correct coordinate system elements & save them
 			switch (iniTabbedPane.getSelectedIndex()) {
-			
+
 			case 0:
 				// Keplerian system
 
@@ -1837,12 +1827,46 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				break;
 
 			case 4:
-				icNode.setSatelliteTleElements(tleHash.get(satTree
-						.getLastSelectedPathComponent().toString()));
-				icNode.setSatelliteTleName(satTree
-				.getLastSelectedPathComponent().toString());
+				// TLE
+				try {
+
+					// get the satellite name
+					String satName = satTree.getLastSelectedPathComponent()
+							.toString();
+
+					// Check if the user has selected a leaf and not a node
+					if (!tleHash.containsKey(satName)) {
+						throw new Exception();
+
+					}
+
+					icNode.setSatelliteTleElements(tleHash.get(satName));
+					icNode.setSatelliteTleName(satName);
+
+					// Save the current satellite TLE selection
+					TreePath treePath = satTree.getLeadSelectionPath();
+
+					ArrayList<Integer> lastTreeSelection = new ArrayList<Integer>();
+
+					while (null != treePath) {
+
+						lastTreeSelection.add(satTree.getRowForPath(treePath));
+						treePath = treePath.getParentPath();
+					}
+					icNode.setLastTreeSelection(lastTreeSelection);
+
+					// Set the name of the selected satellite in the panel
+					icNode.getjSatConfigPanel().setSatNameTextField(
+							satName.trim());
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(this,
+							"Please select a satellite", "Information",
+							JOptionPane.INFORMATION_MESSAGE);
+					saveSuccess = false;
+				}
+
 				break;
-				
+
 			default:
 				break;
 
@@ -2135,6 +2159,48 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	public void setIframe(JInternalFrame iframe) {
 		this.iframe = iframe;
+	}
+
+	public void expand(TreePath path) {
+
+		satTree.expandPath(path);
+	}
+
+	// is path1 descendant of path2
+	public static boolean isDescendant(TreePath path1, TreePath path2) {
+		int count1 = path1.getPathCount();
+		int count2 = path2.getPathCount();
+		if (count1 <= count2)
+			return false;
+		while (count1 != count2) {
+			path1 = path1.getParentPath();
+			count1--;
+		}
+		return path1.equals(path2);
+	}
+
+	public static String getExpansionState(JTree tree, int row) {
+		TreePath rowPath = tree.getPathForRow(row);
+		StringBuffer buf = new StringBuffer();
+		int rowCount = tree.getRowCount();
+		for (int i = row; i < rowCount; i++) {
+			TreePath path = tree.getPathForRow(i);
+			if (i == row || isDescendant(path, rowPath)) {
+				if (tree.isExpanded(path))
+					buf.append("," + String.valueOf(i - row));
+			} else
+				break;
+		}
+		return buf.toString();
+	}
+
+	public static void restoreExpanstionState(JTree tree, int row,
+			String expansionState) {
+		StringTokenizer stok = new StringTokenizer(expansionState, ",");
+		while (stok.hasMoreTokens()) {
+			int token = row + Integer.parseInt(stok.nextToken());
+			tree.expandRow(token);
+		}
 	}
 
 }

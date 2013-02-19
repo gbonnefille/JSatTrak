@@ -13,7 +13,7 @@ public class AlignmentDetectorJsat extends AlignmentDetector {
 
 	public AlignmentDetectorJsat(AbstractSatellite sat,
 			PVCoordinatesProvider body, double alignAngle) {
-		super(sat.getInitNode().getOrbitOrekit(), body, alignAngle);
+		super(sat.getMissionTree().getInitNode().getOrbitOrekit(), body, alignAngle);
 		this.satellite = sat;
 	}
 

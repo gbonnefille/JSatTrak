@@ -235,7 +235,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 			SatelliteTleSGP4 prop = satHash.get(nameSelected);
 
 			// create create Sat Settings panel
-			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp,false);
+			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp);
 
 			String windowName = prop.getName().trim() + " - Settings"; // set
 																		// name

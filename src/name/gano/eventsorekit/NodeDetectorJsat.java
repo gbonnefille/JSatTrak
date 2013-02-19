@@ -12,7 +12,7 @@ public class NodeDetectorJsat extends NodeDetector {
 	private AbstractSatellite satellite = null;
 
 	public NodeDetectorJsat(AbstractSatellite sat, Frame frame) {
-		super(sat.getInitNode().getOrbitOrekit(), frame);
+		super(sat.getMissionTree().getInitNode().getOrbitOrekit(), frame);
 		this.satellite = sat;
 	}
 

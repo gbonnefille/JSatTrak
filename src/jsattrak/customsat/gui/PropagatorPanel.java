@@ -27,6 +27,7 @@ package jsattrak.customsat.gui;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
+import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.customsat.PropagatorNode;
 
 /**
@@ -45,8 +46,30 @@ public class PropagatorPanel extends javax.swing.JPanel {
 
 		initComponents();
 
+		// If initials conditions are TLE's
+		if (pNode.getInitNode().getCoordinate() == InitialConditionsNode.TLE) {
+			propTabbedPane.setSelectedIndex(PropagatorNode.TLE);
+
+			// Disable others tabs
+			for (int i = 0; i <= 3; i++) {
+				propTabbedPane.setEnabledAt(i, false);
+			}
+
+		}
+
 		// Reload the panel with good propogator
-		propTabbedPane.setSelectedIndex(pNode.getPropogator());
+		else if (pNode.getPropogator() != PropagatorNode.TLE) {
+
+			propTabbedPane.setSelectedIndex(pNode.getPropogator());
+			// Disable TLE tab
+			propTabbedPane.setEnabledAt(PropagatorNode.TLE, false);
+		}
+		// If the user has changed initials conditions from TLE to others
+		else {
+			propTabbedPane.setSelectedIndex(PropagatorNode.NUMERICAL);
+			// Disable TLE tab
+			propTabbedPane.setEnabledAt(PropagatorNode.TLE, false);
+		}
 
 		// fill in fields with saved values
 		jSpinner1.setValue(pNode.getN_max());
@@ -1295,6 +1318,7 @@ public class PropagatorPanel extends javax.swing.JPanel {
 				JOptionPane.showMessageDialog(this, "Not implemented yet",
 						"Warning", JOptionPane.WARNING_MESSAGE);
 				break;
+
 			default:
 				break;
 

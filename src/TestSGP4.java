@@ -9,6 +9,8 @@
 
 import java.io.File;
 
+import jsattrak.customsat.SatOption;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.TLElements;
 
@@ -56,7 +58,7 @@ public class TestSGP4
         SatelliteTleSGP4 prop = null;
         try
         {
-            prop = new SatelliteTleSGP4(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2());
+            prop = new SatelliteTleSGP4(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2(),new SatOption());
             prop.setShowGroundTrack(false); // if we arn't using the JSatTrak plots midas well turn this off to save CPU time
         }
         catch(Exception e)

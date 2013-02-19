@@ -27,9 +27,9 @@ public class CircularFieldOfViewDetectorJsat extends
 			throws OrekitException {
 
 		if (increasing) {
-			satellite.setSatColor(Color.MAGENTA);
+			satellite.getSatOptions().setSatColor(Color.MAGENTA);
 		} else {
-			satellite.setSatColor(Color.PINK);
+			satellite.getSatOptions().setSatColor(Color.PINK);
 		}
 
 		return Action.CONTINUE;

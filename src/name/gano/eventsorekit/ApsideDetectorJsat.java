@@ -11,7 +11,7 @@ public class ApsideDetectorJsat extends ApsideDetector {
 	private AbstractSatellite satellite = null;
 
 	public ApsideDetectorJsat(AbstractSatellite sat) {
-		super(sat.getInitNode().getOrbitOrekit());
+		super(sat.getMissionTree().getInitNode().getOrbitOrekit());
 		this.satellite = sat;
 	}
 

@@ -24,9 +24,9 @@ public class ApparentElevationDetectorJsat extends ApparentElevationDetector {
 			throws OrekitException {
 
 		if (increasing) {
-			satellite.setSatColor(Color.BLUE);
+			satellite.getSatOptions().setSatColor(Color.BLUE);
 		} else {
-			satellite.setSatColor(Color.RED);
+			satellite.getSatOptions().setSatColor(Color.RED);
 		}
 
 		return Action.CONTINUE;
