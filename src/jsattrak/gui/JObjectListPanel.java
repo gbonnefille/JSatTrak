@@ -33,6 +33,8 @@ import java.util.List;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
+import javax.swing.event.InternalFrameEvent;
+import javax.swing.event.InternalFrameListener;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
@@ -322,54 +324,56 @@ public class JObjectListPanel extends javax.swing.JPanel {
 	public void openCurrentOptions(Object obj) {
 		// try to see if obj is in a current list
 
-		
-		
 		String nameSelected = obj.toString();
 
-			if (satHash.containsKey(nameSelected)
-					|| obj instanceof MissionTableModel) {
-				
-				String windowName = null;
-				SatSettingsPanel newPanel = null;
+		if (satHash.containsKey(nameSelected)
+				|| obj instanceof MissionTableModel) {
 
-				//Existing satellite
-				if (satHash.containsKey(nameSelected)) {
-					AbstractSatellite prop = satHash.get(nameSelected);				
-
-					// create create Sat Settings panel
-					newPanel = new SatSettingsPanel(prop, parentApp);
-
-					 windowName = prop.getName().trim() + " - Settings";				
-				}	
-
-				//New satellite
-				else if(obj instanceof MissionTableModel){
-					windowName = "New Satellite";
-					MissionTableModel MissionTable = (MissionTableModel) obj;
-					try {
-						newPanel = new SatSettingsPanel(MissionTable, parentApp);
-					} catch (OrekitException e) {
-						JOptionPane.showMessageDialog(this, e.getMessage(), "Error",
-								JOptionPane.ERROR_MESSAGE);
-					}
-				}	
-																		
+			String windowName = null;
+			SatSettingsPanel newPanel = null;
 
 			// create new internal frame window
 			JInternalFrame iframe = new JInternalFrame(windowName, true, true,
 					true, true);
 
+			// Existing satellite
+			if (satHash.containsKey(nameSelected)) {
+				AbstractSatellite prop = satHash.get(nameSelected);
+
+				// create create Sat Settings panel
+				newPanel = new SatSettingsPanel(prop, parentApp);
+
+				windowName = prop.getName().trim() + " - Settings";
+			}
+
+			// New satellite
+			else if (obj instanceof MissionTableModel) {
+				windowName = "New Satellite";
+				MissionTableModel MissionTable = (MissionTableModel) obj;
+				try {
+					newPanel = new SatSettingsPanel(MissionTable, parentApp);
+
+					// If the user close the panel before saving (Idem cancel)
+					iframe.addInternalFrameListener(new CloseListener(newPanel));
+
+				} catch (OrekitException e) {
+					JOptionPane.showMessageDialog(this, e.getMessage(),
+							"Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+
 			// save iframe
 			newPanel.setInternalFrame(iframe);
 
 			iframe.setContentPane(newPanel); // set contents pane
+
 			iframe.setSize(340, 380 + 80); // set size w,h (+80 for Nimbus)
 
-//			if (prop instanceof CustomSatellite) {
-				// it needs a bigger panel!
-				iframe.setSize(340 + 35, 380 + 80); // set size w,h (+80 for
-													// Nimbus)
-//			}
+			// if (prop instanceof CustomSatellite) {
+			// it needs a bigger panel!
+			iframe.setSize(340 + 35, 380 + 80); // set size w,h (+80 for
+												// Nimbus)
+												// }
 
 			iframe.setVisible(true);
 			parentApp.addInternalFrame(iframe);
@@ -399,6 +403,7 @@ public class JObjectListPanel extends javax.swing.JPanel {
 			newPanel.setInternalFrame(iframe);
 
 			iframe.setContentPane(newPanel); // set contents pane
+
 			iframe.setSize(340, 380); // set size w,h
 
 			iframe.setVisible(true);
@@ -576,4 +581,67 @@ public class JObjectListPanel extends javax.swing.JPanel {
 		return new TreePath(list.toArray());
 	}
 
+	/**
+	 * 
+	 * @author acouanon
+	 * 
+	 */
+	private class CloseListener implements InternalFrameListener {
+
+		private SatSettingsPanel satSettingsPanel = null;
+
+		/**
+		 * 
+		 * @param satSettingsPanel
+		 */
+		public CloseListener(SatSettingsPanel satSettingsPanel) {
+
+			this.satSettingsPanel = satSettingsPanel;
+
+		}
+
+		@Override
+		public void internalFrameOpened(InternalFrameEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void internalFrameClosing(InternalFrameEvent e) {
+			JObjectListPanel.this.satHash.remove(this.satSettingsPanel.satProps
+					.getName());
+			JObjectListPanel.this.refreshObjectList();
+
+		}
+
+		@Override
+		public void internalFrameClosed(InternalFrameEvent e) {
+
+		}
+
+		@Override
+		public void internalFrameIconified(InternalFrameEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void internalFrameDeiconified(InternalFrameEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void internalFrameActivated(InternalFrameEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void internalFrameDeactivated(InternalFrameEvent e) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
 }

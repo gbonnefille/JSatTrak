@@ -128,8 +128,7 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 //		Add item to the Object list tree	
 		app.objListPanel.addSat2List(satProps);
 
-		// if this a custom sat add extra tab at the begining
-//		if (satProps instanceof CustomSatellite) {
+
 		
 			this.configPanel = new JCustomSatConfigPanel(this.satProps, app);
 			int tabIndex = 0;
