@@ -31,6 +31,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.event.InternalFrameListener;
 
 import jsattrak.customsat.EphemerisFromFileNode;
 import jsattrak.customsat.InitialConditionsNode;
@@ -41,9 +42,8 @@ import jsattrak.customsat.PropagatorNode;
 import jsattrak.customsat.SolverNode;
 import jsattrak.customsat.StopNode;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
+import jsattrak.gui.JObjectListPanel.CloseListener;
 import jsattrak.objects.AbstractSatellite;
-import jsattrak.objects.CustomSatellite;
-import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.CustomFileFilter;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 import name.gano.swingx.treetable.IconTreeTableNodeRenderer;
@@ -54,9 +54,7 @@ import org.jdesktop.swingx.decorator.HighlightPredicate;
 import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
-import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.BoundedPropagator;
-import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.PVCoordinates;
@@ -71,72 +69,22 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	MissionTableModel missonTableModel;
 	CustomTreeTableNode rootNode; // root node in mission designer treetable
 	AbstractSatellite sat;
+	SatSettingsPanel satSettingsPanel;
 
 	JSatTrak app; // used to add message etc.
 
 	/** Creates new form JCustomSatConfigPanel */
-	public JCustomSatConfigPanel(AbstractSatellite sat, JSatTrak app) {
+	public JCustomSatConfigPanel(AbstractSatellite sat, JSatTrak app,
+			SatSettingsPanel satSettingsPanel) {
 
 		this.treeTableModel = sat.getMissionTree().getMissionTableModel();
-		
-		//Link to recover the name of the satellite TLE
+
+		// Link to recover the name of the satellite TLE
 		sat.getMissionTree().getInitNode().setJcustomSatConfigPanel(this);
-		
+
 		this.app = app;
 		this.sat = sat;
-
-		initComponents();
-
-		missionDesignJXTreeTable.setTreeTableModel(treeTableModel);
-		missionDesignJXTreeTable.setRootVisible(true);
-
-		// get root node
-		rootNode = (CustomTreeTableNode) treeTableModel.getRoot();
-
-		// highlighter --same as old AlternateRowHighlighter.genericGrey
-		missionDesignJXTreeTable.addHighlighter(new ColorHighlighter(
-				HighlightPredicate.EVEN, Color.WHITE, Color.black)); // even,
-																		// background,
-																		// foregrond
-		missionDesignJXTreeTable.addHighlighter(new ColorHighlighter(
-				HighlightPredicate.ODD, new Color(229, 229, 229), Color.black)); // even,
-																					// background,
-																					// foregrond
-		// old way
-		// missionDesignJXTreeTable.addHighlighter(AlternateRowHighlighter.genericGrey);
-
-		// roll over effect? (not supported anymore in swingx?)
-		// missionDesignJXTreeTable.addHighlighter(new
-		// RolloverHighlighter(Color.BLACK, Color.WHITE));
-		// missionDesignJXTreeTable.setRolloverEnabled(true);
-
-		// expand all nodes at first
-		missionDesignJXTreeTable.expandAll(); // expand all (for now) - for some
-												// reason stops the ability to
-												// add components to treetable
-		missionDesignJXTreeTable.setColumnControlVisible(true); // column
-																// control
-
-		// for custom icons rendering
-		missionDesignJXTreeTable
-				.setTreeCellRenderer(new IconTreeTableNodeRenderer());
-
-		// console option
-		consoleCheckBox.setSelected(true);
-
-	}
-	
-	/** Creates new form JCustomSatConfigPanel */
-	public JCustomSatConfigPanel(MissionTableModel MissionTable, JSatTrak app) {
-
-		this.treeTableModel = MissionTable.getMissionTableModel(); // treeTableModel;
-		
-		//Link to recover the name of the satellite TLE
-		MissionTable.getInitNode().setJcustomSatConfigPanel(this);
-		
-		this.missonTableModel = MissionTable;
-		this.app = app;
-	
+		this.satSettingsPanel = satSettingsPanel;
 
 		initComponents();
 
@@ -282,7 +230,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		satNameTextField.setFont(new java.awt.Font("Tahoma", 1, 12));
 
 		satNameTextField.setText(sat.getName());
-		
+
 		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
 				jPanel1);
 		jPanel1.setLayout(jPanel1Layout);
@@ -300,8 +248,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 										.addComponent(
 												satNameTextField,
 												javax.swing.GroupLayout.PREFERRED_SIZE,
-												200,
-												Short.MAX_VALUE)
+												200, Short.MAX_VALUE)
 										.addPreferredGap(
 												javax.swing.LayoutStyle.ComponentPlacement.RELATED,
 												262, Short.MAX_VALUE)
@@ -326,7 +273,6 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 																				Short.MAX_VALUE)
 																		.addComponent(
 																				jLabel2))
-														
 
 														.addGroup(
 																jPanel1Layout
@@ -726,7 +672,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	private void addPropButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addPropButtonActionPerformed
 	{// GEN-HEADEREND:event_addPropButtonActionPerformed
-		addNode2MissionDesigner(new PropagatorNode(null, sat.getMissionTree().getInitNode()));
+		addNode2MissionDesigner(new PropagatorNode(null, sat.getMissionTree()
+				.getInitNode()));
 	}// GEN-LAST:event_addPropButtonActionPerformed
 
 	private void addBurnButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addBurnButtonActionPerformed
@@ -904,8 +851,19 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		// thread to run in background
 		MissionDesignPropagator mdp = new MissionDesignPropagator(rootNode,
 				treeTableModel, sat, app);
-		
+
 		mdp.execute();
+
+		// Remove the "closeListener" because it will delete the satellite if
+		// the user close the panel
+		for (InternalFrameListener listener : this.satSettingsPanel.iframe
+				.getInternalFrameListeners()) {
+
+			if (listener.toString().contains(CloseListener.class.getName()))
+				this.satSettingsPanel.iframe
+						.removeInternalFrameListener(listener);
+
+		}
 
 	}// GEN-LAST:event_propMissionButtonActionPerformed
 
@@ -956,8 +914,10 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 				// force repaint and regeneration of ground paths - SEG 24 Sept
 				// 2008
-				sat.getSatOptions().setGroundTrackIni2False(); // force update of ground track
-												// data
+				sat.getSatOptions().setGroundTrackIni2False(); // force update
+																// of ground
+																// track
+				// data
 				app.forceRepainting(false); // repait without updating
 											// positional data
 
@@ -980,7 +940,8 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	private void consoleCheckBoxActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_consoleCheckBoxActionPerformed
 	{// GEN-HEADEREND:event_consoleCheckBoxActionPerformed
 		// save option to sat
-		sat.getSatOptions().setShowConsoleOnPropogate(consoleCheckBox.isSelected());
+		sat.getSatOptions().setShowConsoleOnPropogate(
+				consoleCheckBox.isSelected());
 	}// GEN-LAST:event_consoleCheckBoxActionPerformed
 
 	private void exportEphemerisButtonActionPerformed(
@@ -1055,18 +1016,16 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 		String beginTime = "";
 
 		try {
-			
-				BoundedPropagator ephemeris = this.sat.getEphemeris();
-		
-			
+
+			BoundedPropagator ephemeris = this.sat.getEphemeris();
 
 			if (ephemeris != null) {
 
 				// double firstTime = (ephemeris.getMinDate().durationFrom(
 				// AbsoluteDate.JULIAN_EPOCH) / 86400);
 
-				beginTime = ephemeris.getGeneratedEphemeris().getMinDate().toString(
-						TimeScalesFactory.getUTC());
+				beginTime = ephemeris.getGeneratedEphemeris().getMinDate()
+						.toString(TimeScalesFactory.getUTC());
 
 				// GregorianCalendar cal = Time.convertJD2Calendar(firstTime);
 				//
@@ -1079,9 +1038,10 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 			// open file for writing
 			BufferedWriter buffWriter;
 
-			int NumberOfEphemerisPoints = this.sat.getMissionTree().getPropNode()
-					.getNumberOfStep();
-			double stepSize = this.sat.getMissionTree().getPropNode().getStepSize();
+			int NumberOfEphemerisPoints = this.sat.getMissionTree()
+					.getPropNode().getNumberOfStep();
+			double stepSize = this.sat.getMissionTree().getPropNode()
+					.getStepSize();
 
 			buffWriter = new BufferedWriter(new FileWriter(filename));
 			// add stk header
@@ -1196,7 +1156,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 	public javax.swing.JTextField getSatNameTextField() {
 		return satNameTextField;
 	}
-	
+
 	public void setSatNameTextField(String satName) {
 		this.satNameTextField.setText(satName);
 	}
