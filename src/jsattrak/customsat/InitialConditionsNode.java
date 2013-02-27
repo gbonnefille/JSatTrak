@@ -136,8 +136,8 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	@Override
 	public void execute(MissionDesignPropagator missionDesign) {
 
-		// set inial time of the node ( TT)
-		this.setStartTTjulDate(AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate));
+		// set inial time of the node
+		this.setStartTTjulDate(AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400));
 
 	}// execute
 
@@ -369,5 +369,6 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public void setLastTreeSelection(ArrayList<Integer> lastTreeSelection) {
 		this.lastTreeSelection = lastTreeSelection;
 	}
+
 
 }

@@ -41,6 +41,7 @@ import javax.swing.event.ChangeListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.gui.JSatTrak;
@@ -48,6 +49,7 @@ import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.SatBrowserTleDataLoader;
 import jsattrak.utilities.TLEDownloader;
 import jsattrak.utilities.TLElements;
+import jsattrak.utilities.TreeTransferHandler;
 import name.gano.astro.time.Time;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -1255,6 +1257,33 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 				tleOutputTextArea, satTree, lastTreeSelection);
 
 		sbtdl.execute();
+		
+		 // Drag and Drop Handler
+        // setup transfer handler
+        satTree.setTransferHandler(new TreeTransferHandler(tleHash));
+        
+        // allow mutiple selections
+        satTree.getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+    
+        // if local files exist wait for thread to finish before exiting
+        TLEDownloader tleDownloader = new TLEDownloader();
+        if( (new File(tleDownloader.getLocalPath()).exists()) && (new File(tleDownloader.getTleFilePath(0)).exists()) )
+        {
+            while(!sbtdl.isDone())
+            {
+                
+                try
+                {
+                    Thread.sleep(50); // sleep for a little bit to wait for the thread
+                    
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            
+        } // wait for thread if needed
 
 		// add a change a listener to tabbed pane
 		iniTabbedPane.addChangeListener(new ChangeListener() {

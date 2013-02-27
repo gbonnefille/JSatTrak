@@ -92,7 +92,6 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	public static final int ECKSTEINHECHLER = 2;
 	public static final int SEMIANALYTICAL = 3;
 	public static final int TLE = 4;
-	
 
 	// which prop to use
 	private int propogator = PropagatorNode.NUMERICAL;
@@ -139,10 +138,6 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	private boolean stopOnApogee = false;
 	private boolean stopOnPerigee = false;
 
-	// private variables used internally only
-	private AbsoluteDate JD_TT0; // JD_TT at initial time (Julian Date)
-	// Vector<StateVector> ephemeris;
-
 	// USED FOR GOAL CALCULATIONS
 	StateVector lastStateVector = null; // last state -- to calculate goal
 										// properties
@@ -173,7 +168,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		super(new String[] { "Propagate", "", "" }); // initialize node, default
 														// values
 		this.initNode = initNode;
-		
+
 		// set icon for this type
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
 				getClass().getResource("/icons/customSatIcons/prop.png"))));
@@ -191,37 +186,23 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			throws IOException, ParseException, OrekitException,
 			IllegalArgumentException, IllegalStateException {
 
-		// Set the orbit
-		this.orbitOrekit = initNode.getOrbitOrekit();
+		// save initial time of the node
+		this.setStartTTjulDate(this.initNode.getStartTTjulDate());
 
-		// dummy but should do something based on input ephemeris
-		// System.out.println("Executing : " + getValueAt(0) );
+		// Set the orbit except for TLE propagation
+		if (this.initNode.getCoordinate() != InitialConditionsNode.TLE) {
+			// Set the orbit
+			this.orbitOrekit = initNode.getOrbitOrekit();
+		}
+		else{
+			//Set the propagator if the uses hasn't validate the propagator configuration
+			this.propogator = PropagatorNode.TLE;
+		}
 
-		// last state before propogation
-		// StateVector lastState = this.ephemeris.lastElement();
-
-		// save initial time of the node ( TT)
-		// this.setStartTTjulDate(lastState.state[0]);
-		this.setStartTTjulDate(orbitOrekit.getDate());
-
-		// double[] pos = new double[] { lastState.state[1], lastState.state[2],
-		// lastState.state[3] };
-		// double[] vel = new double[] { lastState.state[4], lastState.state[5],
-		// lastState.state[6] };
-
-
-
-		// time parameters that are shared
-		// JD_TT0 = lastState.state[0]; // last time !!!! IS THIS TT
-		this.JD_TT0 = this.orbitOrekit.getDate();
-
-		// Begin date of simulation
-		// AbsoluteDate BeginOfSimulation = AbsoluteDate.JULIAN_EPOCH
-		// .shiftedBy(JD_TT0 * 86400);
-		AbsoluteDate BeginOfSimulation = JD_TT0;
-		// End date of simulation
-		AbsoluteDate EndOfSimulation = BeginOfSimulation
-				.shiftedBy(this.popogateTimeLen);
+		// Duration of the propagation (Only use in exportEphemeris for TLE
+		// propagation)
+		AbsoluteDate EndOfSimulation = this.getStartTTjulDate().shiftedBy(
+				this.popogateTimeLen);
 		// Number of steps for ephemeris file
 		this.numberOfStep = (int) Math.ceil(popogateTimeLen / this.stepSize);
 
@@ -325,7 +306,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			ephemeris =  prop.getGeneratedEphemeris();
+			ephemeris = prop.getGeneratedEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -361,7 +342,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			prop.propagate(EndOfSimulation);
 
-			ephemeris =  prop.getGeneratedEphemeris();
+			ephemeris = prop.getGeneratedEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -430,20 +411,21 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// Not implemented yet
 
 		}
-		
-		///////////////
-		//////TLE//////
-		///////////////
-		
+
+		// /////////////
+		// ////TLE//////
+		// /////////////
+
 		else if (propogator == PropagatorNode.TLE) {
 
 			TLElements tle = initNode.getSatelliteTleElements();
-			
+
 			String satName = initNode.getSatelliteTleName();
 
-			SatelliteTleSGP4 sat = new SatelliteTleSGP4(satName, tle.getLine1(), tle.getLine2(),new SatOption());
-			
-			 ephemeris = sat.getEphemeris();
+			SatelliteTleSGP4 sat = new SatelliteTleSGP4(satName,
+					tle.getLine1(), tle.getLine2(), new SatOption());
+
+			ephemeris = sat.getEphemeris();
 
 			if (!eventDetector.isEmpty()) {
 
@@ -454,19 +436,16 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 					AbstractDetector event = eventIterator.next();
 
 					ephemeris.addEventDetector(event);
-					
-					
+
 				}
 			}
 
 			missionDesign.setEphemeris(ephemeris);
-	
 
 			// Reset the event if not use in the next simulation
 			this.eventDetector.clear();
-			
+
 		}
-		
 
 	}// execute
 
@@ -956,7 +935,5 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	public InitialConditionsNode getInitNode() {
 		return initNode;
 	}
-	
-	
 
 }

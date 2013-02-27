@@ -586,7 +586,7 @@ public class JObjectListPanel extends javax.swing.JPanel {
 	 * @author acouanon
 	 * 
 	 */
-	private class CloseListener implements InternalFrameListener {
+	public class CloseListener implements InternalFrameListener {
 
 		private SatSettingsPanel satSettingsPanel = null;
 

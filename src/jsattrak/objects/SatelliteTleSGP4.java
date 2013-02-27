@@ -41,6 +41,7 @@ import name.gano.astro.propogators.sgp4_cssi.SGP4SatData;
 import name.gano.worldwind.modelloader.WWModel3D_new;
 import net.java.joglutils.model.ModelFactory;
 
+import org.apache.commons.math3.exception.util.DummyLocalizable;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.bodies.GeodeticPoint;
 import org.orekit.bodies.OneAxisEllipsoid;
@@ -298,7 +299,12 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// calculate period - in minutes
 		double periodMin = Kepler.CalculatePeriod(AstroConst.GM_Earth,
 				position.toArray(), velocity.toArray()) / (60.0);
-		// System.out.println("period [min] = "+periodMin);
+
+		if (Double.isNaN(periodMin)) {
+
+			throw new OrekitException(new DummyLocalizable(
+					"Error in the initialization, check the TLE"));
+		}
 
 		// time step divisions (in fractions of a day)
 		double fracOfPeriod = 15.0;

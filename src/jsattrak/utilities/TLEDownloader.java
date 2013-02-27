@@ -236,6 +236,8 @@ public class TLEDownloader implements java.io.Serializable
             systemSettings.put("proxySet", "true");
             systemSettings.put("http.proxyHost", proxyHost);
             systemSettings.put("http.proxyPort", proxyPort);
+//            systemSettings.put("http.proxyUser", "user");
+//            systemSettings.put("http.proxyPassword", "pass");
         }
 
         // first see if local directory exists if not try to create it
