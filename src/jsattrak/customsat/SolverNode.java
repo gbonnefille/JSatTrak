@@ -48,6 +48,7 @@ import org.orekit.time.AbsoluteDate;
  * 
  * @author sgano
  */
+//TODO Modify the SolverNode in ManeuverNode with Orekit maneuvers
 public class SolverNode extends CustomTreeTableNode implements
 		NonLinearEquationSystemProblem {
 	public static int NEWTONSOLVER = 0;
@@ -233,7 +234,7 @@ public class SolverNode extends CustomTreeTableNode implements
 
 		// run children
 		//TODO Adapt SolverNode with OREKIT
-//		executeChildren(ephemerisInternal);//Create a mission design propagator
+//		executeChildren(ephemerisInternal);
 
 		// extract results:
 		double[] f = new double[goalParamVec.size()];
