@@ -35,8 +35,8 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JInternalFrame;
 
-import jsattrak.customsat.gui.ManeuverPanel;
-import jsattrak.customsat.gui.ManeuverPanel.Events;
+import jsattrak.customsat.gui.EventPanel;
+import jsattrak.customsat.gui.EventPanel.Events;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
 import jsattrak.objects.AbstractSatellite;
@@ -597,7 +597,7 @@ public class EventNode extends CustomTreeTableNode {
 				true, true);
 
 		// show satellite browser window
-		ManeuverPanel panel = new ManeuverPanel(this, iframe); // non-modal
+		EventPanel panel = new EventPanel(this, iframe); // non-modal
 																// version
 		panel.setIframe(iframe);
 

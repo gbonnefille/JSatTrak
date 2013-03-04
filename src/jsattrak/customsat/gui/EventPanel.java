@@ -43,13 +43,13 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.utils.Constants;
 
 import jsattrak.customsat.EventNode;
-import jsattrak.customsat.gui.ManeuverPanel.Events;
+import jsattrak.customsat.gui.EventPanel.Events;
 
 /**
  * 
  * @author sgano
  */
-public class ManeuverPanel extends javax.swing.JPanel {
+public class EventPanel extends javax.swing.JPanel {
 
 	EventNode mNode;
 
@@ -58,7 +58,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 									// close window
 
 	/** Creates new form ManeuverPanel */
-	public ManeuverPanel(EventNode mNode, JInternalFrame iframe) {
+	public EventPanel(EventNode mNode, JInternalFrame iframe) {
 		this.iframe = iframe;
 		this.mNode = mNode;
 
