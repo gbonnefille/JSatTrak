@@ -92,7 +92,7 @@ import org.orekit.utils.PVCoordinatesProvider;
  * 
  * @author sgano
  */
-public class ManeuverNode extends CustomTreeTableNode {
+public class EventNode extends CustomTreeTableNode {
 
 	private double[] vncThrustVector = new double[3];
 
@@ -115,7 +115,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 	public static final int CELESTIALBODYOBJECT = 2;
 
 	// which event target
-	private int typeOfTarget = ManeuverNode.SATELLITEOBJECT;
+	private int typeOfTarget = EventNode.SATELLITEOBJECT;
 
 	// Events params
 	private double[] eventsParams = new double[3];
@@ -164,7 +164,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 	// ========================================
 
-	public ManeuverNode(CustomTreeTableNode parentNode,
+	public EventNode(CustomTreeTableNode parentNode,
 			AbstractSatellite currentSat,
 			Hashtable<String, AbstractSatellite> satList,
 			Hashtable<String, GroundStation> groundStations) {
@@ -271,7 +271,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 			// Alignment detector
 			case ALIGNMENT:
 
-				if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+				if (typeOfTarget == EventNode.SATELLITEOBJECT) {
 
 					AbstractSatellite abstractSat = userSatList
 							.get(targetBodyObjectName);
@@ -295,7 +295,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 				}
 
-				else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
+				else if (typeOfTarget == EventNode.GROUNDSTATIONOBJECT) {
 
 					groundStation = userGroundStationsList
 							.get(targetBodyObjectName);
@@ -316,7 +316,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 				}
 
-				else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
+				else if (typeOfTarget == EventNode.CELESTIALBODYOBJECT) {
 
 					pvTarget = CelestialBodyFactory
 							.getBody(targetBodyObjectName);
@@ -383,7 +383,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 			// Circular field of view detector
 			case CIRCULARFIELDOFVIEW:
 
-				if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+				if (typeOfTarget == EventNode.SATELLITEOBJECT) {
 
 					AbstractSatellite abstractSat = userSatList
 							.get(targetBodyObjectName);
@@ -407,7 +407,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 				}
 
-				else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
+				else if (typeOfTarget == EventNode.GROUNDSTATIONOBJECT) {
 
 					groundStation = userGroundStationsList
 							.get(targetBodyObjectName);
@@ -430,7 +430,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 				}
 
-				else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
+				else if (typeOfTarget == EventNode.CELESTIALBODYOBJECT) {
 
 					pvTarget = CelestialBodyFactory
 							.getBody(targetBodyObjectName);
@@ -460,7 +460,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 			// Dihedral field of view detector
 			case DIHEDRALFIELDOFVIEW:
 
-				if (typeOfTarget == ManeuverNode.SATELLITEOBJECT) {
+				if (typeOfTarget == EventNode.SATELLITEOBJECT) {
 
 					AbstractSatellite abstractSat = userSatList
 							.get(targetBodyObjectName);
@@ -484,7 +484,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 				}
 
-				else if (typeOfTarget == ManeuverNode.GROUNDSTATIONOBJECT) {
+				else if (typeOfTarget == EventNode.GROUNDSTATIONOBJECT) {
 
 					groundStation = userGroundStationsList
 							.get(targetBodyObjectName);
@@ -507,7 +507,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 
 				}
 
-				else if (typeOfTarget == ManeuverNode.CELESTIALBODYOBJECT) {
+				else if (typeOfTarget == EventNode.CELESTIALBODYOBJECT) {
 
 					pvTarget = CelestialBodyFactory
 							.getBody(targetBodyObjectName);

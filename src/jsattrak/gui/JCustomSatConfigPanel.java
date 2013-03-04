@@ -36,7 +36,7 @@ import javax.swing.event.InternalFrameListener;
 import jsattrak.customsat.EphemerisFromFileNode;
 import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.customsat.InputVariable;
-import jsattrak.customsat.ManeuverNode;
+import jsattrak.customsat.EventNode;
 import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.PropagatorNode;
 import jsattrak.customsat.SolverNode;
@@ -678,7 +678,7 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 	private void addBurnButtonActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_addBurnButtonActionPerformed
 	{// GEN-HEADEREND:event_addBurnButtonActionPerformed
-		addNode2MissionDesigner(new ManeuverNode(null, sat, app.getSatHash(),
+		addNode2MissionDesigner(new EventNode(null, sat, app.getSatHash(),
 				app.getGsHash()));
 	}// GEN-LAST:event_addBurnButtonActionPerformed
 

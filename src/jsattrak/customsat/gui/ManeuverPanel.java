@@ -42,7 +42,7 @@ import javax.swing.text.DateFormatter;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.utils.Constants;
 
-import jsattrak.customsat.ManeuverNode;
+import jsattrak.customsat.EventNode;
 import jsattrak.customsat.gui.ManeuverPanel.Events;
 
 /**
@@ -51,14 +51,14 @@ import jsattrak.customsat.gui.ManeuverPanel.Events;
  */
 public class ManeuverPanel extends javax.swing.JPanel {
 
-	ManeuverNode mNode;
+	EventNode mNode;
 
 	// used for diaplying settings panel
 	private JInternalFrame iframe; // used to know what its parent frame is - to
 									// close window
 
 	/** Creates new form ManeuverPanel */
-	public ManeuverPanel(ManeuverNode mNode, JInternalFrame iframe) {
+	public ManeuverPanel(EventNode mNode, JInternalFrame iframe) {
 		this.iframe = iframe;
 		this.mNode = mNode;
 
@@ -111,11 +111,11 @@ public class ManeuverPanel extends javax.swing.JPanel {
 		// If an object was saved
 		if (mNode.getTargetBodyObjectName() != null) {
 			// Satellite object
-			if (mNode.getTypeOfTarget() == ManeuverNode.SATELLITEOBJECT) {
+			if (mNode.getTypeOfTarget() == EventNode.SATELLITEOBJECT) {
 				satObjectRadioButtonActionPerformed(null);
 			}
 			// Ground station object
-			else if (mNode.getTypeOfTarget() == ManeuverNode.GROUNDSTATIONOBJECT) {
+			else if (mNode.getTypeOfTarget() == EventNode.GROUNDSTATIONOBJECT) {
 				groundStationBodyRadioButtonActionPerformed(null);
 			}
 			// Celestial body object
@@ -1339,17 +1339,17 @@ public class ManeuverPanel extends javax.swing.JPanel {
 				mNode.setEvent(Events.ALIGNMENT);
 
 				if (satBodyEventRadioButton.isSelected()) {
-					mNode.setTypeOfTarget(ManeuverNode.SATELLITEOBJECT);
+					mNode.setTypeOfTarget(EventNode.SATELLITEOBJECT);
 				}
 
 				else if (groundStationBodyEventRadioButton.isSelected()) {
 
-					mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
+					mNode.setTypeOfTarget(EventNode.GROUNDSTATIONOBJECT);
 				}
 
 				else {
 
-					mNode.setTypeOfTarget(ManeuverNode.CELESTIALBODYOBJECT);
+					mNode.setTypeOfTarget(EventNode.CELESTIALBODYOBJECT);
 				}
 
 				break;
@@ -1365,7 +1365,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 			case APPARENTELEVATION:
 				mNode.setTargetBodyObjectName(bodyComboBox.getSelectedItem()
 						.toString());
-				mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
+				mNode.setTypeOfTarget(EventNode.GROUNDSTATIONOBJECT);
 
 				mNode.setEvent(Events.APPARENTELEVATION);
 
@@ -1385,17 +1385,17 @@ public class ManeuverPanel extends javax.swing.JPanel {
 						.toString());
 
 				if (satBodyEventRadioButton.isSelected()) {
-					mNode.setTypeOfTarget(ManeuverNode.SATELLITEOBJECT);
+					mNode.setTypeOfTarget(EventNode.SATELLITEOBJECT);
 				}
 
 				else if (groundStationBodyEventRadioButton.isSelected()) {
 
-					mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
+					mNode.setTypeOfTarget(EventNode.GROUNDSTATIONOBJECT);
 				}
 
 				else {
 
-					mNode.setTypeOfTarget(ManeuverNode.CELESTIALBODYOBJECT);
+					mNode.setTypeOfTarget(EventNode.CELESTIALBODYOBJECT);
 				}
 
 				mNode.setEventsParams(new double[] {
@@ -1428,17 +1428,17 @@ public class ManeuverPanel extends javax.swing.JPanel {
 						.toString());
 
 				if (satBodyEventRadioButton.isSelected()) {
-					mNode.setTypeOfTarget(ManeuverNode.SATELLITEOBJECT);
+					mNode.setTypeOfTarget(EventNode.SATELLITEOBJECT);
 				}
 
 				else if (groundStationBodyEventRadioButton.isSelected()) {
 
-					mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
+					mNode.setTypeOfTarget(EventNode.GROUNDSTATIONOBJECT);
 				}
 
 				else {
 
-					mNode.setTypeOfTarget(ManeuverNode.CELESTIALBODYOBJECT);
+					mNode.setTypeOfTarget(EventNode.CELESTIALBODYOBJECT);
 				}
 
 				mNode.setEventsParams(new double[] {
@@ -1478,7 +1478,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 				mNode.setTargetCelestialBodyObjectName(celestialBodyComboBox
 						.getSelectedItem().toString());
 
-				mNode.setTypeOfTarget(ManeuverNode.CELESTIALBODYOBJECT);
+				mNode.setTypeOfTarget(EventNode.CELESTIALBODYOBJECT);
 
 				mNode.setTotalEclipse(totalEclipseEventRadioButton.isSelected());
 
@@ -1491,7 +1491,7 @@ public class ManeuverPanel extends javax.swing.JPanel {
 
 				mNode.setTargetBodyObjectName(bodyComboBox.getSelectedItem()
 						.toString());
-				mNode.setTypeOfTarget(ManeuverNode.GROUNDSTATIONOBJECT);
+				mNode.setTypeOfTarget(EventNode.GROUNDSTATIONOBJECT);
 
 				mNode.setEvent(Events.ELEVATION);
 

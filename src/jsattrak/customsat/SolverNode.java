@@ -91,7 +91,10 @@ public class SolverNode extends CustomTreeTableNode implements
 
 		// add default (burn and propogate componets as children) if desired
 		if (addDefaultcomponets) {
-			new ManeuverNode(this);
+			
+			//TODO Adapt SolverNode with OREKIT
+//			new EventNode(this); //create a Maneuver Event
+			
 			new PropagatorNode(this,(InitialConditionsNode)parentNode.getChildAt(0));
 		}
 
@@ -195,7 +198,8 @@ public class SolverNode extends CustomTreeTableNode implements
 			for (int i = 1; i < ephemerisInternal.size(); i++) // skip first
 																// entry
 			{
-				ephemeris.add(ephemerisInternal.get(i));
+				//TODO Adapt SolverNode with OREKIT
+//				ephemeris.add(ephemerisInternal.get(i));//Create an Orekit ephemeris
 			}
 
 		} // use solver (end)
@@ -228,7 +232,8 @@ public class SolverNode extends CustomTreeTableNode implements
 		}
 
 		// run children
-		executeChildren(ephemerisInternal);
+		//TODO Adapt SolverNode with OREKIT
+//		executeChildren(ephemerisInternal);//Create a mission design propagator
 
 		// extract results:
 		double[] f = new double[goalParamVec.size()];
