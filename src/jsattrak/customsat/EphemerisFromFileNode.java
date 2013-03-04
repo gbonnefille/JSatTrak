@@ -52,7 +52,7 @@ import org.orekit.frames.FramesFactory;
 import org.orekit.frames.Transform;
 import org.orekit.orbits.CartesianOrbit;
 import org.orekit.propagation.SpacecraftState;
-import org.orekit.propagation.precomputed.Ephemeris;
+import org.orekit.propagation.analytical.Ephemeris;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.DateComponents;
 import org.orekit.time.TimeComponents;
@@ -218,7 +218,7 @@ public class EphemerisFromFileNode extends CustomTreeTableNode {
 					frame.getFrozenFrame(frame, b1950Date, "B1950");
 				} else {
 					throw new OrekitException(
-							OrekitMessages.CCSDS_ORBIT_DATA_MESSAGE_UNKNOWN_FRAME,
+							OrekitMessages.NON_PSEUDO_INERTIAL_FRAME_NOT_SUITABLE_FOR_DEFINING_ORBITS,
 							coordSys);
 				}
 

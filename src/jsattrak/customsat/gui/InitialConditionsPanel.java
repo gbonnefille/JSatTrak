@@ -55,6 +55,7 @@ import name.gano.astro.time.Time;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.FramesFactory;
+import org.orekit.frames.IERSConventions;
 import org.orekit.orbits.PositionAngle;
 import org.orekit.utils.PVCoordinates;
 
@@ -1743,7 +1744,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 					break;
 
 				case 1:
-					icNode.setFrame(FramesFactory.getCIRF2000());
+					icNode.setFrame(FramesFactory.getCIRF2000(IERSConventions.IERS_2010));
 					break;
 
 				case 2:
