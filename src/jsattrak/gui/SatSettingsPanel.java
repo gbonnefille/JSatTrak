@@ -33,12 +33,6 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import javax.swing.event.InternalFrameListener;
 
-import name.gano.astro.time.Time;
-
-import org.apache.commons.math3.exception.util.DummyLocalizable;
-import org.orekit.errors.OrekitException;
-import org.orekit.time.TimeComponents;
-
 import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.SatOption;
 import jsattrak.gui.JObjectListPanel.CloseListener;
@@ -46,6 +40,8 @@ import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.RelativePath;
+
+import org.orekit.errors.OrekitException;
 
 /**
  * 
@@ -132,6 +128,7 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 		app.objListPanel.addSat2List(satProps);
 
 		this.configPanel = new JCustomSatConfigPanel(this.satProps, app, this);
+
 		int tabIndex = 0;
 		jTabbedPane1.add(configPanel, tabIndex);
 		jTabbedPane1.setTitleAt(tabIndex, "Satellite Settings");
@@ -1068,6 +1065,9 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 			app.objListPanel.satHash.remove(satProps.getName());
 			app.objListPanel.refreshObjectList();
 		}
+
+		app.objListPanel.satHash.remove(satProps.getName());
+		app.objListPanel.refreshObjectList();
 
 		try {
 			iframe.dispose(); // could setClosed(true)

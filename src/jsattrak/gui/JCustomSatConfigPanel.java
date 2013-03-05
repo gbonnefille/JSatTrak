@@ -865,9 +865,11 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		}
 
+
 		// Removes the action of removing the current satellite when the user
 		// click on cancel
 		this.satSettingsPanel.setIsPropagate(true);
+
 
 	}// GEN-LAST:event_propMissionButtonActionPerformed
 
