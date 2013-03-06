@@ -235,7 +235,6 @@ import jsattrak.coverage.JSatTrakTimeDependent;
 import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.SatOption;
 import jsattrak.objects.AbstractSatellite;
-import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.ConsoleDialog;
@@ -252,7 +251,7 @@ import name.gano.astro.bodies.Sun;
 import name.gano.astro.time.Time;
 import name.gano.file.FileTypeFilter;
 import name.gano.file.SaveImageFile;
-import org.apache.commons.math3.exception.util.DummyLocalizable;
+
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.ZipJarCrawler;
 import org.orekit.errors.OrekitException;
@@ -1753,13 +1752,13 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
     private void playBackButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_playBackButtonActionPerformed
     {//GEN-HEADEREND:event_playBackButtonActionPerformed
         currentPlayDirection = -1; // backwards
-        runAnimation();
+        runAnimation(false);
     }//GEN-LAST:event_playBackButtonActionPerformed
 
     private void stepBackButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_stepBackButtonActionPerformed
     {//GEN-HEADEREND:event_stepBackButtonActionPerformed
         currentPlayDirection = -1; // backward in time
-        updateTime();
+        updateTime(false);
     }//GEN-LAST:event_stepBackButtonActionPerformed
 
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_playButtonActionPerformed
@@ -1775,7 +1774,7 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
     public void playScenario()
     {
         currentPlayDirection = 1; // forwards
-        runAnimation(); // perform animation
+        runAnimation(true); // perform animation
     } // playScenario
 
     private void runAnimation(final boolean eventDetector)
@@ -1848,9 +1847,9 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
             // big time jump
             for (AbstractSatellite sat : satHash.values() )
             {
-                if(sat.getShowGroundTrack() && (sat.getPeriod() <= (timeDiffDays*24.0*60.0) ) )
+                if(sat.getSatOptions().isShowGroundTrack() && (sat.getPeriod() <= (timeDiffDays*24.0*60.0) ) )
                 {
-                    sat.setGroundTrackIni2False();
+                    sat.getSatOptions().setGroundTrackIni(false);
                     //System.out.println(sat.getName() +" - Groundtrack Iniated");
                 }
             }
@@ -1899,7 +1898,7 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
     private void stepForwardTimeButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_stepForwardTimeButtonActionPerformed
     {//GEN-HEADEREND:event_stepForwardTimeButtonActionPerformed
         currentPlayDirection = 1; // forward in time
-        updateTime();
+        updateTime(true);
     }//GEN-LAST:event_stepForwardTimeButtonActionPerformed
 
     private void new2DWindowMenuItemActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_new2DWindowMenuItemActionPerformed
@@ -2112,7 +2111,7 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
                 sat.propogate2JulDate( currentJulianDate.getJulianDate(), eventDetector);
             } // propgate each sat
         } catch (OrekitException e) {
-            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE)
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
 
         // update ground stations to the current time  
@@ -2747,18 +2746,18 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
         
     } // add InternalFrame
     
-    public void updateTleDataInCurrentList()
+    public void updateTleDataInCurrentList() throws OrekitException
     {
         // update TLE data in current list  - used mostly after updating TLEs
         JSatBrowser newBrowswer = new JSatBrowser(this, false, this);
-        Hashtable<String,TLE> tleHash = newBrowswer.getTleHash();
+        Hashtable<String,TLElements> tleHash = newBrowswer.getTleHash();
         
         for (AbstractSatellite sat : satHash.values() )
         {
             if (sat instanceof SatelliteTleSGP4) // if sat is a TLE/SGP4 sat
             {
                 String name = sat.getName();
-                TLE newTLE = tleHash.get(name);
+                TLElements newTLE = tleHash.get(name);
 
                 if (newTLE != null)
                 {
@@ -2777,16 +2776,16 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
         // add sat to list if TLE exsits by name
         JSatBrowser newBrowswer = new JSatBrowser(this, false, this);
         
-        Hashtable<String,TLE> tleHash = newBrowswer.getTleHash();
+        Hashtable<String,TLElements> tleHash = newBrowswer.getTleHash();
         
-         TLE newTLE = tleHash.get(satName); 
+        TLElements newTLE = tleHash.get(satName); 
          
          if(newTLE != null)
          {
             // make sat prop object and add it to the list
              try
              {
-                SatelliteTleSGP4 prop = new SatelliteTleSGP4(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2());
+                SatelliteTleSGP4 prop = new SatelliteTleSGP4(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2(),new SatOption());
             
                 // add sat to list
                 objListPanel.addSat2List(prop);
@@ -3217,7 +3216,7 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
                     for(String key : tempHash.keySet() )
                     {
                         satHash.put(key, tempHash.get(key)); // copy manually
-                        satHash.get(key).setUse3dModel( satHash.get(key).isUse3dModel() ); // auto-loads 3D models if they are used
+                        satHash.get(key).setUse3dModel( satHash.get(key).getSatOptions().isUse3dModel() ); // auto-loads 3D models if they are used
                     }
                     
                     // populate ground station hash
@@ -3536,7 +3535,7 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
         // set animation direction = 0
         currentPlayDirection = 0;
         // update graphics
-        updateTime();
+        updateTime(true);
     }
     
     /**
