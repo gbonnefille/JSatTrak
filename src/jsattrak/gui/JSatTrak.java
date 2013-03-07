@@ -253,6 +253,7 @@ import name.gano.file.FileTypeFilter;
 import name.gano.file.SaveImageFile;
 
 import org.orekit.data.DataProvidersManager;
+import org.orekit.data.DirectoryCrawler;
 import org.orekit.data.ZipJarCrawler;
 import org.orekit.errors.OrekitException;
 
@@ -3839,12 +3840,16 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
     public static void main(final String args[])
     {
 
-        // change this if your orekit data is not located in your home directory
-        File zipFile = new File("data/orekit-data.zip");
-        if (zipFile.exists()) {
-            DataProvidersManager.getInstance().addProvider(new ZipJarCrawler(zipFile));
+        File orekitData = new File("data/orekit-data");
+        if (orekitData.exists() || !orekitData.isDirectory()) {
+            try {
+                DataProvidersManager.getInstance().addProvider(new DirectoryCrawler(orekitData));
+            } catch (OrekitException oe) {
+                System.err.println(oe.getLocalizedMessage());
+                System.exit(1);
+            }
         } else {
-            System.err.println(zipFile.getAbsolutePath() + " zip file not found, aborting");
+            System.err.println(orekitData.getAbsolutePath() + " not found, aborting");
             System.exit(1);
         }
 
