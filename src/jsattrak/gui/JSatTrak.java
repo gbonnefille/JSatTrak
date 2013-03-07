@@ -1743,7 +1743,15 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
         // check to see if large time jump occured
         double timeDiffDays = Math.abs(currentJulianDate.getJulianDate()-prevJulDate); // in days
         checkTimeDiffResetGroundTracks(timeDiffDays);
-        
+      
+        //Reset events
+      		for (AbstractSatellite sat : satHash.values()) {
+
+      			sat.getEventPositions().clear();
+      			sat.getEventName().clear();
+      			sat.setEventDetected(false);
+
+      		} 
         // set animation direction = 0
         currentPlayDirection = 0;
         // update graphics
@@ -3761,21 +3769,7 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
     }
     
     
-    public void addCustomSat()
-    {
-        // start status bar animation
-        startStatusAnimation();
-        
-        // get a name from the user:
-        String name = JOptionPane.showInputDialog(this,"Custom Satellite Name");
-        
-         stopStatusAnimation();
-         
-         // call overloaded function with name
-         addCustomSat(name);
-    }
-    
-    public void addCustomSat(String name)
+	public void addCustomSat()
     {
         try {
             // open properties panel
