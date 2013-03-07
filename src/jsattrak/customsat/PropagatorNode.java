@@ -35,7 +35,6 @@ import javax.swing.JInternalFrame;
 import jsattrak.customsat.gui.PropagatorPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
-import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.StateVector;
 import jsattrak.utilities.TLElements;
@@ -60,24 +59,21 @@ import org.orekit.forces.drag.DTM2000;
 import org.orekit.forces.drag.DragForce;
 import org.orekit.forces.drag.MarshallSolarActivityFutureEstimation;
 import org.orekit.forces.drag.MarshallSolarActivityFutureEstimation.StrengthLevel;
-import org.orekit.forces.gravity.CunninghamAttractionModel;
+import org.orekit.forces.gravity.HolmesFeatherstoneAttractionModel;
 import org.orekit.forces.gravity.ThirdBodyAttraction;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
-import org.orekit.forces.gravity.potential.PotentialCoefficientsProvider;
+import org.orekit.forces.gravity.potential.NormalizedSphericalHarmonicsProvider;
 import org.orekit.forces.radiation.SolarRadiationPressure;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.Orbit;
-import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.SpacecraftState;
 import org.orekit.propagation.analytical.EcksteinHechlerPropagator;
 import org.orekit.propagation.analytical.KeplerianPropagator;
-import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.propagation.events.AbstractDetector;
 import org.orekit.propagation.numerical.NumericalPropagator;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
-import org.orekit.utils.PVCoordinates;
 import org.orekit.utils.PVCoordinatesProvider;
 
 /**
@@ -85,7 +81,8 @@ import org.orekit.utils.PVCoordinatesProvider;
  * @author sgano
  */
 public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem {
-	// static int to determin which propogator to use
+    private static final long serialVersionUID = 7899130530816296619L;
+    // static int to determin which propogator to use
 	public static final int NUMERICAL = 0;
 	public static final int KEPLERIAN = 1;
 	public static final int ECKSTEINHECHLER = 2;
@@ -229,45 +226,26 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			prop.setInitialState(new SpacecraftState(this.orbitOrekit,
 					this.mass));
 
-			// Factory used to read gravity field files in several supported
-			// formats
-			PotentialCoefficientsProvider provider = GravityFieldFactory
-					.getPotentialProvider();
-			// Earth central body reference radius
-			final double ae = provider.getAe();
-			// Earth central body attraction coefficient
-			final double mu = provider.getMu();
-
-			// Earth Gravity model
-			if (this.includeSunPert) {
-
-				ForceModel earthGravity = new CunninghamAttractionModel(
-						FramesFactory.getITRF2005(), ae, mu, provider.getC(
-								this.n_max, this.m_max, false), provider.getS(
-								this.n_max, this.m_max, false));
-
-				prop.addForceModel(earthGravity);
-
-			}
-
+            // Earth Gravity model
+			NormalizedSphericalHarmonicsProvider provider = GravityFieldFactory.getNormalizedProvider(n_max, m_max);
+			prop.addForceModel(new HolmesFeatherstoneAttractionModel(FramesFactory.getITRF2008(),
+			                                                         provider));
 			// 3rd bodies
 
-			if (this.includeLunarPert) {
-				ForceModel sun3rd = new ThirdBodyAttraction(
-						CelestialBodyFactory.getSun());
-				ForceModel moon3rd = new ThirdBodyAttraction(
-						CelestialBodyFactory.getMoon());
+			if (this.includeSunPert) {
+			    prop.addForceModel(new ThirdBodyAttraction(CelestialBodyFactory.getSun()));
+			}
 
-				prop.addForceModel(sun3rd);
-				prop.addForceModel(moon3rd);
+			if (this.includeLunarPert) {
+                prop.addForceModel(new ThirdBodyAttraction(CelestialBodyFactory.getMoon()));
 			}
 
 			// Drag
 			if (this.includeAtmosDrag) {
 
-				OneAxisEllipsoid earth = new OneAxisEllipsoid(ae,
-						Constants.WGS84_EARTH_FLATTENING,
-						FramesFactory.getITRF2005());
+				OneAxisEllipsoid earth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+				                                              Constants.WGS84_EARTH_FLATTENING,
+				                                              FramesFactory.getITRF2008());
 				PVCoordinatesProvider sun = CelestialBodyFactory.getSun();
 
 				final String supportedNames = "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\p{Digit}\\p{Digit}\\p{Digit}\\p{Digit}F10\\.(?:txt|TXT)";
@@ -292,8 +270,8 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 				// kR compute & kA=0
 				double kR = 1 - 9 / 4 * (this.CR - 1);
 
-				ForceModel pressureNUM = new SolarRadiationPressure(sunSRP, ae,
-						new SphericalSpacecraft(area, 0., 0, kR));
+				ForceModel pressureNUM = new SolarRadiationPressure(sunSRP, Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+				                                                    new SphericalSpacecraft(area, 0., 0, kR));
 
 				prop.addForceModel(pressureNUM);
 			}
