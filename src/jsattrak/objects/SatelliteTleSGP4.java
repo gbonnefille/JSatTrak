@@ -56,16 +56,24 @@ import org.orekit.utils.PVCoordinates;
 
 /**
  * @author ganos
+ * @author acouanon
  * 
  */
 public class SatelliteTleSGP4 extends AbstractSatellite {
+
+	private static final long serialVersionUID = 4891584707529716558L;
+
 	private TLElements tle;
 
 	private SatOption satOption = null;
 
 	String name;
 
+	// ITRF 2005 Frame (Terrestrial Frame)
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
+	
+	//Inertial Frame
+	private final Frame inertialFrame = FramesFactory.getGCRF();
 
 	private SGP4SatData sgp4SatData; // sgp4 propogator data
 	private BoundedPropagator orekitTlePropagator;
@@ -177,22 +185,6 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 		satOption.setGroundTrackColor(satOption.getSatColor());
 
-		// try to load TLE into propogator
-
-		// options - hard coded
-		// char opsmode = SGP4utils.OPSMODE_IMPROVED; // OPSMODE_IMPROVED
-		// SGP4unit.Gravconsttype gravconsttype = SGP4unit.Gravconsttype.wgs72;
-
-		// load TLE data as strings and INI all SGP4 data
-		// boolean loadSuccess = SGP4utils.readTLEandIniSGP4(name, tleLine1,
-		// tleLine2, opsmode, gravconsttype, sgp4SatData);
-		//
-		// // if there is an error loading send an exception
-		// if (!loadSuccess) {
-		// throw new Exception("Error loading TLE error code:"
-		// + sgp4SatData.error);
-		// }
-
 		// TLE age since AJD
 		tleEpochJD = tle.getDate().durationFrom(AbsoluteDate.JULIAN_EPOCH) / 86400;
 
@@ -226,35 +218,30 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		// save date
 		this.currentJulianDate = julDate;
 
-		// AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
-		// .shiftedBy(julDate * 86400);
-
 		AbsoluteDate orekitJulDate = new AbsoluteDate(
 				AbsoluteDate.JULIAN_EPOCH, julDate * 86400,
 				TimeScalesFactory.getUTC());
 
+		//Position & speed in terrestrial frame
 		PVCoordinates posVit = orekitTlePropagator.getPVCoordinates(
 				orekitJulDate, ITRF2005);
+		//Position & speed in inertial frame
+		PVCoordinates posVitInertial = orekitTlePropagator.getPVCoordinates(
+				orekitJulDate, this.inertialFrame);
 
-		position = posVit.getPosition();
-		velocity = posVit.getVelocity();
+		position = posVitInertial.getPosition();
+		velocity = posVitInertial.getVelocity();
 
 		// save old lat/long for ascending node check
 		double[] oldLLA = lla.clone(); // copy old LLA
 
-		// calculate Lat,Long,Alt - must use Mean of Date (MOD) Position
-		// lla = GeoFunctions
-		// .GeodeticLLA(posTEME, julDate - AstroConst.JDminusMJD); // j2kPos
-
-		OneAxisEllipsoid orbit = new OneAxisEllipsoid(
+		// Earth model
+		OneAxisEllipsoid earth = new OneAxisEllipsoid(
 				Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
-				Constants.WGS84_EARTH_FLATTENING, ITRF2005);
+				Constants.WGS84_EARTH_FLATTENING, this.ITRF2005);
 
-		posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
-				this.ITRF2005);
-
-		GeodeticPoint geodeticPoint = orbit.transform(posVit.getPosition(),
-				this.ITRF2005, orekitJulDate);
+		GeodeticPoint geodeticPoint = earth.transform(
+				posVit.getPosition(), this.ITRF2005, orekitJulDate);
 
 		this.lla = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude() };
@@ -441,20 +428,15 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(ptTime * 86400);
 
-		OneAxisEllipsoid orbit = new OneAxisEllipsoid(
+		OneAxisEllipsoid earth = new OneAxisEllipsoid(
 				Constants.GRS80_EARTH_EQUATORIAL_RADIUS,
 				Constants.GRS80_EARTH_FLATTENING, ITRF2005);
 
-		PVCoordinates posVit;
-		GeodeticPoint geodeticPoint = null;
-		try {
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
-					ITRF2005);
-			geodeticPoint = orbit.transform(posVit.getPosition(), ITRF2005,
-					orekitJulDate);
-		} catch (OrekitException e) {
-			e.printStackTrace();
-		}
+		//Position & speed in terrestrial frame
+		PVCoordinates posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate, ITRF2005);
+		
+		GeodeticPoint geodeticPoint = earth.transform(posVit.getPosition(), ITRF2005,
+				orekitJulDate);
 
 		double[] ptLlaXyz = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude(),
@@ -477,18 +459,14 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 	@Override
 	public Vector3D calculatePositionFromUT(double julDate)
 			throws OrekitException {
-		Vector3D ptPos = Vector3D.ZERO;
 
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
-		PVCoordinates posVit = null;
+		//Position & speed in inertial frame
+		PVCoordinates posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate, this.inertialFrame);
 
-		posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate, ITRF2005);
-
-		ptPos = posVit.getPosition();
-
-		return ptPos;
+		return posVit.getPosition();
 
 	} // calculatePositionFromUT
 
@@ -534,11 +512,8 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 
 	private double latitudeGivenJulianDate(double julDate)
 			throws OrekitException {
-		// computer latiude of the spacecraft at a given date
-		Vector3D ptPos = calculatePositionFromUT(julDate);
 
 		// get lat and long
-
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -546,16 +521,11 @@ public class SatelliteTleSGP4 extends AbstractSatellite {
 				Constants.GRS80_EARTH_EQUATORIAL_RADIUS,
 				Constants.GRS80_EARTH_FLATTENING, ITRF2005);
 
-		PVCoordinates posVit;
-		GeodeticPoint geodeticPoint = null;
-		try {
-			posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate,
-					ITRF2005);
-			geodeticPoint = orbit.transform(posVit.getPosition(), ITRF2005,
-					orekitJulDate);
-		} catch (OrekitException e) {
-			e.printStackTrace();
-		}
+		//Position & speed in terrestrial frame
+		PVCoordinates posVit = orekitTlePropagator.getPVCoordinates(orekitJulDate, ITRF2005);
+		
+		GeodeticPoint geodeticPoint = orbit.transform(posVit.getPosition(), ITRF2005,
+				orekitJulDate);
 
 		return geodeticPoint.getLatitude(); // pass back latitude
 

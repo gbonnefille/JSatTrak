@@ -50,22 +50,15 @@ import org.orekit.utils.PVCoordinates;
  * NOTE !!!!!!!! -- internal time for epehemeris is TT time all input times UTC
  * 
  * @author sgano
+ * @author acouanon
  */
 public class CustomSatellite extends AbstractSatellite {
+
+	private static final long serialVersionUID = -7936848462137206875L;
 	// ====================================
-	private int ephemerisIncrement = 30; // number of rows added at a time to
-											// improve speed of memory
-											// allocation
-	// internal ephemeris (Time store in TT)
-	// private Vector<StateVector> ephemeris = new Vector<StateVector>(
-	// ephemerisIncrement, ephemerisIncrement); // array to store ephemeris
+
+
 	private BoundedPropagator ephemeris = null;
-
-	// private CustomTreeTableNode rootNode = null;
-
-	// private InitialConditionsNode initNode = null;
-
-	// private PropagatorNode propNode = null;
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
 
@@ -78,7 +71,7 @@ public class CustomSatellite extends AbstractSatellite {
 	// Frame ITRF2005
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
 
-	// Modele de la terre
+	// Earth model
 	private final OneAxisEllipsoid earth = new OneAxisEllipsoid(
 			Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
 			Constants.WGS84_EARTH_FLATTENING, this.ITRF2005);
@@ -127,59 +120,7 @@ public class CustomSatellite extends AbstractSatellite {
 		// iniMissionTableModel(scenarioEpochDate);
 	}
 
-	// // initalizes the mission Table Model
-	// private void iniMissionTableModel(Time scenarioEpochDate)
-	// throws OrekitException {
-	// // set names of columns
-	// Vector<String> tableHeaders = new Vector<String>();
-	// tableHeaders.add("Mission Objects");
-	// // tableHeaders.add("Time Start?");
-	// // tableHeaders.add("Time Stop?");
-	//
-	// missionTableModel.setColumnIdentifiers(tableHeaders);
-	//
-	// // Add root Node
-	// String[] str = new String[3];
-	// str[0] = name;
-	//
-	// // DefaultMutableTreeTableNode ttn = new
-	// // DefaultMutableTreeTableNode(str);
-	// rootNode = new CustomTreeTableNode(str);
-	// rootNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-	// getClass().getResource("/icons/custom/sat_icon.png"))));
-	// missionTableModel.setRoot(rootNode);
-	//
-	// // must add Initial conditions
-	// // Initial Node
-	// this.initNode = new InitialConditionsNode(rootNode, scenarioEpochDate);
-	//
-	// // by default also add a propogator node
-	// // Propogator Node
-	// this.propNode = new PropagatorNode(rootNode, initNode);
-	//
-	// // ADD SOME NODES (example) -----
-	// // CustomTreeTableNode ttn2 = new PropogatorNode(rootNode);
-	// // ttn2.setValueAt("3 Jan 2008", 1); // example at setting a columns
-	// // value
-	// //
-	// // ttn2 = new SolverNode(rootNode, true); // parent / add default
-	// // children
-	// //
-	// // ttn2 = new StopNode(rootNode);
-	// //
-	// // ------------------------------
-	//
-	// // must add stop node
-	// new StopNode(rootNode);
-	//
-	// }
 
-	// ================================================================
-	// functions that have to be fixed yet =========================
-	// =================================================================
-
-	// this function is basically given time update all current info and update
-	// lead/lag data if needed
 	@Override
 	public void propogate2JulDate(double julDate, boolean eventDetector)
 			throws OrekitException {
@@ -203,8 +144,7 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
-				// Suppression des points de detection d'evenement si l'on recul
-				// dans le temps
+				// Deleting events detection if you step back in time
 				if (this.isEventDetected()
 						&& this.getCurrentJulDate() < this.getEventPositions()
 								.get(this.getEventPositions().size() - 1)[0]) {
@@ -215,15 +155,7 @@ public class CustomSatellite extends AbstractSatellite {
 					if (this.getEventPositions().isEmpty())
 						this.eventDetected = false;
 
-					// Iterator<double[]> ite =
-					// this.getEventPositions().iterator();
-					//
-					// while (ite.hasNext())
-					// {
-					// double[] eventTimePosition =ite.next();
-					// if (eventTimePosition<this.getCurrentJulDate())
-					//
-					// }
+				
 				}
 
 				// Au step qui suit le calcul de la trace au sol il faut
@@ -237,7 +169,7 @@ public class CustomSatellite extends AbstractSatellite {
 					eventDetector = false;
 					lastStepInitGroundTrack = false;
 				}
-				// Retrait des evenements
+				// Removing events
 				if (!eventDetector) {
 					events = ephemeris.getEventsDetectors();
 					ephemeris.clearEventsDetectors();
@@ -250,7 +182,7 @@ public class CustomSatellite extends AbstractSatellite {
 				PVCoordinates pvCoordinateEarthFrame = ephemeris
 						.getPVCoordinates(orekitJulDate, ITRF2005);
 
-				// Restauration des evenements
+				// Restore events
 				if (!eventDetector) {
 					for (EventDetector event : events)
 						ephemeris.addEventDetector(event);
@@ -262,7 +194,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 				// Satellite trace
 
-				// Current position point
+				// Current position point in inertial frame
 				position = pvCoordinateInertialFrame.getPosition();
 				velocity = pvCoordinateInertialFrame.getVelocity();
 
@@ -286,15 +218,14 @@ public class CustomSatellite extends AbstractSatellite {
 					// track
 					// needed
 					{
-						// Retrait des evenements pour le calcul de la trace au
-						// sol
+						// Withdrawal of events for the the ground track calculation 
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
 
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
 
-						// Restauration des evenements
+						// Restore events
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
@@ -305,15 +236,15 @@ public class CustomSatellite extends AbstractSatellite {
 						// System.out.println("Ascending NODE passed: " +
 						// tle.getSatName() );
 
-						// Retrait des evenements pour le calcul de la trace au
-						// sol
+						// Withdrawal of events for the the ground track calculation 
+
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
 
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
 
-						// Restauration des evenements
+						// Restore events
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
@@ -323,15 +254,14 @@ public class CustomSatellite extends AbstractSatellite {
 					else if (timeLead[timeLead.length - 1] < julDate
 							|| timeLag[0] > julDate) {
 
-						// Retrait des evenements pour le calcul de la trace au
-						// sol
+						// Withdrawal of events for the the ground track calculation 
 						events = ephemeris.getEventsDetectors();
 						ephemeris.clearEventsDetectors();
 
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
 
-						// Restauration des evenements
+						// Restore events
 						for (EventDetector event : events)
 							ephemeris.addEventDetector(event);
 
@@ -583,18 +513,15 @@ public class CustomSatellite extends AbstractSatellite {
 
 				pos = ephemeris.getPVCoordinates(orekitJulDate, this.ITRF2005)
 						.getPosition();
-
 			}
 		}
 
 		GeodeticPoint geodeticPoint = null;
-		try {
+	
 
 			geodeticPoint = this.earth.transform(pos, this.ITRF2005,
 					orekitJulDate);
-		} catch (OrekitException e) {
-			e.printStackTrace();
-		}
+		
 
 		double[] ptLlaXyz = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude(),
@@ -755,45 +682,7 @@ public class CustomSatellite extends AbstractSatellite {
 		return timeLag;
 	}
 
-	// ---------------------------------------
-	// SECANT Routines to find Crossings of the Equator (hopefully Ascending
-	// Nodes)
-	// xn_1 = date guess 1
-	// xn date guess 2
-	// tol = convergence tolerance
-	// maxIter = maximum iterations allowed
-	// RETURNS: double = julian date of crossing
-	private double secantMethod(double xn_1, double xn, double tol, int maxIter)
-			throws OrekitException {
 
-		double d;
-
-		// calculate functional values at guesses
-		double fn_1 = this.calculateLatLongAltXyz(xn_1)[0];
-		double fn = this.calculateLatLongAltXyz(xn)[0];
-
-		for (int n = 1; n <= maxIter; n++) {
-			d = (xn - xn_1) / (fn - fn_1) * fn;
-			if (Math.abs(d) < tol) // convergence check
-			{
-				// System.out.println("Iters:"+n);
-				return xn;
-			}
-
-			// save past point
-			xn_1 = xn;
-			fn_1 = fn;
-
-			// new point
-			xn = xn - d;
-			fn = this.calculateLatLongAltXyz(xn)[0];
-		}
-
-		System.out
-				.println("Warning: Secant Method - Max Iteration limit reached finding Asending Node.");
-
-		return xn;
-	} // secantMethod
 
 	// 3D model -------------------------
 
