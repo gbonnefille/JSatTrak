@@ -8,6 +8,8 @@ import org.orekit.propagation.events.ApsideDetector;
 
 public class ApsideDetectorJsat extends ApsideDetector {
 
+	private static final long serialVersionUID = -3668656889818681018L;
+	
 	private AbstractSatellite satellite = null;
 
 	public ApsideDetectorJsat(AbstractSatellite sat) {

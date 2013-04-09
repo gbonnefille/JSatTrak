@@ -9,6 +9,8 @@ import org.orekit.propagation.events.NodeDetector;
 
 public class NodeDetectorJsat extends NodeDetector {
 
+	private static final long serialVersionUID = 4283910959260147038L;
+	
 	private AbstractSatellite satellite = null;
 
 	public NodeDetectorJsat(AbstractSatellite sat, Frame frame) {

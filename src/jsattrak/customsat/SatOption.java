@@ -8,8 +8,14 @@ public class SatOption {
 
 	// plot options
 	private boolean plot2d = true;
-	private Color satColor = Color.RED; // randomize in future
-	private Color groundTrackColor = Color.RED;
+	
+	private Color trueSatColor = Color.RED;
+	private Color EventSatColor = Color.LIGHT_GRAY;
+	
+	
+	private Color satColor = trueSatColor; // randomize in future
+	private Color groundTrackColor = trueSatColor;
+	
 	private boolean plot2DFootPrint = true;
 	private boolean fillFootPrint = true;
 	private int numPtsFootPrint = 101; // number of points in footprint
@@ -256,4 +262,15 @@ public class SatOption {
 	public void setThreeDModelPath(String threeDModelPath) {
 		this.threeDModelPath = threeDModelPath;
 	}
+
+
+	public Color getTrueSatColor() {
+		return trueSatColor;
+	}
+
+
+	public Color getEventSatColor() {
+		return EventSatColor;
+	}
+
 }

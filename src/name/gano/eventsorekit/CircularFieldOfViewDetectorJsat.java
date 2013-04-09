@@ -1,7 +1,5 @@
 package name.gano.eventsorekit;
 
-import java.awt.Color;
-
 import jsattrak.objects.AbstractSatellite;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
@@ -13,6 +11,8 @@ import org.orekit.utils.PVCoordinatesProvider;
 public class CircularFieldOfViewDetectorJsat extends
 		CircularFieldOfViewDetector {
 
+	private static final long serialVersionUID = 27381469913207579L;
+	
 	private AbstractSatellite satellite = null;
 
 	public CircularFieldOfViewDetectorJsat(AbstractSatellite sat,
@@ -27,9 +27,12 @@ public class CircularFieldOfViewDetectorJsat extends
 			throws OrekitException {
 
 		if (increasing) {
-			satellite.getSatOptions().setSatColor(Color.MAGENTA);
+			satellite.getSatOptions().setSatColor(satellite.getSatOptions().getTrueSatColor());
+			satellite.getSatOptions().setGroundTrackColor(satellite.getSatOptions().getTrueSatColor());
+
 		} else {
-			satellite.getSatOptions().setSatColor(Color.PINK);
+			satellite.getSatOptions().setSatColor(satellite.getSatOptions().getEventSatColor());
+			satellite.getSatOptions().setGroundTrackColor(satellite.getSatOptions().getEventSatColor());
 		}
 
 		return Action.CONTINUE;

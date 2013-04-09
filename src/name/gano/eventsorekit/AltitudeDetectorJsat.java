@@ -1,7 +1,5 @@
 package name.gano.eventsorekit;
 
-import java.awt.Color;
-
 import jsattrak.objects.AbstractSatellite;
 
 import org.orekit.bodies.BodyShape;
@@ -11,6 +9,8 @@ import org.orekit.propagation.events.AltitudeDetector;
 
 public class AltitudeDetectorJsat extends AltitudeDetector {
 
+	private static final long serialVersionUID = -8699078633593512720L;
+	
 	private AbstractSatellite satellite = null;
 
 	public AltitudeDetectorJsat(AbstractSatellite sat, double altitude,
@@ -24,10 +24,12 @@ public class AltitudeDetectorJsat extends AltitudeDetector {
 			throws OrekitException {
 
 		if (increasing) {
-			satellite.getSatOptions().setSatColor(Color.RED);
+			satellite.getSatOptions().setSatColor(satellite.getSatOptions().getTrueSatColor());
+			satellite.getSatOptions().setGroundTrackColor(satellite.getSatOptions().getTrueSatColor());
 
 		} else {
-			satellite.getSatOptions().setSatColor(Color.BLUE);
+			satellite.getSatOptions().setSatColor(satellite.getSatOptions().getEventSatColor());
+			satellite.getSatOptions().setGroundTrackColor(satellite.getSatOptions().getEventSatColor());
 		}
 
 		return Action.CONTINUE;

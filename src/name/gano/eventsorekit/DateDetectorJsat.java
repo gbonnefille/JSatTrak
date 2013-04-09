@@ -9,6 +9,8 @@ import org.orekit.time.AbsoluteDate;
 
 public class DateDetectorJsat extends DateDetector {
 
+	private static final long serialVersionUID = -6035451822115113997L;
+	
 	private AbstractSatellite satellite = null;
 
 	public DateDetectorJsat(AbstractSatellite sat, AbsoluteDate target) {

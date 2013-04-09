@@ -9,6 +9,8 @@ import org.orekit.utils.PVCoordinatesProvider;
 
 public class AlignmentDetectorJsat extends AlignmentDetector {
 
+	private static final long serialVersionUID = 1970535351522468060L;
+	
 	private AbstractSatellite satellite = null;
 
 	public AlignmentDetectorJsat(AbstractSatellite sat,

@@ -254,7 +254,6 @@ import name.gano.file.SaveImageFile;
 
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.DirectoryCrawler;
-import org.orekit.data.ZipJarCrawler;
 import org.orekit.errors.OrekitException;
 
 import bsh.Interpreter;
@@ -1750,6 +1749,9 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
       			sat.getEventPositions().clear();
       			sat.getEventName().clear();
       			sat.setEventDetected(false);
+      			//Reset sat & ground track color
+      			sat.getSatOptions().setSatColor(sat.getSatOptions().getTrueSatColor());
+      			sat.getSatOptions().setGroundTrackColor(sat.getSatOptions().getTrueSatColor());
 
       		} 
         // set animation direction = 0
