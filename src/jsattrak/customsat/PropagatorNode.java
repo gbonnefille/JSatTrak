@@ -81,8 +81,10 @@ import org.orekit.utils.PVCoordinatesProvider;
  * @author sgano
  */
 public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem {
-    private static final long serialVersionUID = 7899130530816296619L;
-    // static int to determin which propogator to use
+	
+	private static final long serialVersionUID = 7899130530816296619L;
+	
+	// static int to determin which propogator to use
 	public static final int NUMERICAL = 0;
 	public static final int KEPLERIAN = 1;
 	public static final int ECKSTEINHECHLER = 2;
@@ -189,9 +191,9 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		if (this.initNode.getCoordinate() != InitialConditionsNode.TLE) {
 			// Set the orbit
 			this.orbitOrekit = initNode.getOrbitOrekit();
-		}
-		else{
-			//Set the propagator if the uses hasn't validate the propagator configuration
+		} else {
+			// Set the propagator if the uses hasn't validate the propagator
+			// configuration
 			this.propogator = PropagatorNode.TLE;
 		}
 
@@ -226,26 +228,30 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			prop.setInitialState(new SpacecraftState(this.orbitOrekit,
 					this.mass));
 
-            // Earth Gravity model
-			NormalizedSphericalHarmonicsProvider provider = GravityFieldFactory.getNormalizedProvider(n_max, m_max);
-			prop.addForceModel(new HolmesFeatherstoneAttractionModel(FramesFactory.getITRF2008(),
-			                                                         provider));
+			// Earth Gravity model
+			NormalizedSphericalHarmonicsProvider provider = GravityFieldFactory
+					.getNormalizedProvider(n_max, m_max);
+			prop.addForceModel(new HolmesFeatherstoneAttractionModel(
+					FramesFactory.getITRF2008(), provider));
 			// 3rd bodies
 
 			if (this.includeSunPert) {
-			    prop.addForceModel(new ThirdBodyAttraction(CelestialBodyFactory.getSun()));
+				prop.addForceModel(new ThirdBodyAttraction(CelestialBodyFactory
+						.getSun()));
 			}
 
 			if (this.includeLunarPert) {
-                prop.addForceModel(new ThirdBodyAttraction(CelestialBodyFactory.getMoon()));
+				prop.addForceModel(new ThirdBodyAttraction(CelestialBodyFactory
+						.getMoon()));
 			}
 
 			// Drag
 			if (this.includeAtmosDrag) {
 
-				OneAxisEllipsoid earth = new OneAxisEllipsoid(Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
-				                                              Constants.WGS84_EARTH_FLATTENING,
-				                                              FramesFactory.getITRF2008());
+				OneAxisEllipsoid earth = new OneAxisEllipsoid(
+						Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+						Constants.WGS84_EARTH_FLATTENING,
+						FramesFactory.getITRF2008());
 				PVCoordinatesProvider sun = CelestialBodyFactory.getSun();
 
 				final String supportedNames = "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\p{Digit}\\p{Digit}\\p{Digit}\\p{Digit}F10\\.(?:txt|TXT)";
@@ -270,8 +276,9 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 				// kR compute & kA=0
 				double kR = 1 - 9 / 4 * (this.CR - 1);
 
-				ForceModel pressureNUM = new SolarRadiationPressure(sunSRP, Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
-				                                                    new SphericalSpacecraft(area, 0., 0, kR));
+				ForceModel pressureNUM = new SolarRadiationPressure(sunSRP,
+						Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+						new SphericalSpacecraft(area, 0., 0, kR));
 
 				prop.addForceModel(pressureNUM);
 			}
@@ -438,7 +445,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 																		// version
 
 		iframe.setContentPane(gsBrowser);
-		iframe.setSize(415 + 20, 386 + 115); // w,h
+		iframe.setSize(415 + 60, 386 + 115); // w,h
 		iframe.setLocation(5, 5);
 
 		app.addInternalFrame(iframe);

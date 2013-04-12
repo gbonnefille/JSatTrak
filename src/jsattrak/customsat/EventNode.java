@@ -71,17 +71,7 @@ import org.orekit.forces.gravity.potential.GravityFieldFactory;
 import org.orekit.forces.gravity.potential.PotentialCoefficientsProvider;
 import org.orekit.frames.FramesFactory;
 import org.orekit.frames.TopocentricFrame;
-import org.orekit.propagation.BoundedPropagator;
 import org.orekit.propagation.events.AbstractDetector;
-import org.orekit.propagation.events.AlignmentDetector;
-import org.orekit.propagation.events.AltitudeDetector;
-import org.orekit.propagation.events.ApparentElevationDetector;
-import org.orekit.propagation.events.ApsideDetector;
-import org.orekit.propagation.events.CircularFieldOfViewDetector;
-import org.orekit.propagation.events.DateDetector;
-import org.orekit.propagation.events.ElevationDetector;
-import org.orekit.propagation.events.GroundMaskElevationDetector;
-import org.orekit.propagation.events.NodeDetector;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.time.TimeScalesFactory;
 import org.orekit.utils.Constants;
@@ -92,6 +82,8 @@ import org.orekit.utils.PVCoordinatesProvider;
  * @author sgano
  */
 public class EventNode extends CustomTreeTableNode {
+
+	private static final long serialVersionUID = 4737950791071131714L;
 
 	private double[] vncThrustVector = new double[3];
 
@@ -127,10 +119,9 @@ public class EventNode extends CustomTreeTableNode {
 
 	private boolean totalEclipse = true;
 
-	GregorianCalendar currentTimeDate = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+	GregorianCalendar currentTimeDate = new GregorianCalendar(
+			TimeZone.getTimeZone("UTC"));
 
-	
-	
 	final SimpleDateFormat dateformatShort = new SimpleDateFormat(
 			"dd MMM yyyy HH:mm:ss z");
 
@@ -140,7 +131,7 @@ public class EventNode extends CustomTreeTableNode {
 
 	//
 	private String targetBodyObjectName = "ISS (ZARYA)             ";
-	
+
 	private String targetCelestialBodyObjectName = null;
 
 	// Enum for orekit events
@@ -529,12 +520,13 @@ public class EventNode extends CustomTreeTableNode {
 			case ECLIPSE:
 
 				pvTarget = CelestialBodyFactory.getBody(targetBodyObjectName);
-				
-				 PVCoordinatesProvider celestialBodyOcculted = CelestialBodyFactory.getBody(targetCelestialBodyObjectName);
+
+				PVCoordinatesProvider celestialBodyOcculted = CelestialBodyFactory
+						.getBody(targetCelestialBodyObjectName);
 
 				eventDetector = new EclipseDetectorJsat(pvTarget,
-						eventsParams[0],celestialBodyOcculted,eventsParams[1],this.currentSat,
-						totalEclipse);
+						eventsParams[0], celestialBodyOcculted,
+						eventsParams[1], this.currentSat, totalEclipse);
 
 				break;
 
@@ -569,7 +561,8 @@ public class EventNode extends CustomTreeTableNode {
 			// Node detector
 			case NODE:
 				eventDetector = new NodeDetectorJsat(this.currentSat,
-						this.currentSat.getMissionTree().getInitNode().getFrame());
+						this.currentSat.getMissionTree().getInitNode()
+								.getFrame());
 				break;
 
 			default:
@@ -584,7 +577,8 @@ public class EventNode extends CustomTreeTableNode {
 		}
 
 		// Add event to the satellite
-		this.currentSat.getMissionTree().getPropNode().addEventDetector(eventDetector);
+		this.currentSat.getMissionTree().getPropNode()
+				.addEventDetector(eventDetector);
 
 	}// execute
 
@@ -597,11 +591,11 @@ public class EventNode extends CustomTreeTableNode {
 
 		// show satellite browser window
 		EventPanel panel = new EventPanel(this, iframe); // non-modal
-																// version
+															// version
 		panel.setIframe(iframe);
 
 		iframe.setContentPane(panel);
-		iframe.setSize(420, 350); // w,h
+		iframe.setSize(370, 500); // w,h
 		iframe.setLocation(5, 5);
 
 		app.addInternalFrame(iframe);

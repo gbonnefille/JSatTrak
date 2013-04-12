@@ -55,6 +55,8 @@ import org.orekit.utils.PVCoordinates;
  */
 public class InitialConditionsNode extends CustomTreeTableNode {
 
+	private static final long serialVersionUID = -4739379085877131283L;
+	
 	public static final int KEPLERIAN = 0;
 	public static final int CARTESIAN = 1;
 	public static final int CIRCULAR = 2;
@@ -136,7 +138,8 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public void execute(MissionDesignPropagator missionDesign) {
 
 		// set inial time of the node
-		this.setStartTTjulDate(AbsoluteDate.JULIAN_EPOCH.shiftedBy(iniJulDate * 86400));
+		this.setStartTTjulDate(AbsoluteDate.JULIAN_EPOCH
+				.shiftedBy(iniJulDate * 86400));
 
 	}// execute
 
@@ -151,17 +154,13 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 		InitialConditionsPanel gsBrowser = new InitialConditionsPanel(app,
 				this, scenarioEpochDate); // non-modal version
 
-		
-		
 		gsBrowser.setIframe(iframe);
 
 		iframe.setContentPane(gsBrowser);
-		iframe.setSize(365, 304 + 50); // w,h
+		iframe.setSize(375, 420); // w,h
 		iframe.setLocation(5, 5);
 
 		app.addInternalFrame(iframe);
-		
-
 
 	}
 
@@ -368,6 +367,5 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	public void setLastTreeSelection(ArrayList<Integer> lastTreeSelection) {
 		this.lastTreeSelection = lastTreeSelection;
 	}
-
 
 }
