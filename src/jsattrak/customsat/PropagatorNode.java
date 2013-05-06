@@ -19,7 +19,6 @@
  * =====================================================================
  * 
  */
-
 package jsattrak.customsat;
 
 import java.awt.Toolkit;
@@ -63,6 +62,8 @@ import org.orekit.forces.gravity.HolmesFeatherstoneAttractionModel;
 import org.orekit.forces.gravity.ThirdBodyAttraction;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
 import org.orekit.forces.gravity.potential.NormalizedSphericalHarmonicsProvider;
+import org.orekit.forces.maneuvers.ConstantThrustManeuver;
+import org.orekit.forces.maneuvers.ImpulseManeuver;
 import org.orekit.forces.radiation.SolarRadiationPressure;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.Orbit;
@@ -78,36 +79,34 @@ import org.orekit.utils.PVCoordinatesProvider;
 
 /**
  * 
- * @author sgano
+ * @author acouanon
  */
 public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem {
-	
+
 	private static final long serialVersionUID = 7899130530816296619L;
-	
+
 	// static int to determin which propogator to use
 	public static final int NUMERICAL = 0;
 	public static final int KEPLERIAN = 1;
 	public static final int ECKSTEINHECHLER = 2;
 	public static final int SEMIANALYTICAL = 3;
 	public static final int TLE = 4;
-
 	// which prop to use
 	private int propogator = PropagatorNode.NUMERICAL;
-
 	// Orbit
 	private Orbit orbitOrekit = null;
-
 	private InitialConditionsNode initNode = null;
-
+	// Events
 	private ArrayList<AbstractDetector> eventDetector = new ArrayList<AbstractDetector>();
-
+	// Constant thrust Maneuver
+	private ArrayList<ConstantThrustManeuver> constantThrustManeuvers = new ArrayList<ConstantThrustManeuver>();
+	// Impulse maneuver
+	private ArrayList<ImpulseManeuver> impulseManeuver = new ArrayList<ImpulseManeuver>();
 	// Central attraction coefficient
 	private double mu = Constants.EIGEN5C_EARTH_MU;
-
 	// Un-normalized zonal coefficient
 	private double[] zonalCoefficients = new double[] { -1.08e-3, 2.53e-6,
 			1.62e-6, 2.28e-7, -5.41e-7 };
-
 	// Hprop settings
 	private int n_max = 20; // degree
 	private int m_max = 20; // order
@@ -119,31 +118,23 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	private double area = 5.0; // [m^2] Cross-section Area
 	private double CR = 1.3; // Solar radiation pressure coefficient
 	private double CD = 1.5; // spacecraft drag coefficient
-	private double stepSize = 60.0; // seconds (ini step for Hprop 7-8)
-
+	private double stepSize = 60.0; // seconds 
 	// Hprop 7-8 unique
 	private double minStepSize = 1.0; // 1 second
 	private double maxStepSize = 600.0; // 10 minutes
-
 	// Relative accuracy (m)
 	private double dP = 1.0;
-
 	private double popogateTimeLen = 86400; // in seconds
-
 	private int numberOfStep = (int) Math.ceil(popogateTimeLen / this.stepSize);
-
 	// stopping conditions used
 	private boolean stopOnApogee = false;
 	private boolean stopOnPerigee = false;
-
 	// USED FOR GOAL CALCULATIONS
 	StateVector lastStateVector = null; // last state -- to calculate goal
-										// properties
-
+	// properties
 	// variables that can be set data ----------
 	String[] varNames = new String[] { "Propagation Time [s]" };
 	// -----------------------------------------
-
 	// parameters that can be used as GOALS ---
 	String[] goalNames = new String[] {
 			"X Position (J2000) [m]", // element 0
@@ -155,16 +146,15 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			"Argument of pericenter (Osculating) [deg]",
 			"Mean anomaly (Osculating) [deg]", "Orbital Radius [m]",
 			"Derivative of Orbital Radius [m/s]", // can be used to find perigee
-													// / apogee
+			// / apogee
 			"Latitude [deg]", "Longitude [deg]", "Altitude [m]", // element 16
 	};
 
 	// ========================================
-
 	public PropagatorNode(CustomTreeTableNode parentNode,
 			InitialConditionsNode initNode) {
 		super(new String[] { "Propagate", "", "" }); // initialize node, default
-														// values
+		// values
 		this.initNode = initNode;
 
 		// set icon for this type
@@ -174,8 +164,9 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		setNodeType("Propagator");
 
 		// add this node to parent - last thing
-		if (parentNode != null)
+		if (parentNode != null) {
 			parentNode.add(this);
+		}
 
 	} // PropogatorNode
 
@@ -222,6 +213,20 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 					tolerance[1]);
 
 			NumericalPropagator prop = new NumericalPropagator(dormanIntegrator);
+
+			// Add impulse maneuvers
+			if (!impulseManeuver.isEmpty()) {
+
+				Iterator<ImpulseManeuver> impulseManeuverIterator = this.impulseManeuver
+						.iterator();
+
+				while (impulseManeuverIterator.hasNext()) {
+					ImpulseManeuver maneuver = impulseManeuverIterator.next();
+
+					prop.addEventDetector(maneuver);
+
+				}
+			}
 
 			prop.setOrbitType(this.orbitOrekit.getType());
 
@@ -283,6 +288,21 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 				prop.addForceModel(pressureNUM);
 			}
 
+			// Add constant thrust maneuvers
+			if (!constantThrustManeuvers.isEmpty()) {
+
+				Iterator<ConstantThrustManeuver> constantThrustIterator = this.constantThrustManeuvers
+						.iterator();
+
+				while (constantThrustIterator.hasNext()) {
+					ConstantThrustManeuver maneuver = constantThrustIterator
+							.next();
+
+					prop.addForceModel(maneuver);
+
+				}
+			}
+
 			// Activate the ephemeris mode
 			prop.setEphemerisMode();
 
@@ -310,16 +330,27 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// Reset the event if not use in the next simulation
 			this.eventDetector.clear();
 
-		}
-
-		// ///////////////////////
-		// Keplerian propogator//
-		// ///////////////////////
-
+		} // ///////////////////////
+			// Keplerian propogator//
+			// ///////////////////////
 		else if (propogator == PropagatorNode.KEPLERIAN) {
 
 			KeplerianPropagator prop = new KeplerianPropagator(
 					this.orbitOrekit, this.mu);
+
+			// Add impulse maneuvers
+			if (!impulseManeuver.isEmpty()) {
+
+				Iterator<ImpulseManeuver> impulseManeuverIterator = this.impulseManeuver
+						.iterator();
+
+				while (impulseManeuverIterator.hasNext()) {
+					ImpulseManeuver maneuver = impulseManeuverIterator.next();
+
+					prop.addEventDetector(maneuver);
+
+				}
+			}
 
 			// Activate the ephemeris mode
 			prop.setEphemerisMode();
@@ -346,12 +377,9 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// Reset the event if not use in the next simulation
 			this.eventDetector.clear();
 
-		}
-
-		// /////////////////////////////
-		// Eckstein Hechler Propogator//
-		// /////////////////////////////
-
+		} // /////////////////////////////
+			// Eckstein Hechler Propogator//
+			// /////////////////////////////
 		else if (propogator == PropagatorNode.ECKSTEINHECHLER) {
 
 			EcksteinHechlerPropagator prop = new EcksteinHechlerPropagator(
@@ -360,6 +388,20 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 					this.zonalCoefficients[0], this.zonalCoefficients[1],
 					this.zonalCoefficients[2], this.zonalCoefficients[3],
 					this.zonalCoefficients[4]);
+
+			// Add impulse maneuvers
+			if (!impulseManeuver.isEmpty()) {
+
+				Iterator<ImpulseManeuver> impulseManeuverIterator = this.impulseManeuver
+						.iterator();
+
+				while (impulseManeuverIterator.hasNext()) {
+					ImpulseManeuver maneuver = impulseManeuverIterator.next();
+
+					prop.addEventDetector(maneuver);
+
+				}
+			}
 
 			// Activate the ephemeris mode
 			prop.setEphemerisMode();
@@ -391,15 +433,10 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// ////////////////////////////
 
 		} else if (propogator == PropagatorNode.SEMIANALYTICAL) {
-
 			// Not implemented yet
-
-		}
-
-		// /////////////
-		// ////TLE//////
-		// /////////////
-
+		} // /////////////
+			// ////TLE//////
+			// /////////////
 		else if (propogator == PropagatorNode.TLE) {
 
 			TLElements tle = initNode.getSatelliteTleElements();
@@ -442,7 +479,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 		// show satellite browser window
 		PropagatorPanel gsBrowser = new PropagatorPanel(this, iframe); // non-modal
-																		// version
+		// version
 
 		iframe.setContentPane(gsBrowser);
 		iframe.setSize(415 + 60, 386 + 115); // w,h
@@ -455,7 +492,6 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	// ==========================================
 	// Get-Set Methods ==========================
 	// ==========================================
-
 	public int getPropogator() {
 		return propogator;
 	}
@@ -587,9 +623,11 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	// ====================================================
 	// ======= ORBIT Problem Functions ===================
 	// ====================================================
-	/***************************************************************************
+	/**
+	 * *************************************************************************
 	 * Equations of Motion (accelerations) for 2-Body Problem + perturbations
-	 ************************************************************************* 
+	 * ************************************************************************
+	 * 
 	 * @param var
 	 * @param vel
 	 * @param t
@@ -665,8 +703,8 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		return acc;
 
 	} // deriv
+		// verbose - debug
 
-	// verbose - debug
 	private boolean verbose = false;
 
 	public void setVerbose(boolean verbose) {
@@ -731,7 +769,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		for (int i = 0; i < goalNames.length; i++) {
 			GoalParameter inVar = new GoalParameter(this, i, goalNames[i],
 					getGoal(i)); // hmm, need to put current value here if
-									// possible
+			// possible
 			varVec.add(inVar);
 		}
 
@@ -916,8 +954,16 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 		this.eventDetector.add(eventDetector);
 	}
 
+	public void addConstantThrustManeuver(
+			ConstantThrustManeuver constantThrustManeuver) {
+		this.constantThrustManeuvers.add(constantThrustManeuver);
+	}
+
+	public void addImpulseManeuver(ImpulseManeuver impulseManeuver) {
+		this.impulseManeuver.add(impulseManeuver);
+	}
+
 	public InitialConditionsNode getInitNode() {
 		return initNode;
 	}
-
 }

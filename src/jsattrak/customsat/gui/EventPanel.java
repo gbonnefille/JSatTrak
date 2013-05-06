@@ -36,7 +36,7 @@ import org.orekit.utils.Constants;
 
 /**
  * 
- * @author sgano
+ * @author acouanon
  */
 public class EventPanel extends javax.swing.JPanel {
 
@@ -102,6 +102,8 @@ public class EventPanel extends javax.swing.JPanel {
 							CelestialBodyObject.getValues()));
 			celestialBodyComboBox.setSelectedItem(mNode
 					.getTargetCelestialBodyObjectName());
+//			totalEclipseEventRadioButton.setSelected(mNode.isTotalEclipse());
+//			penumbraEclipseEventRadioButton.setSelected(!mNode.isTotalEclipse());
 			break;
 
 		}
@@ -133,791 +135,375 @@ public class EventPanel extends javax.swing.JPanel {
 	// <editor-fold defaultstate="collapsed"
 	@SuppressWarnings("unchecked")
 	// <editor-fold defaultstate="collapsed"
-	// desc="Generated Code">//GEN-BEGIN:initComponents
-	private void initComponents() {
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
 
-		jInternalFrame1 = new javax.swing.JInternalFrame();
-		okButton = new javax.swing.JButton();
-		cancelButton = new javax.swing.JButton();
-		applyButton = new javax.swing.JButton();
-		jLabel1 = new javax.swing.JLabel();
-		jPanelAlignment = new javax.swing.JPanel();
-		dateTextField = new javax.swing.JTextField();
-		jLabelEvent1 = new javax.swing.JLabel();
-		jLabelEvent2 = new javax.swing.JLabel();
-		jLabelEvent3 = new javax.swing.JLabel();
-		jLabel2 = new javax.swing.JLabel();
-		posLabel = new javax.swing.JLabel();
-		pos2Label = new javax.swing.JLabel();
-		eventTextField1 = new javax.swing.JTextField();
-		eventTextField2 = new javax.swing.JTextField();
-		eventTextField3 = new javax.swing.JTextField();
-		bodyLabel = new javax.swing.JLabel();
-		bodyComboBox = new javax.swing.JComboBox();
-		CelestialBodyEventRadioButton = new javax.swing.JRadioButton();
-		celestialBodyComboBox = new javax.swing.JComboBox();
-		satBodyEventRadioButton = new javax.swing.JRadioButton();
-		totalEclipseEventRadioButton = new javax.swing.JRadioButton();
-		groundStationBodyEventRadioButton = new javax.swing.JRadioButton();
-		penumbraEclipseEventRadioButton = new javax.swing.JRadioButton();
-		xTextField = new javax.swing.JTextField();
-		yTextField = new javax.swing.JTextField();
-		zTextField = new javax.swing.JTextField();
-		posXTextField = new javax.swing.JTextField();
-		posYTextField = new javax.swing.JTextField();
-		posZTextField = new javax.swing.JTextField();
-		posX2TextField = new javax.swing.JTextField();
-		posY2TextField = new javax.swing.JTextField();
-		posZ2TextField = new javax.swing.JTextField();
-		celestialBodyLabel = new javax.swing.JLabel();
-		jPanel1 = new javax.swing.JPanel();
-		jLabel5 = new javax.swing.JLabel();
-		eventsComboBox = new javax.swing.JComboBox();
+        jInternalFrame1 = new javax.swing.JInternalFrame();
+        okButton = new javax.swing.JButton();
+        cancelButton = new javax.swing.JButton();
+        applyButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jPanelAlignment = new javax.swing.JPanel();
+        dateTextField = new javax.swing.JTextField();
+        jLabelEvent1 = new javax.swing.JLabel();
+        jLabelEvent2 = new javax.swing.JLabel();
+        jLabelEvent3 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        posLabel = new javax.swing.JLabel();
+        pos2Label = new javax.swing.JLabel();
+        eventTextField1 = new javax.swing.JTextField();
+        eventTextField2 = new javax.swing.JTextField();
+        eventTextField3 = new javax.swing.JTextField();
+        bodyLabel = new javax.swing.JLabel();
+        bodyComboBox = new javax.swing.JComboBox();
+        CelestialBodyEventRadioButton = new javax.swing.JRadioButton();
+        celestialBodyComboBox = new javax.swing.JComboBox();
+        satBodyEventRadioButton = new javax.swing.JRadioButton();
+        totalEclipseEventRadioButton = new javax.swing.JRadioButton();
+        groundStationBodyEventRadioButton = new javax.swing.JRadioButton();
+        penumbraEclipseEventRadioButton = new javax.swing.JRadioButton();
+        xTextField = new javax.swing.JTextField();
+        yTextField = new javax.swing.JTextField();
+        zTextField = new javax.swing.JTextField();
+        posXTextField = new javax.swing.JTextField();
+        posYTextField = new javax.swing.JTextField();
+        posZTextField = new javax.swing.JTextField();
+        posX2TextField = new javax.swing.JTextField();
+        posY2TextField = new javax.swing.JTextField();
+        posZ2TextField = new javax.swing.JTextField();
+        celestialBodyLabel = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        eventsComboBox = new javax.swing.JComboBox();
 
-		jInternalFrame1.setVisible(true);
+        jInternalFrame1.setVisible(true);
 
-		javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(
-				jInternalFrame1.getContentPane());
-		jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
-		jInternalFrame1Layout.setHorizontalGroup(jInternalFrame1Layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 0, Short.MAX_VALUE));
-		jInternalFrame1Layout.setVerticalGroup(jInternalFrame1Layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGap(0, 0, Short.MAX_VALUE));
+        javax.swing.GroupLayout jInternalFrame1Layout = new javax.swing.GroupLayout(jInternalFrame1.getContentPane());
+        jInternalFrame1.getContentPane().setLayout(jInternalFrame1Layout);
+        jInternalFrame1Layout.setHorizontalGroup(
+            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        jInternalFrame1Layout.setVerticalGroup(
+            jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
 
-		okButton.setText("Ok");
-		okButton.setMaximumSize(new java.awt.Dimension(50, 26));
-		okButton.setMinimumSize(new java.awt.Dimension(50, 26));
-		okButton.setPreferredSize(new java.awt.Dimension(50, 26));
-		okButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				okButtonActionPerformed(evt);
-			}
-		});
+        okButton.setText("Ok");
+        okButton.setMaximumSize(new java.awt.Dimension(50, 26));
+        okButton.setMinimumSize(new java.awt.Dimension(50, 26));
+        okButton.setPreferredSize(new java.awt.Dimension(50, 26));
+        okButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                okButtonActionPerformed(evt);
+            }
+        });
 
-		cancelButton.setText("Cancel");
-		cancelButton.setMaximumSize(new java.awt.Dimension(73, 26));
-		cancelButton.setMinimumSize(new java.awt.Dimension(73, 26));
-		cancelButton.setPreferredSize(new java.awt.Dimension(73, 26));
-		cancelButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				cancelButtonActionPerformed(evt);
-			}
-		});
+        cancelButton.setText("Cancel");
+        cancelButton.setMaximumSize(new java.awt.Dimension(73, 26));
+        cancelButton.setMinimumSize(new java.awt.Dimension(73, 26));
+        cancelButton.setPreferredSize(new java.awt.Dimension(73, 26));
+        cancelButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelButtonActionPerformed(evt);
+            }
+        });
 
-		applyButton.setText("Apply");
-		applyButton.setMaximumSize(new java.awt.Dimension(65, 26));
-		applyButton.setMinimumSize(new java.awt.Dimension(65, 26));
-		applyButton.setPreferredSize(new java.awt.Dimension(65, 26));
-		applyButton.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				applyButtonActionPerformed(evt);
-			}
-		});
+        applyButton.setText("Apply");
+        applyButton.setMaximumSize(new java.awt.Dimension(65, 26));
+        applyButton.setMinimumSize(new java.awt.Dimension(65, 26));
+        applyButton.setPreferredSize(new java.awt.Dimension(65, 26));
+        applyButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                applyButtonActionPerformed(evt);
+            }
+        });
 
-		jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
-		jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel1.setText("Event detector node :");
-		jLabel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
+        jLabel1.setFont(new java.awt.Font("Tahoma", 1, 14)); // NOI18N
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("Event detector node :");
+        jLabel1.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
 
-		jPanelAlignment.setBorder(javax.swing.BorderFactory
-				.createTitledBorder("Parameters"));
-		jPanelAlignment.setMaximumSize(new java.awt.Dimension(32767, 128));
-		jPanelAlignment.setMinimumSize(new java.awt.Dimension(379, 128));
-		jPanelAlignment.setPreferredSize(new java.awt.Dimension(496, 128));
+        jPanelAlignment.setBorder(javax.swing.BorderFactory.createTitledBorder("Parameters"));
+        jPanelAlignment.setMaximumSize(new java.awt.Dimension(32767, 128));
+        jPanelAlignment.setMinimumSize(new java.awt.Dimension(379, 128));
+        jPanelAlignment.setPreferredSize(new java.awt.Dimension(496, 128));
 
-		jLabelEvent1.setText("LabelEvent1");
+        jLabelEvent1.setText("LabelEvent1");
 
-		jLabelEvent2.setText("LabelEvent2");
+        jLabelEvent2.setText("LabelEvent2");
 
-		jLabelEvent3.setText("LabelEvent3");
+        jLabelEvent3.setText("LabelEvent3");
 
-		jLabel2.setText("LabelPosition1");
+        jLabel2.setText("LabelPosition1");
 
-		posLabel.setText("LabelPosition2");
+        posLabel.setText("LabelPosition2");
 
-		pos2Label.setText("LabelPosition3");
+        pos2Label.setText("LabelPosition3");
 
-		eventTextField1.setMinimumSize(new java.awt.Dimension(141, 20));
-		eventTextField1.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				eventTextField1ActionPerformed(evt);
-			}
-		});
+        eventTextField1.setMinimumSize(new java.awt.Dimension(141, 20));
 
-		eventTextField2.setMinimumSize(new java.awt.Dimension(141, 20));
+        eventTextField2.setMinimumSize(new java.awt.Dimension(141, 20));
 
-		eventTextField3.setMinimumSize(new java.awt.Dimension(141, 20));
+        eventTextField3.setMinimumSize(new java.awt.Dimension(141, 20));
 
-		bodyLabel.setText("BodyLabel1");
+        bodyLabel.setText("BodyLabel1");
 
-		bodyComboBox.setMinimumSize(new java.awt.Dimension(141, 20));
-		bodyComboBox.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				bodyActionPerformed(evt);
-			}
-		});
+        bodyComboBox.setMinimumSize(new java.awt.Dimension(141, 20));
+        bodyComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bodyActionPerformed(evt);
+            }
+        });
 
-		CelestialBodyEventRadioButton.setText("Celestial object");
-		CelestialBodyEventRadioButton.setMaximumSize(new java.awt.Dimension(
-				112, 24));
-		CelestialBodyEventRadioButton.setMinimumSize(new java.awt.Dimension(
-				112, 24));
-		CelestialBodyEventRadioButton.setPreferredSize(new java.awt.Dimension(
-				112, 24));
+        CelestialBodyEventRadioButton.setText("Celestial object");
+        CelestialBodyEventRadioButton.setMaximumSize(new java.awt.Dimension(112, 24));
+        CelestialBodyEventRadioButton.setMinimumSize(new java.awt.Dimension(112, 24));
+        CelestialBodyEventRadioButton.setPreferredSize(new java.awt.Dimension(112, 24));
 
-		celestialBodyComboBox.setMinimumSize(new java.awt.Dimension(141, 20));
-		celestialBodyComboBox
-				.addActionListener(new java.awt.event.ActionListener() {
-					public void actionPerformed(java.awt.event.ActionEvent evt) {
-						celestialBodyComboBoxActionPerformed(evt);
-					}
-				});
+        celestialBodyComboBox.setMinimumSize(new java.awt.Dimension(141, 20));
+        celestialBodyComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                celestialBodyComboBoxActionPerformed(evt);
+            }
+        });
 
-		satBodyEventRadioButton.setSelected(true);
-		satBodyEventRadioButton.setText("Satellite");
-		satBodyEventRadioButton.setMaximumSize(new java.awt.Dimension(71, 24));
-		satBodyEventRadioButton.setMinimumSize(new java.awt.Dimension(71, 24));
-		satBodyEventRadioButton
-				.setPreferredSize(new java.awt.Dimension(71, 24));
+        satBodyEventRadioButton.setSelected(true);
+        satBodyEventRadioButton.setText("Satellite");
+        satBodyEventRadioButton.setMaximumSize(new java.awt.Dimension(71, 24));
+        satBodyEventRadioButton.setMinimumSize(new java.awt.Dimension(71, 24));
+        satBodyEventRadioButton.setPreferredSize(new java.awt.Dimension(71, 24));
 
-		totalEclipseEventRadioButton.setSelected(true);
-		totalEclipseEventRadioButton.setText("Total eclipse detection");
-		totalEclipseEventRadioButton.setMaximumSize(new java.awt.Dimension(153,
-				24));
-		totalEclipseEventRadioButton.setMinimumSize(new java.awt.Dimension(153,
-				24));
-		totalEclipseEventRadioButton.setPreferredSize(new java.awt.Dimension(
-				153, 24));
+        totalEclipseEventRadioButton.setSelected(true);
+        totalEclipseEventRadioButton.setText("Total eclipse detection");
+        totalEclipseEventRadioButton.setMaximumSize(new java.awt.Dimension(153, 24));
+        totalEclipseEventRadioButton.setMinimumSize(new java.awt.Dimension(153, 24));
+        totalEclipseEventRadioButton.setPreferredSize(new java.awt.Dimension(153, 24));
+        totalEclipseEventRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                totalEclipseEventRadioButtonActionPerformed(evt);
+            }
+        });
 
-		groundStationBodyEventRadioButton.setText("Ground station");
-		groundStationBodyEventRadioButton
-				.setMaximumSize(new java.awt.Dimension(108, 24));
-		groundStationBodyEventRadioButton
-				.setMinimumSize(new java.awt.Dimension(108, 24));
-		groundStationBodyEventRadioButton
-				.setPreferredSize(new java.awt.Dimension(108, 24));
+        groundStationBodyEventRadioButton.setText("Ground station");
+        groundStationBodyEventRadioButton.setMaximumSize(new java.awt.Dimension(108, 24));
+        groundStationBodyEventRadioButton.setMinimumSize(new java.awt.Dimension(108, 24));
+        groundStationBodyEventRadioButton.setPreferredSize(new java.awt.Dimension(108, 24));
 
-		penumbraEclipseEventRadioButton.setText("Penumbra detection");
-		penumbraEclipseEventRadioButton.setMaximumSize(new java.awt.Dimension(
-				140, 24));
-		penumbraEclipseEventRadioButton.setMinimumSize(new java.awt.Dimension(
-				140, 24));
-		penumbraEclipseEventRadioButton
-				.setPreferredSize(new java.awt.Dimension(140, 24));
+        penumbraEclipseEventRadioButton.setText("Penumbra detection");
+        penumbraEclipseEventRadioButton.setMaximumSize(new java.awt.Dimension(140, 24));
+        penumbraEclipseEventRadioButton.setMinimumSize(new java.awt.Dimension(140, 24));
+        penumbraEclipseEventRadioButton.setPreferredSize(new java.awt.Dimension(140, 24));
+        penumbraEclipseEventRadioButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                penumbraEclipseEventRadioButtonActionPerformed(evt);
+            }
+        });
 
-		xTextField.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				xTextFieldActionPerformed(evt);
-			}
-		});
+        celestialBodyLabel.setBackground(new java.awt.Color(255, 255, 255));
+        celestialBodyLabel.setText("CelestialBodyLabel");
 
-		celestialBodyLabel.setBackground(new java.awt.Color(255, 255, 255));
-		celestialBodyLabel.setText("CelestialBodyLabel");
+        javax.swing.GroupLayout jPanelAlignmentLayout = new javax.swing.GroupLayout(jPanelAlignment);
+        jPanelAlignment.setLayout(jPanelAlignmentLayout);
+        jPanelAlignmentLayout.setHorizontalGroup(
+            jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                                .addComponent(satBodyEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(groundStationBodyEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(CelestialBodyEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                                .addComponent(totalEclipseEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(penumbraEclipseEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(celestialBodyLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelEvent1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(bodyLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelEvent3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(posLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabelEvent2, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(pos2Label, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                .addComponent(celestialBodyComboBox, 0, 141, Short.MAX_VALUE)
+                                .addComponent(bodyComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(eventTextField1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(eventTextField2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(eventTextField3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                                    .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(posX2TextField)
+                                        .addComponent(posXTextField)
+                                        .addComponent(xTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGap(11, 11, 11)
+                                    .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(yTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(posY2TextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(posYTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addComponent(zTextField, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 40, Short.MAX_VALUE)
+                                        .addComponent(posZTextField, javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(posZ2TextField, javax.swing.GroupLayout.Alignment.LEADING))))))
+                    .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                        .addGap(77, 77, 77)
+                        .addComponent(dateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanelAlignmentLayout.setVerticalGroup(
+            jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanelAlignmentLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(satBodyEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(groundStationBodyEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(CelestialBodyEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(11, 11, 11)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(totalEclipseEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(penumbraEclipseEventRadioButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(dateTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bodyLabel)
+                    .addComponent(bodyComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(eventTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelEvent1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(celestialBodyComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(celestialBodyLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(eventTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelEvent2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(eventTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabelEvent3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(yTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(zTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(xTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(posXTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(posYTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(posZTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(posLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanelAlignmentLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(posX2TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(posY2TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(posZ2TextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pos2Label, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
-		javax.swing.GroupLayout jPanelAlignmentLayout = new javax.swing.GroupLayout(
-				jPanelAlignment);
-		jPanelAlignment.setLayout(jPanelAlignmentLayout);
-		jPanelAlignmentLayout
-				.setHorizontalGroup(jPanelAlignmentLayout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanelAlignmentLayout
-										.createSequentialGroup()
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.LEADING)
-														.addGroup(
-																jPanelAlignmentLayout
-																		.createSequentialGroup()
-																		.addGap(15,
-																				15,
-																				15)
-																		.addGroup(
-																				jPanelAlignmentLayout
-																						.createParallelGroup(
-																								javax.swing.GroupLayout.Alignment.LEADING)
-																						.addGroup(
-																								jPanelAlignmentLayout
-																										.createSequentialGroup()
-																										.addComponent(
-																												satBodyEventRadioButton,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												javax.swing.GroupLayout.PREFERRED_SIZE)
-																										.addPreferredGap(
-																												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																										.addComponent(
-																												groundStationBodyEventRadioButton,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												106,
-																												javax.swing.GroupLayout.PREFERRED_SIZE)
-																										.addPreferredGap(
-																												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-																										.addComponent(
-																												CelestialBodyEventRadioButton,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												101,
-																												javax.swing.GroupLayout.PREFERRED_SIZE))
-																						.addGroup(
-																								jPanelAlignmentLayout
-																										.createSequentialGroup()
-																										.addComponent(
-																												totalEclipseEventRadioButton,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												javax.swing.GroupLayout.PREFERRED_SIZE)
-																										.addPreferredGap(
-																												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																										.addComponent(
-																												penumbraEclipseEventRadioButton,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												javax.swing.GroupLayout.PREFERRED_SIZE))))
-														.addGroup(
-																jPanelAlignmentLayout
-																		.createSequentialGroup()
-																		.addContainerGap()
-																		.addGroup(
-																				jPanelAlignmentLayout
-																						.createParallelGroup(
-																								javax.swing.GroupLayout.Alignment.LEADING)
-																						.addComponent(
-																								celestialBodyLabel,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								jLabelEvent1,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								bodyLabel,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								jLabelEvent3,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								jLabel2,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								posLabel,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								jLabelEvent2,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE)
-																						.addComponent(
-																								pos2Label,
-																								javax.swing.GroupLayout.PREFERRED_SIZE,
-																								120,
-																								javax.swing.GroupLayout.PREFERRED_SIZE))
-																		.addGap(30,
-																				30,
-																				30)
-																		.addGroup(
-																				jPanelAlignmentLayout
-																						.createParallelGroup(
-																								javax.swing.GroupLayout.Alignment.LEADING)
-																						.addGroup(
-																								jPanelAlignmentLayout
-																										.createParallelGroup(
-																												javax.swing.GroupLayout.Alignment.LEADING,
-																												false)
-																										.addComponent(
-																												celestialBodyComboBox,
-																												0,
-																												141,
-																												Short.MAX_VALUE)
-																										.addComponent(
-																												bodyComboBox,
-																												0,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												Short.MAX_VALUE)
-																										.addComponent(
-																												eventTextField1,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												Short.MAX_VALUE)
-																										.addComponent(
-																												eventTextField2,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												Short.MAX_VALUE))
-																						.addGroup(
-																								jPanelAlignmentLayout
-																										.createParallelGroup(
-																												javax.swing.GroupLayout.Alignment.TRAILING,
-																												false)
-																										.addComponent(
-																												eventTextField3,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												javax.swing.GroupLayout.DEFAULT_SIZE,
-																												Short.MAX_VALUE)
-																										.addGroup(
-																												jPanelAlignmentLayout
-																														.createSequentialGroup()
-																														.addGroup(
-																																jPanelAlignmentLayout
-																																		.createParallelGroup(
-																																				javax.swing.GroupLayout.Alignment.LEADING,
-																																				false)
-																																		.addComponent(
-																																				posX2TextField)
-																																		.addComponent(
-																																				posXTextField)
-																																		.addComponent(
-																																				xTextField,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE,
-																																				40,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE))
-																														.addGap(11,
-																																11,
-																																11)
-																														.addGroup(
-																																jPanelAlignmentLayout
-																																		.createParallelGroup(
-																																				javax.swing.GroupLayout.Alignment.LEADING)
-																																		.addComponent(
-																																				yTextField,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE,
-																																				40,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE)
-																																		.addComponent(
-																																				posY2TextField,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE,
-																																				40,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE)
-																																		.addComponent(
-																																				posYTextField,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE,
-																																				40,
-																																				javax.swing.GroupLayout.PREFERRED_SIZE))
-																														.addPreferredGap(
-																																javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-																														.addGroup(
-																																jPanelAlignmentLayout
-																																		.createParallelGroup(
-																																				javax.swing.GroupLayout.Alignment.TRAILING,
-																																				false)
-																																		.addComponent(
-																																				zTextField,
-																																				javax.swing.GroupLayout.Alignment.LEADING,
-																																				javax.swing.GroupLayout.DEFAULT_SIZE,
-																																				40,
-																																				Short.MAX_VALUE)
-																																		.addComponent(
-																																				posZTextField,
-																																				javax.swing.GroupLayout.Alignment.LEADING)
-																																		.addComponent(
-																																				posZ2TextField,
-																																				javax.swing.GroupLayout.Alignment.LEADING))))))
-														.addGroup(
-																jPanelAlignmentLayout
-																		.createSequentialGroup()
-																		.addGap(77,
-																				77,
-																				77)
-																		.addComponent(
-																				dateTextField,
-																				javax.swing.GroupLayout.PREFERRED_SIZE,
-																				160,
-																				javax.swing.GroupLayout.PREFERRED_SIZE)))
-										.addContainerGap(69, Short.MAX_VALUE)));
-		jPanelAlignmentLayout
-				.setVerticalGroup(jPanelAlignmentLayout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanelAlignmentLayout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																satBodyEventRadioButton,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																groundStationBodyEventRadioButton,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																CelestialBodyEventRadioButton,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addGap(11, 11, 11)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																totalEclipseEventRadioButton,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																penumbraEclipseEventRadioButton,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-										.addComponent(
-												dateTextField,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(bodyLabel)
-														.addComponent(
-																bodyComboBox,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																eventTextField1,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																jLabelEvent1))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																celestialBodyComboBox,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																celestialBodyLabel,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																20,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																eventTextField2,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																jLabelEvent2,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																17,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																eventTextField3,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																jLabelEvent3,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																Short.MAX_VALUE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																yTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																zTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																xTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																jLabel2,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																17,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																posXTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																posYTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																posZTextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																posLabel,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																19,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-										.addGroup(
-												jPanelAlignmentLayout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.BASELINE)
-														.addComponent(
-																posX2TextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																posY2TextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																posZ2TextField,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																javax.swing.GroupLayout.DEFAULT_SIZE,
-																javax.swing.GroupLayout.PREFERRED_SIZE)
-														.addComponent(
-																pos2Label,
-																javax.swing.GroupLayout.PREFERRED_SIZE,
-																18,
-																javax.swing.GroupLayout.PREFERRED_SIZE))
-										.addContainerGap(119, Short.MAX_VALUE)));
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Event type"));
 
-		jPanel1.setBorder(javax.swing.BorderFactory
-				.createTitledBorder("Event type"));
+        jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
+        jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel5.setText("Alignment detector");
+        jLabel5.setMaximumSize(new java.awt.Dimension(108, 16));
+        jLabel5.setMinimumSize(new java.awt.Dimension(108, 16));
+        jLabel5.setPreferredSize(new java.awt.Dimension(108, 16));
 
-		jLabel5.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
-		jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-		jLabel5.setText("Alignment detector");
-		jLabel5.setMaximumSize(new java.awt.Dimension(108, 16));
-		jLabel5.setMinimumSize(new java.awt.Dimension(108, 16));
-		jLabel5.setPreferredSize(new java.awt.Dimension(108, 16));
+        eventsComboBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Alignment", "Altitude", "Apparent Elevation", "Apside", "Circular field of view", "Date", "Diheral field of view", "Eclipse", "Elevation", "Ground mask elevation", "Node" }));
+        eventsComboBox.setMinimumSize(new java.awt.Dimension(158, 25));
+        eventsComboBox.setPreferredSize(new java.awt.Dimension(158, 25));
+        eventsComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                eventActionPerformed(evt);
+            }
+        });
 
-		eventsComboBox.setModel(new javax.swing.DefaultComboBoxModel(
-				new String[] { "Alignment", "Altitude", "Apparent Elevation",
-						"Apside", "Circular field of view", "Date",
-						"Diheral field of view", "Eclipse", "Elevation",
-						"Ground mask elevation", "Node" }));
-		eventsComboBox.setMinimumSize(new java.awt.Dimension(158, 25));
-		eventsComboBox.setPreferredSize(new java.awt.Dimension(158, 25));
-		eventsComboBox.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(java.awt.event.ActionEvent evt) {
-				eventActionPerformed(evt);
-			}
-		});
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 299, Short.MAX_VALUE)
+                        .addContainerGap())
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addComponent(eventsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(78, 78, 78))))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(eventsComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
 
-		javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(
-				jPanel1);
-		jPanel1.setLayout(jPanel1Layout);
-		jPanel1Layout
-				.setHorizontalGroup(jPanel1Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel1Layout
-										.createSequentialGroup()
-										.addContainerGap()
-										.addGroup(
-												jPanel1Layout
-														.createParallelGroup(
-																javax.swing.GroupLayout.Alignment.LEADING)
-														.addGroup(
-																jPanel1Layout
-																		.createSequentialGroup()
-																		.addComponent(
-																				jLabel5,
-																				javax.swing.GroupLayout.DEFAULT_SIZE,
-																				299,
-																				Short.MAX_VALUE)
-																		.addContainerGap())
-														.addGroup(
-																javax.swing.GroupLayout.Alignment.TRAILING,
-																jPanel1Layout
-																		.createSequentialGroup()
-																		.addComponent(
-																				eventsComboBox,
-																				javax.swing.GroupLayout.PREFERRED_SIZE,
-																				javax.swing.GroupLayout.DEFAULT_SIZE,
-																				javax.swing.GroupLayout.PREFERRED_SIZE)
-																		.addGap(78,
-																				78,
-																				78)))));
-		jPanel1Layout
-				.setVerticalGroup(jPanel1Layout
-						.createParallelGroup(
-								javax.swing.GroupLayout.Alignment.LEADING)
-						.addGroup(
-								jPanel1Layout
-										.createSequentialGroup()
-										.addComponent(
-												jLabel5,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addPreferredGap(
-												javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-										.addComponent(
-												eventsComboBox,
-												javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE)
-										.addContainerGap()));
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(applyButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jPanelAlignment, javax.swing.GroupLayout.PREFERRED_SIZE, 335, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(21, Short.MAX_VALUE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(10, 10, 10)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(jPanelAlignment, javax.swing.GroupLayout.PREFERRED_SIZE, 296, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(cancelButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(applyButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+    }// </editor-fold>//GEN-END:initComponents
 
-		javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-		this.setLayout(layout);
-		layout.setHorizontalGroup(layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						layout.createSequentialGroup()
-								.addGap(19, 19, 19)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.TRAILING,
-												false)
-												.addGroup(
-														layout.createSequentialGroup()
-																.addComponent(
-																		okButton,
-																		javax.swing.GroupLayout.PREFERRED_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.PREFERRED_SIZE)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		cancelButton,
-																		javax.swing.GroupLayout.PREFERRED_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.PREFERRED_SIZE)
-																.addPreferredGap(
-																		javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-																.addComponent(
-																		applyButton,
-																		javax.swing.GroupLayout.PREFERRED_SIZE,
-																		javax.swing.GroupLayout.DEFAULT_SIZE,
-																		javax.swing.GroupLayout.PREFERRED_SIZE))
-												.addComponent(
-														jPanelAlignment,
-														javax.swing.GroupLayout.PREFERRED_SIZE,
-														0, Short.MAX_VALUE)
-												.addComponent(
-														jPanel1,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														Short.MAX_VALUE)
-												.addComponent(
-														jLabel1,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														Short.MAX_VALUE))
-								.addContainerGap(21, Short.MAX_VALUE)));
-		layout.setVerticalGroup(layout
-				.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(
-						layout.createSequentialGroup()
-								.addGap(10, 10, 10)
-								.addComponent(jLabel1,
-										javax.swing.GroupLayout.PREFERRED_SIZE,
-										27,
-										javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-								.addComponent(jPanel1,
-										javax.swing.GroupLayout.PREFERRED_SIZE,
-										80,
-										javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addGap(4, 4, 4)
-								.addComponent(jPanelAlignment,
-										javax.swing.GroupLayout.PREFERRED_SIZE,
-										296,
-										javax.swing.GroupLayout.PREFERRED_SIZE)
-								.addPreferredGap(
-										javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-								.addGroup(
-										layout.createParallelGroup(
-												javax.swing.GroupLayout.Alignment.BASELINE)
-												.addComponent(
-														okButton,
-														javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(
-														cancelButton,
-														javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE)
-												.addComponent(
-														applyButton,
-														javax.swing.GroupLayout.PREFERRED_SIZE,
-														javax.swing.GroupLayout.DEFAULT_SIZE,
-														javax.swing.GroupLayout.PREFERRED_SIZE))
-								.addContainerGap(
-										javax.swing.GroupLayout.DEFAULT_SIZE,
-										Short.MAX_VALUE)));
-	}// </editor-fold>//GEN-END:initComponents
+    private void totalEclipseEventRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_totalEclipseEventRadioButtonActionPerformed
+                totalEclipseEventRadioButton.setSelected(true);
+		penumbraEclipseEventRadioButton.setSelected(false);
+    }//GEN-LAST:event_totalEclipseEventRadioButtonActionPerformed
 
-	private void eventTextField1ActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_eventTextField1ActionPerformed
-		// TODO add your handling code here:
-	}// GEN-LAST:event_eventTextField1ActionPerformed
+    private void penumbraEclipseEventRadioButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_penumbraEclipseEventRadioButtonActionPerformed
+                totalEclipseEventRadioButton.setSelected(false);
+		penumbraEclipseEventRadioButton.setSelected(true);
+    }//GEN-LAST:event_penumbraEclipseEventRadioButtonActionPerformed
 
-	private void xTextFieldActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_xTextFieldActionPerformed
-		// TODO add your handling code here:
-	}// GEN-LAST:event_xTextFieldActionPerformed
 
 	private void bodyActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_bodyActionPerformed
 
@@ -1082,25 +668,6 @@ public class EventPanel extends javax.swing.JPanel {
 		saveSettings();
 	}// GEN-LAST:event_applyButtonActionPerformed
 
-	private void yTextFieldActionPerformed(java.awt.event.ActionEvent evt)// GEN-FIRST:event_yTextFieldActionPerformed
-	{// GEN-HEADEREND:event_yTextFieldActionPerformed
-		// TODO add your handling code here:
-	}// GEN-LAST:event_yTextFieldActionPerformed
-
-	private void totalEclipseRadioButtonActionPerformed(
-			java.awt.event.ActionEvent evt)// GEN-FIRST:event_eciRadioButtonActionPerformed
-	{// GEN-HEADEREND:event_eciRadioButtonActionPerformed
-		totalEclipseEventRadioButton.setSelected(true);
-		penumbraEclipseEventRadioButton.setSelected(false);
-	}// GEN-LAST:event_eciRadioButtonActionPerformed
-
-	private void penumbraEclipseRadioButtonActionPerformed(
-			java.awt.event.ActionEvent evt)// GEN-FIRST:event_ecefRadioButtonActionPerformed
-	{// GEN-HEADEREND:event_ecefRadioButtonActionPerformed
-		totalEclipseEventRadioButton.setSelected(false);
-		penumbraEclipseEventRadioButton.setSelected(true);
-	}// GEN-LAST:event_ecefRadioButtonActionPerformed
-
 	@SuppressWarnings("unchecked")
 	private void satObjectRadioButtonActionPerformed(
 			java.awt.event.ActionEvent evt)// GEN-FIRST:event_ecefRadioButtonActionPerformed
@@ -1145,47 +712,45 @@ public class EventPanel extends javax.swing.JPanel {
 		groundStationBodyEventRadioButton.setSelected(false);
 		CelestialBodyEventRadioButton.setSelected(true);
 	}// GEN-LAST:event_ecefRadioButtonActionPerformed
-		// Variables declaration - do not modify//GEN-BEGIN:variables
-
-	private javax.swing.JRadioButton CelestialBodyEventRadioButton;
-	private javax.swing.JButton applyButton;
-	private javax.swing.JComboBox bodyComboBox;
-	private javax.swing.JLabel bodyLabel;
-	private javax.swing.JButton cancelButton;
-	private javax.swing.JComboBox celestialBodyComboBox;
-	private javax.swing.JLabel celestialBodyLabel;
-	private javax.swing.JTextField dateTextField;
-	private javax.swing.JTextField eventTextField1;
-	private javax.swing.JTextField eventTextField2;
-	private javax.swing.JTextField eventTextField3;
-	private javax.swing.JComboBox eventsComboBox;
-	private javax.swing.JRadioButton groundStationBodyEventRadioButton;
-	private javax.swing.JInternalFrame jInternalFrame1;
-	private javax.swing.JLabel jLabel1;
-	private javax.swing.JLabel jLabel2;
-	private javax.swing.JLabel jLabel5;
-	private javax.swing.JLabel jLabelEvent1;
-	private javax.swing.JLabel jLabelEvent2;
-	private javax.swing.JLabel jLabelEvent3;
-	private javax.swing.JPanel jPanel1;
-	private javax.swing.JPanel jPanelAlignment;
-	private javax.swing.JButton okButton;
-	private javax.swing.JRadioButton penumbraEclipseEventRadioButton;
-	private javax.swing.JLabel pos2Label;
-	private javax.swing.JLabel posLabel;
-	private javax.swing.JTextField posX2TextField;
-	private javax.swing.JTextField posXTextField;
-	private javax.swing.JTextField posY2TextField;
-	private javax.swing.JTextField posYTextField;
-	private javax.swing.JTextField posZ2TextField;
-	private javax.swing.JTextField posZTextField;
-	private javax.swing.JRadioButton satBodyEventRadioButton;
-	private javax.swing.JRadioButton totalEclipseEventRadioButton;
-	private javax.swing.JTextField xTextField;
-	private javax.swing.JTextField yTextField;
-	private javax.swing.JTextField zTextField;
-
-	// End of variables declaration//GEN-END:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton CelestialBodyEventRadioButton;
+    private javax.swing.JButton applyButton;
+    private javax.swing.JComboBox bodyComboBox;
+    private javax.swing.JLabel bodyLabel;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JComboBox celestialBodyComboBox;
+    private javax.swing.JLabel celestialBodyLabel;
+    private javax.swing.JTextField dateTextField;
+    private javax.swing.JTextField eventTextField1;
+    private javax.swing.JTextField eventTextField2;
+    private javax.swing.JTextField eventTextField3;
+    private javax.swing.JComboBox eventsComboBox;
+    private javax.swing.JRadioButton groundStationBodyEventRadioButton;
+    private javax.swing.JInternalFrame jInternalFrame1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabelEvent1;
+    private javax.swing.JLabel jLabelEvent2;
+    private javax.swing.JLabel jLabelEvent3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanelAlignment;
+    private javax.swing.JButton okButton;
+    private javax.swing.JRadioButton penumbraEclipseEventRadioButton;
+    private javax.swing.JLabel pos2Label;
+    private javax.swing.JLabel posLabel;
+    private javax.swing.JTextField posX2TextField;
+    private javax.swing.JTextField posXTextField;
+    private javax.swing.JTextField posY2TextField;
+    private javax.swing.JTextField posYTextField;
+    private javax.swing.JTextField posZ2TextField;
+    private javax.swing.JTextField posZTextField;
+    private javax.swing.JRadioButton satBodyEventRadioButton;
+    private javax.swing.JRadioButton totalEclipseEventRadioButton;
+    private javax.swing.JTextField xTextField;
+    private javax.swing.JTextField yTextField;
+    private javax.swing.JTextField zTextField;
+    // End of variables declaration//GEN-END:variables
 
 	@SuppressWarnings("unchecked")
 	private void eventActionPerformed(ActionEvent evt) {

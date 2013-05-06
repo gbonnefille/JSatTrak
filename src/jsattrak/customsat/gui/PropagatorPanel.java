@@ -31,12 +31,12 @@ import jsattrak.customsat.PropagatorNode;
 
 /**
  * 
- * @author sgano
+ * @author acouanon
  */
 public class PropagatorPanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 3532395304593969598L;
-	
+
 	PropagatorNode pNode;
 	private JInternalFrame iframe; // used to know what its parent frame is - to
 									// close window

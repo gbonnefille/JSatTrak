@@ -56,18 +56,18 @@ import name.gano.astro.time.Time;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.errors.OrekitException;
 import org.orekit.frames.FramesFactory;
-import org.orekit.frames.IERSConventions;
 import org.orekit.orbits.PositionAngle;
+import org.orekit.utils.IERSConventions;
 import org.orekit.utils.PVCoordinates;
 
 /**
  * 
- * @author sgano
+ * @author acouanon
  */
 public class InitialConditionsPanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 3434684446972278319L;
-	
+
 	InitialConditionsNode icNode;
 	boolean componentsIni = false; // flag for when the components have been
 	// inialized
@@ -698,17 +698,17 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 																								javax.swing.GroupLayout.Alignment.LEADING,
 																								false)
 																						.addComponent(
-																								zTextField,
+																								yTextField,
 																								javax.swing.GroupLayout.DEFAULT_SIZE,
-																								94,
+																								114,
 																								Short.MAX_VALUE)
 																						.addComponent(
-																								yTextField)
+																								xTextField)
 																						.addComponent(
-																								xTextField))
-																		.addGap(38,
-																				38,
-																				38)
+																								zTextField))
+																		.addGap(18,
+																				18,
+																				18)
 																		.addGroup(
 																				j2kPanelLayout
 																						.createParallelGroup(
@@ -725,10 +725,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 																										.addPreferredGap(
 																												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																										.addComponent(
-																												dyTextField,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												95,
-																												javax.swing.GroupLayout.PREFERRED_SIZE))
+																												dyTextField))
 																						.addGroup(
 																								j2kPanelLayout
 																										.createSequentialGroup()
@@ -753,10 +750,10 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 																												javax.swing.LayoutStyle.ComponentPlacement.RELATED)
 																										.addComponent(
 																												dxTextField,
-																												javax.swing.GroupLayout.PREFERRED_SIZE,
-																												94,
-																												javax.swing.GroupLayout.PREFERRED_SIZE)))))
-										.addContainerGap(61, Short.MAX_VALUE)));
+																												javax.swing.GroupLayout.DEFAULT_SIZE,
+																												114,
+																												Short.MAX_VALUE)))))
+										.addContainerGap(41, Short.MAX_VALUE)));
 		j2kPanelLayout
 				.setVerticalGroup(j2kPanelLayout
 						.createParallelGroup(

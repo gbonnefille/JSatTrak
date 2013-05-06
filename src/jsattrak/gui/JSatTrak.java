@@ -2096,16 +2096,6 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
         
         // update sun position
         sun.setCurrentMJD(currentJulianDate.getMJD());
-        // DEBUG:
-//        double [] sunPos = sun.getCurrentPositionJ2K();
-//        System.out.println("Sun Pos(J2K) - Date (MJD): " + currentJulianDate.getMJD() + ", <x,y,z> < " +sunPos[0] +", " +sunPos[1] +", "+sunPos[2] +" >");
-//        sunPos = sun.getCurrentPositionMOD();
-//        System.out.println("Sun Pos(MOD) - Date (MJD): " + currentJulianDate.getMJD() + ", <x,y,z> < " +sunPos[0] +", " +sunPos[1] +", "+sunPos[2] +" >");
-//        double[] llaTemp = GeoFunctions.GeodeticJulDate( sun.getCurrentPositionMOD() ,currentJulianDate.getJulianDate());
-//        // sun.getCurrentPositionMOD()
-//        //double[] llaTemp = GeoFunctions.GeodeticJulDate( new double[] {-1.400954880970050E+08,  5.168955443226393E+07 , 2.240975286312218E+07} ,currentJulianDate.getJDN());
-//        // 01 Sep 2007 00:00:00.000 UTC
-//        System.out.println("Sun lat/long :  " + llaTemp[0]*180.0/Math.PI + " , " + llaTemp[1]*180.0/Math.PI);
                 
         // if time jumps by more than 91 minutes check period of sat to see if
         // ground tracks need to be updated

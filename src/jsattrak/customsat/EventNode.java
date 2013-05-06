@@ -79,7 +79,7 @@ import org.orekit.utils.PVCoordinatesProvider;
 
 /**
  * 
- * @author sgano
+ * @author acouanon
  */
 public class EventNode extends CustomTreeTableNode {
 
@@ -162,7 +162,7 @@ public class EventNode extends CustomTreeTableNode {
 													// values
 		// set icon for this type
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(
-				getClass().getResource("/icons/customSatIcons/burn.png"))));
+				getClass().getResource("/icons/customSatIcons/event.png"))));
 		// set Node Type
 		setNodeType("Event");
 
@@ -181,65 +181,7 @@ public class EventNode extends CustomTreeTableNode {
 	@Override
 	public void execute(MissionDesignPropagator missionDesign)
 			throws OrekitException, IOException, ParseException {
-		// dummy but should do something based on input ephemeris
-		// System.out.println("Executing : " + getValueAt(0) );
-
-		// get last stat vector (we are going to change it - impulse burn)
-
-		// BoundedPropagator ephemeris = missionDesign.getEphemeris();
-		//
-		// double lastTime = ephemeris.getMaxDate().durationFrom(
-		// AbsoluteDate.JULIAN_EPOCH) / 86400;
-		// StateVector lastState = new StateVector(ephemeris.getPVCoordinates(
-		// ephemeris.getMaxDate(), ephemeris.getFrame()), lastTime);
-		//
-		// // for VNC system see:
-		// //
-		// http://www.stk.com/resources/help/stk613/helpSystem/extfile/gator/eq-coordsys.htm
-		//
-		// // set inial time of the node ( TT)
-		// this.setStartTTjulDate(ephemeris.getMaxDate());
-		//
-		// // get r and v vectors
-		// double[] r = new double[] { lastState.state[1], lastState.state[2],
-		// lastState.state[3] };
-		// double[] v = new double[] { lastState.state[4], lastState.state[5],
-		// lastState.state[6] };
-		//
-		// // calculate unit vector in V direction (in J2K coordinate frame)
-		// double normV = MathUtils.norm(v);
-		// double[] unitV = new double[] { v[0] / normV, v[1] / normV,
-		// v[2] / normV };
-		//
-		// // calculate unit vector in N direction
-		// double[] unitNorm = MathUtils.cross(r, v);
-		// double normNorm = MathUtils.norm(unitNorm);
-		// unitNorm[0] = unitNorm[0] / normNorm;
-		// unitNorm[1] = unitNorm[1] / normNorm;
-		// unitNorm[2] = unitNorm[2] / normNorm;
-		//
-		// // calculate unit vector in the Co-Normal direction
-		// double[] unitCoNorm = MathUtils.cross(unitV, unitNorm);
-		//
-		// // calculate Thrust Vector in J2000.0
-		// double[] thrustj2K = new double[] { 0.0, 0.0, 0.0 };
-		// // add V component
-		// thrustj2K = MathUtils.add(thrustj2K,
-		// MathUtils.scale(unitV, vncThrustVector[0]));
-		// // add N component
-		// thrustj2K = MathUtils.add(thrustj2K,
-		// MathUtils.scale(unitNorm, vncThrustVector[1]));
-		// // add C component
-		// thrustj2K = MathUtils.add(thrustj2K,
-		// MathUtils.scale(unitCoNorm, vncThrustVector[2]));
-		//
-		// // add the trustj2k as a delta V to the last state
-		// lastState.state[4] += thrustj2K[0];
-		// lastState.state[5] += thrustj2K[1];
-		// lastState.state[6] += thrustj2K[2];
-
-		// copy final ephemeris state: - for goal calculations
-		// lastStateVector = ephemeris.lastElement();
+		
 
 		// Compute the event
 		AbstractDetector eventDetector = null;
@@ -294,8 +236,8 @@ public class EventNode extends CustomTreeTableNode {
 					// supported
 					// formats
 					provider = GravityFieldFactory.getPotentialProvider();
+					
 					// Earth central body reference radius
-
 					earth = new OneAxisEllipsoid(provider.getAe(),
 							Constants.WGS84_EARTH_FLATTENING,
 							FramesFactory.getITRF2005());
@@ -350,8 +292,8 @@ public class EventNode extends CustomTreeTableNode {
 				// Factory used to read gravity field files in several supported
 				// formats
 				provider = GravityFieldFactory.getPotentialProvider();
+				
 				// Earth central body reference radius
-
 				earth = new OneAxisEllipsoid(provider.getAe(),
 						Constants.WGS84_EARTH_FLATTENING,
 						FramesFactory.getITRF2005());
@@ -406,8 +348,8 @@ public class EventNode extends CustomTreeTableNode {
 					// supported
 					// formats
 					provider = GravityFieldFactory.getPotentialProvider();
+					
 					// Earth central body reference radius
-
 					earth = new OneAxisEllipsoid(provider.getAe(),
 							Constants.WGS84_EARTH_FLATTENING,
 							FramesFactory.getITRF2005());
@@ -483,8 +425,8 @@ public class EventNode extends CustomTreeTableNode {
 					// supported
 					// formats
 					provider = GravityFieldFactory.getPotentialProvider();
+					
 					// Earth central body reference radius
-
 					earth = new OneAxisEllipsoid(provider.getAe(),
 							Constants.WGS84_EARTH_FLATTENING,
 							FramesFactory.getITRF2005());
@@ -539,8 +481,8 @@ public class EventNode extends CustomTreeTableNode {
 				// Factory used to read gravity field files in several supported
 				// formats
 				provider = GravityFieldFactory.getPotentialProvider();
+				
 				// Earth central body reference radius
-
 				earth = new OneAxisEllipsoid(provider.getAe(),
 						Constants.WGS84_EARTH_FLATTENING,
 						FramesFactory.getITRF2005());

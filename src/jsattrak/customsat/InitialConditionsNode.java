@@ -51,12 +51,12 @@ import org.orekit.utils.PVCoordinates;
 
 /**
  * 
- * @author sgano
+ * @author acouanon
  */
 public class InitialConditionsNode extends CustomTreeTableNode {
 
 	private static final long serialVersionUID = -4739379085877131283L;
-	
+
 	public static final int KEPLERIAN = 0;
 	public static final int CARTESIAN = 1;
 	public static final int CIRCULAR = 2;

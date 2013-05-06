@@ -57,7 +57,6 @@ public class CustomSatellite extends AbstractSatellite {
 	private static final long serialVersionUID = -7936848462137206875L;
 	// ====================================
 
-
 	private BoundedPropagator ephemeris = null;
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
@@ -120,7 +119,6 @@ public class CustomSatellite extends AbstractSatellite {
 		// iniMissionTableModel(scenarioEpochDate);
 	}
 
-
 	@Override
 	public void propogate2JulDate(double julDate, boolean eventDetector)
 			throws OrekitException {
@@ -140,7 +138,7 @@ public class CustomSatellite extends AbstractSatellite {
 			minTime = ephemeris.getMinDate();
 			maxTime = ephemeris.getMaxDate();
 
-			// see if the current time in inside of the ephemeris range
+			// see if the current time is inside of the ephemeris range
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
@@ -155,7 +153,6 @@ public class CustomSatellite extends AbstractSatellite {
 					if (this.getEventPositions().isEmpty())
 						this.eventDetected = false;
 
-				
 				}
 
 				// Au step qui suit le calcul de la trace au sol il faut
@@ -212,65 +209,17 @@ public class CustomSatellite extends AbstractSatellite {
 				// Check to see if the ascending node has been passed
 				if (satOptions.isShowGroundTrack() == true) {
 
-					if (satOptions.isGroundTrackIni() == false
-							|| oldLLA == null) // update
-					// ground
-					// track
-					// needed
-					{
-						// Withdrawal of events for the the ground track calculation 
-						events = ephemeris.getEventsDetectors();
-						ephemeris.clearEventsDetectors();
+					// update ground track needed || check for ascending node
+					// pass || ascending node passed
 
+					if ((satOptions.isGroundTrackIni() == false || oldLLA == null)
+							|| (oldLLA[0] < 0 && lla[0] >= 0)
+							|| (timeLead[timeLead.length - 1] < julDate || timeLag[0] > julDate)) {
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
-
-						// Restore events
-						for (EventDetector event : events)
-							ephemeris.addEventDetector(event);
-
-					} else if (oldLLA[0] < 0 && lla[0] >= 0) // check for
-																// ascending
-																// node pass
-					{
-						// System.out.println("Ascending NODE passed: " +
-						// tle.getSatName() );
-
-						// Withdrawal of events for the the ground track calculation 
-
-						events = ephemeris.getEventsDetectors();
-						ephemeris.clearEventsDetectors();
-
-						initializeGroundTrack();
-						lastStepInitGroundTrack = true;
-
-						// Restore events
-						for (EventDetector event : events)
-							ephemeris.addEventDetector(event);
-
-					} // ascending node passed
-						// ELSE if current time is not in the lead/lag interval
-						// reinintialize it
-					else if (timeLead[timeLead.length - 1] < julDate
-							|| timeLag[0] > julDate) {
-
-						// Withdrawal of events for the the ground track calculation 
-						events = ephemeris.getEventsDetectors();
-						ephemeris.clearEventsDetectors();
-
-						initializeGroundTrack();
-						lastStepInitGroundTrack = true;
-
-						// Restore events
-						for (EventDetector event : events)
-							ephemeris.addEventDetector(event);
-
 					}
 
 				} // if show ground track is true
-
-				// isInTime = true;
-				// System.out.println("true");
 
 			} else // not in the timeFrame
 			{
@@ -414,6 +363,10 @@ public class CustomSatellite extends AbstractSatellite {
 		temePosLead = new double[ptsLead][3];
 		timeLead = new double[ptsLead];
 
+		// Withdrawal of events for the the ground track calculation
+		Collection<EventDetector> events = ephemeris.getEventsDetectors();
+		ephemeris.clearEventsDetectors();
+
 		for (int i = 0; i < ptsLead; i++) {
 			double ptTime = lastAscendingNodeTime + i
 					* (leadEndTime - lastAscendingNodeTime) / (ptsLead - 1);
@@ -489,6 +442,11 @@ public class CustomSatellite extends AbstractSatellite {
 			timeLag[i] = ptTime;
 
 		} // for each lag point
+
+		// Restore events
+		for (EventDetector event : events)
+			ephemeris.addEventDetector(event);
+
 	} // fillGroundTrack
 
 	// takes in JulDate
@@ -517,11 +475,8 @@ public class CustomSatellite extends AbstractSatellite {
 		}
 
 		GeodeticPoint geodeticPoint = null;
-	
 
-			geodeticPoint = this.earth.transform(pos, this.ITRF2005,
-					orekitJulDate);
-		
+		geodeticPoint = this.earth.transform(pos, this.ITRF2005, orekitJulDate);
 
 		double[] ptLlaXyz = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude(),
@@ -569,6 +524,10 @@ public class CustomSatellite extends AbstractSatellite {
 			timeLag = new double[] {};
 		} else {
 			// ground track needs to be initalized
+
+			// <<<<<<<<>soit retirer puis ajouter les evt comme au dessus soit
+			// le faire pour tous dans
+			// initializegroundtrack>>>>>>>
 			initializeGroundTrack();
 		}
 	}
@@ -681,8 +640,6 @@ public class CustomSatellite extends AbstractSatellite {
 	double[] getTimeLag() {
 		return timeLag;
 	}
-
-
 
 	// 3D model -------------------------
 
