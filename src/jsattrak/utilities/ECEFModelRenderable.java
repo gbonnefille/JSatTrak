@@ -200,8 +200,6 @@ public class ECEFModelRenderable implements Renderable {
 					double[] eventPosition = eventPositionIterator.next();
 					String eventName = eventNameIterator.next();
 
-					int sz = sat.getEventPosition2DPixelSize();
-
 					Vec4 pos = globe.computePointFromPosition(
 							Angle.fromDegrees(eventPosition[1] * 180.0
 									/ Math.PI),

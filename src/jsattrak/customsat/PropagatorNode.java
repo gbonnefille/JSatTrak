@@ -62,9 +62,11 @@ import org.orekit.forces.gravity.HolmesFeatherstoneAttractionModel;
 import org.orekit.forces.gravity.ThirdBodyAttraction;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
 import org.orekit.forces.gravity.potential.NormalizedSphericalHarmonicsProvider;
+import org.orekit.forces.gravity.potential.UnnormalizedSphericalHarmonicsProvider;
 import org.orekit.forces.maneuvers.ConstantThrustManeuver;
 import org.orekit.forces.maneuvers.ImpulseManeuver;
 import org.orekit.forces.radiation.SolarRadiationPressure;
+import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.orbits.Orbit;
 import org.orekit.propagation.BoundedPropagator;
@@ -73,6 +75,11 @@ import org.orekit.propagation.analytical.EcksteinHechlerPropagator;
 import org.orekit.propagation.analytical.KeplerianPropagator;
 import org.orekit.propagation.events.AbstractDetector;
 import org.orekit.propagation.numerical.NumericalPropagator;
+import org.orekit.propagation.semianalytical.dsst.DSSTPropagator;
+import org.orekit.propagation.semianalytical.dsst.forces.DSSTAtmosphericDrag;
+import org.orekit.propagation.semianalytical.dsst.forces.DSSTCentralBody;
+import org.orekit.propagation.semianalytical.dsst.forces.DSSTSolarRadiationPressure;
+import org.orekit.propagation.semianalytical.dsst.forces.DSSTThirdBody;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
 import org.orekit.utils.PVCoordinatesProvider;
@@ -118,7 +125,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 	private double area = 5.0; // [m^2] Cross-section Area
 	private double CR = 1.3; // Solar radiation pressure coefficient
 	private double CD = 1.5; // spacecraft drag coefficient
-	private double stepSize = 60.0; // seconds 
+	private double stepSize = 60.0; // seconds
 	// Hprop 7-8 unique
 	private double minStepSize = 1.0; // 1 second
 	private double maxStepSize = 600.0; // 10 minutes
@@ -236,8 +243,12 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// Earth Gravity model
 			NormalizedSphericalHarmonicsProvider provider = GravityFieldFactory
 					.getNormalizedProvider(n_max, m_max);
+
+			Frame earthFrame = CelestialBodyFactory.getEarth()
+					.getBodyOrientedFrame();
+
 			prop.addForceModel(new HolmesFeatherstoneAttractionModel(
-					FramesFactory.getITRF2008(), provider));
+					earthFrame, provider));
 			// 3rd bodies
 
 			if (this.includeSunPert) {
@@ -433,7 +444,137 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 			// ////////////////////////////
 
 		} else if (propogator == PropagatorNode.SEMIANALYTICAL) {
-			// Not implemented yet
+
+			double[][] tolerance = NumericalPropagator.tolerances(this.dP,
+					this.orbitOrekit, this.orbitOrekit.getType());
+
+			DormandPrince853Integrator dormanIntegrator = new DormandPrince853Integrator(
+					this.minStepSize, this.maxStepSize, tolerance[0],
+					tolerance[1]);
+
+			DSSTPropagator prop = new DSSTPropagator(dormanIntegrator);
+
+			// Add impulse maneuvers
+			if (!impulseManeuver.isEmpty()) {
+
+				Iterator<ImpulseManeuver> impulseManeuverIterator = this.impulseManeuver
+						.iterator();
+
+				while (impulseManeuverIterator.hasNext()) {
+					ImpulseManeuver maneuver = impulseManeuverIterator.next();
+
+					prop.addEventDetector(maneuver);
+
+				}
+			}
+
+			prop.setInitialState(new SpacecraftState(this.orbitOrekit,
+					this.mass));
+
+			// Earth Gravity model
+
+			Frame earthFrame = CelestialBodyFactory.getEarth()
+					.getBodyOrientedFrame();
+
+			UnnormalizedSphericalHarmonicsProvider provider = GravityFieldFactory
+					.getConstantUnnormalizedProvider(n_max, m_max);
+
+			DSSTCentralBody earthGravity = new DSSTCentralBody(earthFrame,
+					Constants.WGS84_EARTH_ANGULAR_VELOCITY, provider);
+
+			prop.addForceModel(earthGravity);
+			// 3rd bodies
+
+			if (this.includeSunPert) {
+
+				prop.addForceModel(new DSSTThirdBody(CelestialBodyFactory
+						.getSun()));
+
+			}
+
+			if (this.includeLunarPert) {
+				prop.addForceModel(new DSSTThirdBody(CelestialBodyFactory
+						.getMoon()));
+			}
+
+			// Drag
+			if (this.includeAtmosDrag) {
+
+				OneAxisEllipsoid earth = new OneAxisEllipsoid(
+						Constants.WGS84_EARTH_EQUATORIAL_RADIUS,
+						Constants.WGS84_EARTH_FLATTENING,
+						FramesFactory.getITRF2008());
+				PVCoordinatesProvider sun = CelestialBodyFactory.getSun();
+
+				final String supportedNames = "(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\p{Digit}\\p{Digit}\\p{Digit}\\p{Digit}F10\\.(?:txt|TXT)";
+				MarshallSolarActivityFutureEstimation msafe = new MarshallSolarActivityFutureEstimation(
+						supportedNames, StrengthLevel.AVERAGE);
+				DataProvidersManager.getInstance().feed(
+						msafe.getSupportedNames(), msafe);
+				DTM2000 atmosphere = new DTM2000(msafe, sun, earth);
+				DSSTAtmosphericDrag drag = new DSSTAtmosphericDrag(atmosphere,
+						CD, area);
+
+				prop.addForceModel(drag);
+
+			}
+
+			// SRP
+			if (this.includeSolRadPress) {
+
+				// Solar radiation pressure force model
+				PVCoordinatesProvider sunSRP = CelestialBodyFactory.getSun();
+
+				DSSTSolarRadiationPressure pressureNUM = new DSSTSolarRadiationPressure(
+						this.CR, area, sunSRP,
+						Constants.WGS84_EARTH_EQUATORIAL_RADIUS);
+
+				prop.addForceModel(pressureNUM);
+			}
+
+			// // Add constant thrust maneuvers
+			// if (!constantThrustManeuvers.isEmpty()) {
+			//
+			// Iterator<ConstantThrustManeuver> constantThrustIterator =
+			// this.constantThrustManeuvers
+			// .iterator();
+			//
+			// while (constantThrustIterator.hasNext()) {
+			// ConstantThrustManeuver maneuver = constantThrustIterator
+			// .next();
+			//
+			// prop.addForceModel(maneuver);
+			//
+			// }
+			// }
+
+			// Activate the ephemeris mode
+			prop.setEphemerisMode();
+
+			// take into account the events if there is
+
+			prop.propagate(EndOfSimulation);
+
+			ephemeris = prop.getGeneratedEphemeris();
+
+			if (!eventDetector.isEmpty()) {
+
+				Iterator<AbstractDetector> eventIterator = this.eventDetector
+						.iterator();
+
+				while (eventIterator.hasNext()) {
+					AbstractDetector event = eventIterator.next();
+
+					ephemeris.addEventDetector(event);
+
+				}
+			}
+
+			missionDesign.setEphemeris(ephemeris);
+
+			// Reset the event if not use in the next simulation
+			this.eventDetector.clear();
+
 		} // /////////////
 			// ////TLE//////
 			// /////////////

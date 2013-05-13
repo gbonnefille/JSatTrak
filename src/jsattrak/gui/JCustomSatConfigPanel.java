@@ -29,10 +29,12 @@ import java.io.FileWriter;
 import java.text.DecimalFormat;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.event.InternalFrameListener;
 
 import jsattrak.customsat.EphemerisFromFileNode;
 import jsattrak.customsat.EventNode;
+import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.customsat.InputVariable;
 import jsattrak.customsat.ManeuverNode;
 import jsattrak.customsat.MissionTableModel;
@@ -153,6 +155,14 @@ public class JCustomSatConfigPanel extends javax.swing.JPanel {
 
 		// special case -- inserting an MANEUVER node
 		if (node.getNodeType().equalsIgnoreCase("Maneuver")) {
+
+			// Disable maneuver for TLE
+			if (sat.getMissionTree().getInitNode().getCoordinate() == InitialConditionsNode.TLE) {
+				JOptionPane.showMessageDialog(this,
+						"Maneuvers are not allowed with TLE", "Warning",
+						JOptionPane.WARNING_MESSAGE);
+				return;
+			}
 			treeTableModel.insertNodeInto(node, rootNode, 1);
 			return;
 		}
