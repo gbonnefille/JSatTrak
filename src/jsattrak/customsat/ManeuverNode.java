@@ -108,6 +108,7 @@ public class ManeuverNode extends CustomTreeTableNode {
 					.addConstantThrustManeuver(
 							new ConstantThrustManeuver(date, duration, thrust,
 									constantThrustIsp, direction));
+			
 			break;
 
 		case ManeuverNode.IMPULSE:

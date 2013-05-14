@@ -23,7 +23,7 @@ public class ImpulseManeuverJsat extends ImpulseManeuver {
 	@Override
 	public Action eventOccurred(SpacecraftState s, boolean increasing)
 			throws OrekitException {
-		return Action.RESET_STATE; 
+		return Action.RESET_STATE;
 	}
 
 }
