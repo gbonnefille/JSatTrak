@@ -41,7 +41,6 @@ import jsattrak.gui.JSatTrak;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.StateVector;
 import name.gano.astro.AstroConst;
 import name.gano.astro.GeoFunctions;
@@ -126,7 +125,7 @@ public class EventNode extends CustomTreeTableNode {
 			"dd MMM yyyy HH:mm:ss z");
 
 	private AbstractSatellite currentSat = null;
-	private Hashtable<String, AbstractSatellite> userSatList = null;
+	private Hashtable<String, CustomSatellite> userSatList = null;
 	private Hashtable<String, GroundStation> userGroundStationsList = null;
 
 	//
@@ -156,7 +155,7 @@ public class EventNode extends CustomTreeTableNode {
 
 	public EventNode(CustomTreeTableNode parentNode,
 			AbstractSatellite currentSat,
-			Hashtable<String, AbstractSatellite> satList,
+			Hashtable<String, CustomSatellite> satList,
 			Hashtable<String, GroundStation> groundStations) {
 		super(new String[] { "Event", "", "" }); // initialize node, default
 													// values
@@ -207,23 +206,10 @@ public class EventNode extends CustomTreeTableNode {
 
 					AbstractSatellite abstractSat = userSatList
 							.get(targetBodyObjectName);
-					// Test si c'est un satellite SGP4 ou custom
-					if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
-
-						SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
-						pvTarget = satSGP4.getOrekitTlePropagator();
-
-					} else if (abstractSat.getClass().equals(
-							CustomSatellite.class)) {
 
 						CustomSatellite customSat = (CustomSatellite) abstractSat;
 						pvTarget = customSat.getEphemeris();
-					} else {
 
-						throw new OrekitException(new DummyLocalizable(
-								"unknown satellite"));
-
-					}
 
 				}
 
@@ -319,23 +305,9 @@ public class EventNode extends CustomTreeTableNode {
 
 					AbstractSatellite abstractSat = userSatList
 							.get(targetBodyObjectName);
-					// Test si c'est un satellite SGP4 ou custom
-					if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
-
-						SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
-						pvTarget = satSGP4.getOrekitTlePropagator();
-
-					} else if (abstractSat.getClass().equals(
-							CustomSatellite.class)) {
 
 						CustomSatellite customSat = (CustomSatellite) abstractSat;
 						pvTarget = customSat.getEphemeris();
-					} else {
-
-						throw new OrekitException(new DummyLocalizable(
-								"unknown satellite"));
-
-					}
 
 				}
 
@@ -396,23 +368,9 @@ public class EventNode extends CustomTreeTableNode {
 
 					AbstractSatellite abstractSat = userSatList
 							.get(targetBodyObjectName);
-					// Test si c'est un satellite SGP4 ou custom
-					if (abstractSat.getClass().equals(SatelliteTleSGP4.class)) {
-
-						SatelliteTleSGP4 satSGP4 = (SatelliteTleSGP4) abstractSat;
-						pvTarget = satSGP4.getOrekitTlePropagator();
-
-					} else if (abstractSat.getClass().equals(
-							CustomSatellite.class)) {
 
 						CustomSatellite customSat = (CustomSatellite) abstractSat;
 						pvTarget = customSat.getEphemeris();
-					} else {
-
-						throw new OrekitException(new DummyLocalizable(
-								"unknown satellite"));
-
-					}
 
 				}
 
@@ -743,11 +701,11 @@ public class EventNode extends CustomTreeTableNode {
 		this.eventsParams = eventsParams;
 	}
 
-	public Hashtable<String, AbstractSatellite> getUserSatList() {
+	public Hashtable<String, CustomSatellite> getUserSatList() {
 		return userSatList;
 	}
 
-	public void setUserSatList(Hashtable<String, AbstractSatellite> userSatList) {
+	public void setUserSatList(Hashtable<String, CustomSatellite> userSatList) {
 		this.userSatList = userSatList;
 	}
 

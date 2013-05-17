@@ -235,8 +235,8 @@ import jsattrak.coverage.JSatTrakTimeDependent;
 import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.SatOption;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.ConsoleDialog;
 import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.J2DEarthPanelSave;
@@ -274,7 +274,7 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
     private String versionString = "Version 4.1.4  (7 Feb 2013)"; // Version of app
     
     // hastable to store all the statelites currently being processed
-    private Hashtable<String,AbstractSatellite> satHash = new Hashtable<String,AbstractSatellite>();
+    private Hashtable<String,CustomSatellite> satHash = new Hashtable<String,CustomSatellite>();
     
     // hastable to store all the Ground Stations
     private Hashtable<String,GroundStation> gsHash = new Hashtable<String,GroundStation>();
@@ -1763,13 +1763,13 @@ public class JSatTrak extends javax.swing.JFrame implements InternalFrameListene
     private void playBackButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_playBackButtonActionPerformed
     {//GEN-HEADEREND:event_playBackButtonActionPerformed
         currentPlayDirection = -1; // backwards
-        runAnimation(false);
+        runAnimation(true);
     }//GEN-LAST:event_playBackButtonActionPerformed
 
     private void stepBackButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_stepBackButtonActionPerformed
     {//GEN-HEADEREND:event_stepBackButtonActionPerformed
         currentPlayDirection = -1; // backward in time
-        updateTime(false);
+        updateTime(true);
     }//GEN-LAST:event_stepBackButtonActionPerformed
 
     private void playButtonActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_playButtonActionPerformed
@@ -2753,9 +2753,9 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
         JSatBrowser newBrowswer = new JSatBrowser(this, false, this);
         Hashtable<String,TLElements> tleHash = newBrowswer.getTleHash();
         
-        for (AbstractSatellite sat : satHash.values() )
+        for (CustomSatellite sat : satHash.values() )
         {
-            if (sat instanceof SatelliteTleSGP4) // if sat is a TLE/SGP4 sat
+            if (sat.isTle()) // if sat is a TLE/SGP4 sat
             {
                 String name = sat.getName();
                 TLElements newTLE = tleHash.get(name);
@@ -2786,7 +2786,7 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
             // make sat prop object and add it to the list
              try
              {
-                SatelliteTleSGP4 prop = new SatelliteTleSGP4(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2(),new SatOption());
+            	 CustomSatellite prop = new CustomSatellite(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2(),new SatOption());
             
                 // add sat to list
                 objListPanel.addSat2List(prop);
@@ -3213,7 +3213,7 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
                                        
                     // load satHash carefully
                     satHash.clear();
-                    Hashtable<String,AbstractSatellite> tempHash = openClass.getSatHash();
+                    Hashtable<String,CustomSatellite> tempHash = openClass.getSatHash();
                     for(String key : tempHash.keySet() )
                     {
                         satHash.put(key, tempHash.get(key)); // copy manually
@@ -3432,7 +3432,7 @@ private void lookFeelMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//
         return mainDesktopPane;
     }
 
-    public Hashtable<String, AbstractSatellite> getSatHash()
+    public Hashtable<String, CustomSatellite> getSatHash()
     {
         return satHash;
     }

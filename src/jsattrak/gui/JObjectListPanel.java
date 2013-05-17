@@ -43,7 +43,6 @@ import jsattrak.customsat.MissionTableModel;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.IconTreeNode;
 import jsattrak.utilities.IconTreeNodeRenderer;
 import jsattrak.utilities.ObjectTreeTransferHandler;
@@ -62,14 +61,14 @@ public class JObjectListPanel extends javax.swing.JPanel {
 	IconTreeNode topGSTreeNode; // top Ground Stations node
 
 	// hash table passed in
-	Hashtable<String, AbstractSatellite> satHash;
+	Hashtable<String, CustomSatellite> satHash;
 	Hashtable<String, GroundStation> gsHash;
 
 	// calling JSatTrak program (used to send actions back)
 	JSatTrak parentApp;
 
 	/** Creates new form JSatListPanel */
-	public JObjectListPanel(Hashtable<String, AbstractSatellite> satHashIn,
+	public JObjectListPanel(Hashtable<String, CustomSatellite> satHashIn,
 			Hashtable<String, GroundStation> gsHash, JSatTrak app) {
 		this.satHash = satHashIn; // save sat Hash table reference
 		this.gsHash = gsHash;
@@ -337,7 +336,7 @@ public class JObjectListPanel extends javax.swing.JPanel {
 
 			// Existing satellite
 			if (satHash.containsKey(nameSelected)) {
-				AbstractSatellite prop = satHash.get(nameSelected);
+				CustomSatellite prop = satHash.get(nameSelected);
 
 				// create create Sat Settings panel
 				newPanel = new SatSettingsPanel(prop, parentApp);
@@ -483,7 +482,7 @@ public class JObjectListPanel extends javax.swing.JPanel {
 	// End of variables declaration//GEN-END:variables
 
 	// requires sat Prop
-	public void addSat2List(AbstractSatellite prop) {
+	public void addSat2List(CustomSatellite prop) {
 		// add sat to hash
 		satHash.put(prop.getName(), prop);
 		try {
@@ -495,18 +494,10 @@ public class JObjectListPanel extends javax.swing.JPanel {
 			treeModel.insertNodeInto(newNode, topSatTreeNode,
 					topSatTreeNode.getChildCount());
 
-			// if SGP4 sat
-			if (prop instanceof SatelliteTleSGP4) {
-				newNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit()
-						.getImage(
-								getClass().getResource(
-										"/icons/custom/sat_icon_tle.png"))));
-			} else if (prop instanceof CustomSatellite) {
 				newNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit()
 						.getImage(
 								getClass().getResource(
 										"/icons/custom/sat_icon_cst.png"))));
-			}
 
 			// System.out.println("node added: " + name);
 			objectTree.scrollPathToVisible(getPath(newNode));
@@ -554,7 +545,7 @@ public class JObjectListPanel extends javax.swing.JPanel {
 		}
 
 		// add satellites to tree
-		for (AbstractSatellite sat : satHash.values()) {
+		for (CustomSatellite sat : satHash.values()) {
 			addSat2List(sat);
 		}
 

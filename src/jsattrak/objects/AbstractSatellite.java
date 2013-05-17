@@ -93,15 +93,11 @@ public abstract class AbstractSatellite implements Serializable {
 
 	public abstract double getPeriod();
 
-	public abstract double getSatTleEpochJulDate();
-
 	public abstract double[] getTimeLag();
 
 	public abstract double[] getTimeLead();
 
 	public abstract double getTleAgeDays();
-
-	public abstract double getTleEpochJD();
 
 	public abstract void propogate2JulDate(double julDate, boolean eventDetector)
 			throws OrekitException;

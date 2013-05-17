@@ -5,6 +5,8 @@ import org.orekit.propagation.analytical.tle.TLE;
 
 public class TLElements extends TLE {
 
+	private static final long serialVersionUID = 225572586110429121L;
+	
 	private String name = ""; // name line
 
 	public TLElements(String name, String line1, String line2)

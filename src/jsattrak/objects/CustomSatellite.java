@@ -23,8 +23,10 @@ package jsattrak.objects;
 import gov.nasa.worldwind.geom.Angle;
 import gov.nasa.worldwind.geom.Position;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.SatOption;
@@ -41,6 +43,7 @@ import org.orekit.errors.OrekitException;
 import org.orekit.frames.Frame;
 import org.orekit.frames.FramesFactory;
 import org.orekit.propagation.BoundedPropagator;
+import org.orekit.propagation.analytical.tle.TLEPropagator;
 import org.orekit.propagation.events.EventDetector;
 import org.orekit.time.AbsoluteDate;
 import org.orekit.utils.Constants;
@@ -56,7 +59,11 @@ public class CustomSatellite extends AbstractSatellite {
 
 	private static final long serialVersionUID = -7936848462137206875L;
 	// ====================================
-
+	
+	private TLElements tle;
+	
+	private boolean isTle = false;
+	
 	private BoundedPropagator ephemeris = null;
 
 	private ArrayList<double[]> eventPositions = new ArrayList<double[]>();
@@ -67,8 +74,14 @@ public class CustomSatellite extends AbstractSatellite {
 
 	private int eventPosition2DPixelSize = 10;
 
-	// Frame ITRF2005
+	// Terrestrial Frame ITRF2005
 	private final Frame ITRF2005 = FramesFactory.getITRF2005();
+	
+	//Inertial Frame
+	private final Frame inertialFrame = FramesFactory.getGCRF();
+	
+//	//Inertial Frame
+//		private final Frame inertialFrame = FramesFactory.getICRF();
 
 	// Earth model
 	private final OneAxisEllipsoid earth = new OneAxisEllipsoid(
@@ -86,8 +99,6 @@ public class CustomSatellite extends AbstractSatellite {
 	// current time - julian date
 	double currentJulianDate = -1;
 
-	// TLE epoch -- used to calculate how old is TLE - Julian Date
-	double tleEpochJD = -1; // no age
 
 	// current J2000 position and velocity vectors
 
@@ -118,6 +129,66 @@ public class CustomSatellite extends AbstractSatellite {
 		this.satOptions = satOptions;
 		// iniMissionTableModel(scenarioEpochDate);
 	}
+	
+	/**
+	 * Creates a new instance of SatelliteProps - default properties with given
+	 * name and TLE lines
+	 * 
+	 * @param name
+	 *            name of satellite
+	 * @param tleLine1
+	 *            first line of two line element
+	 * @param tleLine2
+	 *            second line of two line element
+	 * @throws Exception
+	 *             if TLE data is bad
+	 */
+	public CustomSatellite(String name, String tleLine1, String tleLine2,
+			SatOption satOptions) throws OrekitException {
+		// create internal Orekit TLE object
+
+		this.satOptions = satOptions;
+
+		this.name = name;
+		
+		this.isTle = true;
+		
+		tle = new TLElements(name, tleLine1, tleLine2);
+
+		// modele de propa sgp4 Orekit
+		ephemeris = TLEPropagator.selectExtrapolator(tle)
+				.getGeneratedEphemeris();
+
+		// randomly pick color for satellite
+		// === pick a random color
+		Random generator = new Random();
+		switch (generator.nextInt(6)) {
+		case 0:
+			satOptions.setSatColor(Color.red);
+			break;
+		case 1:
+			satOptions.setSatColor(Color.blue);
+			break;
+		case 2:
+			satOptions.setSatColor(Color.green);
+			break;
+		case 3:
+			satOptions.setSatColor(Color.white);
+			break;
+		case 4:
+			satOptions.setSatColor(Color.yellow);
+			break;
+		case 5:
+			satOptions.setSatColor(Color.orange);
+			break;
+		default:
+			satOptions.setSatColor(Color.red);
+			break;
+		} // random color switch
+
+		satOptions.setGroundTrackColor(satOptions.getSatColor());
+
+	}
 
 	@Override
 	public void propogate2JulDate(double julDate, boolean eventDetector)
@@ -127,7 +198,8 @@ public class CustomSatellite extends AbstractSatellite {
 		AbsoluteDate maxTime;
 		AbsoluteDate minTime;
 		Collection<EventDetector> events = null;
-
+		
+		//UTC time
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -172,9 +244,21 @@ public class CustomSatellite extends AbstractSatellite {
 					ephemeris.clearEventsDetectors();
 				}
 
-				PVCoordinates pvCoordinateInertialFrame = ephemeris
+
+				PVCoordinates pvCoordinateInertialFrame;
+				
+				if(!isTle){
+				
+				 pvCoordinateInertialFrame = ephemeris
 						.getPVCoordinates(orekitJulDate, this.missionTree
 								.getInitNode().getFrame());
+				}
+				else{
+					
+				pvCoordinateInertialFrame = ephemeris
+							.getPVCoordinates(orekitJulDate, inertialFrame);
+					
+				}
 
 				PVCoordinates pvCoordinateEarthFrame = ephemeris
 						.getPVCoordinates(orekitJulDate, ITRF2005);
@@ -263,8 +347,12 @@ public class CustomSatellite extends AbstractSatellite {
 
 		AbsoluteDate maxTime, minTime;
 
-		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
+		AbsoluteDate orekitJulDate;
+		
+		//UTC time
+		orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
+
 
 		// CAREFUL ON TIMES... TIME IN EPHMERIS IN TT NOT UTC!!
 
@@ -279,9 +367,17 @@ public class CustomSatellite extends AbstractSatellite {
 			if (orekitJulDate.compareTo(maxTime) <= 0
 					&& orekitJulDate.compareTo(minTime) >= 0) {
 
+				if(!this.isTle){
 				ptPos = ephemeris.getPVCoordinates(orekitJulDate,
 						this.missionTree.getInitNode().getFrame())
 						.getPosition();
+				}
+				else{
+					ptPos = ephemeris.getPVCoordinates(orekitJulDate,
+							inertialFrame)
+							.getPosition();
+					
+				}
 
 			}
 		} // if epeheris contains anything
@@ -370,9 +466,11 @@ public class CustomSatellite extends AbstractSatellite {
 		for (int i = 0; i < ptsLead; i++) {
 			double ptTime = lastAscendingNodeTime + i
 					* (leadEndTime - lastAscendingNodeTime) / (ptsLead - 1);
-
+			
+			//UTC time
 			AbsoluteDate absPtTime = AbsoluteDate.JULIAN_EPOCH
 					.shiftedBy(ptTime * 86400);
+
 
 			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
@@ -454,7 +552,8 @@ public class CustomSatellite extends AbstractSatellite {
 			throws OrekitException {
 
 		Vector3D ptPos = calculatePositionFromUT(julDate);
-
+		
+		//UTC time
 		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
 				.shiftedBy(julDate * 86400);
 
@@ -485,12 +584,19 @@ public class CustomSatellite extends AbstractSatellite {
 		return ptLlaXyz;
 	} // calculateLatLongAlt
 
-	// ==== empty functions to fulfill AbstractSatellite req ===========
 	@Override
-	public void updateTleData(TLElements newTLE) {
-	}
+	public void updateTleData(TLElements newTLE) throws OrekitException {
+		this.tle = newTLE; // save new TLE
 
-	// ==================================================================
+		// modele de propa sgp4 Orekit
+		ephemeris = TLEPropagator.selectExtrapolator(tle)
+				.getGeneratedEphemeris();
+
+		// ground track needs to be redone with new data
+		satOptions.setGroundTrackIni(false);
+
+		// System.out.println("Updated " + tle.getSatName() );
+	}
 
 	// other functions ================
 
@@ -601,10 +707,6 @@ public class CustomSatellite extends AbstractSatellite {
 
 	public String getName() {
 		return name;
-	}
-
-	public double getTleEpochJD() {
-		return tleEpochJD; // returns -1 since there is no TLE
 	}
 
 	public double getTleAgeDays() {
@@ -748,12 +850,6 @@ public class CustomSatellite extends AbstractSatellite {
 	}
 
 	@Override
-	public double getSatTleEpochJulDate() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
 	public void setName(String name) {
 		this.name = name;
 		this.missionTree.getRootNode().setValueAt(name, 0);
@@ -775,6 +871,10 @@ public class CustomSatellite extends AbstractSatellite {
 
 	public MissionTableModel getMissionTree() {
 		return missionTree;
+	}
+
+	public boolean isTle() {
+		return isTle;
 	}
 
 }

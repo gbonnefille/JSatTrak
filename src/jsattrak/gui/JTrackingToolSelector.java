@@ -27,8 +27,8 @@ import java.util.Hashtable;
 
 import javax.swing.DefaultListModel;
 
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import jsattrak.objects.SatelliteTleSGP4;
 
 /**
  *
@@ -37,7 +37,7 @@ import jsattrak.objects.SatelliteTleSGP4;
 public class JTrackingToolSelector extends javax.swing.JPanel
 {
     
-    Hashtable<String,SatelliteTleSGP4> satHash;
+    Hashtable<String,CustomSatellite> satHash;
     Hashtable<String,GroundStation> gsHash;
     JSatTrak app;
     
@@ -45,7 +45,7 @@ public class JTrackingToolSelector extends javax.swing.JPanel
     DefaultListModel gsListModel;
     
     /** Creates new form JTrackingToolSelector */
-    public JTrackingToolSelector(Hashtable<String,SatelliteTleSGP4> satHash, Hashtable<String,GroundStation> gsHash, JSatTrak app)
+    public JTrackingToolSelector(Hashtable<String,CustomSatellite> satHash, Hashtable<String,GroundStation> gsHash, JSatTrak app)
     {
         this.satHash = satHash;
         this.gsHash = gsHash;
@@ -64,7 +64,7 @@ public class JTrackingToolSelector extends javax.swing.JPanel
             gsListModel.addElement(gs.getStationName());
         }
         
-        for(SatelliteTleSGP4 sat : satHash.values())
+        for(CustomSatellite sat : satHash.values())
         {
             satListModel.addElement(sat.getName());
         }
@@ -197,7 +197,7 @@ public class JTrackingToolSelector extends javax.swing.JPanel
             return; // do nothing
         } // 
         
-        SatelliteTleSGP4 sat = satHash.get( satList.getSelectedValue().toString() );
+        CustomSatellite sat = satHash.get( satList.getSelectedValue().toString() );
         GroundStation gs = gsHash.get( gsList.getSelectedValue().toString() );
         
         // create a internal frame with a TrackingTool

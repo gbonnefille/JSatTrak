@@ -11,7 +11,6 @@ import java.io.File;
 
 import jsattrak.customsat.SatOption;
 import jsattrak.objects.CustomSatellite;
-import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.TLElements;
 
 import org.orekit.data.DataProvidersManager;
@@ -55,10 +54,10 @@ public class TestSGP4
         double julianDate = 2454992.0; // 09 Jun 2009 12:00:00.000 UTC
 
         // Create SGP4 satelite propogator
-        SatelliteTleSGP4 prop = null;
+        CustomSatellite prop = null;
         try
         {
-            prop = new SatelliteTleSGP4(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2(),new SatOption());
+            prop = new CustomSatellite(newTLE.getSatName(), newTLE.getLine1(), newTLE.getLine2(),new SatOption());
             prop.setShowGroundTrack(false); // if we arn't using the JSatTrak plots midas well turn this off to save CPU time
         }
         catch(Exception e)

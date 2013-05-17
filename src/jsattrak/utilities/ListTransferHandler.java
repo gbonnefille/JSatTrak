@@ -33,7 +33,6 @@ import javax.swing.JList;
 import jsattrak.customsat.SatOption;
 import jsattrak.gui.JSatTrak;
 import jsattrak.objects.CustomSatellite;
-import jsattrak.objects.SatelliteTleSGP4;
 
 public class ListTransferHandler extends StringTransferHandler  implements java.io.Serializable
 {
@@ -42,13 +41,13 @@ public class ListTransferHandler extends StringTransferHandler  implements java.
     private int addCount = 0;  //Number of items added.
     
     // hashtable reference -- used to keep track of all sats
-    Hashtable<String,SatelliteTleSGP4> satHash;
+    Hashtable<String,CustomSatellite> satHash;
     
     // parent App
     JSatTrak parentApp;
     
     // constructor
-    public ListTransferHandler(Hashtable<String,SatelliteTleSGP4> satHash, JSatTrak app)
+    public ListTransferHandler(Hashtable<String,CustomSatellite> satHash, JSatTrak app)
     {
         this.satHash = satHash;
         parentApp = app;
@@ -137,7 +136,7 @@ public class ListTransferHandler extends StringTransferHandler  implements java.
                 // add to hashTable
                 try
                 {
-                	SatelliteTleSGP4 prop = new SatelliteTleSGP4(name, tleLine1, tleLine2,new SatOption());
+                	CustomSatellite prop = new CustomSatellite(name, tleLine1, tleLine2,new SatOption());
 
                     satHash.put(name, prop);
 

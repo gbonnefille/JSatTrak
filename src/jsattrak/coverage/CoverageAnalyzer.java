@@ -34,6 +34,7 @@ import java.util.Vector;
 
 import jsattrak.gui.J2dEarthLabel2;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.GeoFunctions;
 import name.gano.astro.time.Time;
@@ -189,7 +190,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
      * @param gsHash
      */
     @Override
-    public void updateTime(final Time currentJulianDate, final Hashtable<String,AbstractSatellite> satHash, final Hashtable<String,GroundStation> gsHash)
+    public void updateTime(final Time currentJulianDate, final Hashtable<String,CustomSatellite> satHash, final Hashtable<String,GroundStation> gsHash)
     {
         if(!dynamicUpdating)
         {
@@ -206,7 +207,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
      * @param currentJulianDate
      * @param satHash
      */
-    public void performCoverageAnalysis(final Time currentJulianDate, final Hashtable<String,AbstractSatellite> satHash)
+    public void performCoverageAnalysis(final Time currentJulianDate, final Hashtable<String,CustomSatellite> satHash)
     {
         // if first time update, save time and quit (only start calc after first time step)
         if(lastMJD == -1)
@@ -862,5 +863,6 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
     public double getLastMJD() {
         return lastMJD;
     }
+
     
 } // CoverageAnalyzer

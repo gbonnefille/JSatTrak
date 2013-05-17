@@ -40,6 +40,7 @@ import java.util.Iterator;
 import javax.media.opengl.GL;
 
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.worldwind.geom.SphereObject;
 
@@ -49,7 +50,7 @@ import name.gano.worldwind.geom.SphereObject;
 public class ECEFModelRenderable implements Renderable {
 
 	// hash of sat props
-	Hashtable<String, AbstractSatellite> satHash;
+	Hashtable<String, CustomSatellite> satHash;
 
 	// ground stations
 	Hashtable<String, GroundStation> gsHash;
@@ -77,7 +78,7 @@ public class ECEFModelRenderable implements Renderable {
 	 * @param satHash
 	 * @param globe
 	 */
-	public ECEFModelRenderable(Hashtable<String, AbstractSatellite> satHash,
+	public ECEFModelRenderable(Hashtable<String, CustomSatellite> satHash,
 			Hashtable<String, GroundStation> gsHash, Globe globe) {
 		this.satHash = satHash;
 		this.gsHash = gsHash;

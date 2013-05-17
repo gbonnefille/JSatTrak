@@ -64,6 +64,7 @@ import javax.swing.event.PopupMenuListener;
 
 import jsattrak.coverage.JSatTrakRenderable;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import jsattrak.utilities.LandMassRegions;
 import name.gano.astro.bodies.Sun;
@@ -129,13 +130,13 @@ public class J2DEarthPanel extends JPanel implements ComponentListener , java.io
     {
         super(false); // no double buffering
         
-        Hashtable<String,AbstractSatellite> satHash = new Hashtable<String,AbstractSatellite>();
+        Hashtable<String,CustomSatellite> satHash = new Hashtable<String,CustomSatellite>();
         Hashtable<String,GroundStation> gsHash = new Hashtable<String, GroundStation>();
         iniObject(satHash,gsHash);
                
     }
     
-    public J2DEarthPanel(Hashtable<String,AbstractSatellite> satHash, Hashtable<String,GroundStation> gsHash, JToggleButton zoomInToggleButton, JToggleButton zoomOutToggleButton, JToggleButton recenterToggleButton, Time currentTime, Sun sun, JSatTrak app)
+    public J2DEarthPanel(Hashtable<String,CustomSatellite> satHash, Hashtable<String,GroundStation> gsHash, JToggleButton zoomInToggleButton, JToggleButton zoomOutToggleButton, JToggleButton recenterToggleButton, Time currentTime, Sun sun, JSatTrak app)
     {
         super(false);//not double buffered
        
@@ -166,7 +167,7 @@ public class J2DEarthPanel extends JPanel implements ComponentListener , java.io
         
     } // TwoDFrame
     
-    private void iniObject(Hashtable<String,AbstractSatellite> satHash, Hashtable<String,GroundStation> gsHash)
+    private void iniObject(Hashtable<String,CustomSatellite> satHash, Hashtable<String,GroundStation> gsHash)
     {
         //...Create the GUI and put it in the window...
         
@@ -288,7 +289,7 @@ public class J2DEarthPanel extends JPanel implements ComponentListener , java.io
                 
     } // ini Object
     
-    public void setSatHashTable(Hashtable<String,AbstractSatellite> satHash)
+    public void setSatHashTable(Hashtable<String,CustomSatellite> satHash)
     {
         imageMap.setSatHashTable(satHash);
         

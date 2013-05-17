@@ -34,7 +34,7 @@ import javax.swing.JInternalFrame;
 import jsattrak.customsat.gui.PropagatorPanel;
 import jsattrak.customsat.swingworker.MissionDesignPropagator;
 import jsattrak.gui.JSatTrak;
-import jsattrak.objects.SatelliteTleSGP4;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.StateVector;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.AstroConst;
@@ -584,7 +584,7 @@ public class PropagatorNode extends CustomTreeTableNode implements OrbitProblem 
 
 			String satName = initNode.getSatelliteTleName();
 
-			SatelliteTleSGP4 sat = new SatelliteTleSGP4(satName,
+			CustomSatellite sat = new CustomSatellite(satName,
 					tle.getLine1(), tle.getLine2(), new SatOption());
 
 			ephemeris = sat.getEphemeris();

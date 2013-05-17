@@ -44,7 +44,6 @@ import javax.swing.tree.TreePath;
 import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import jsattrak.objects.SatelliteTleSGP4;
 import jsattrak.utilities.IconTreeNode;
 import jsattrak.utilities.IconTreeNodeRenderer;
 import jsattrak.utilities.ObjectTreeTransferHandler;
@@ -63,7 +62,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 	IconTreeNode topGSTreeNode; // top Ground Stations node
 
 	// hash table passed in
-	Hashtable<String, AbstractSatellite> satHash;
+	Hashtable<String, CustomSatellite> satHash;
 	Hashtable<String, GroundStation> gsHash;
 
 	// calling JSatTrak program (used to send actions back)
@@ -71,7 +70,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 
 	/** Creates new form JObjectListInternalFrame */
 	public JObjectListInternalFrame(
-			Hashtable<String, AbstractSatellite> satHashIn,
+			Hashtable<String, CustomSatellite> satHashIn,
 			Hashtable<String, GroundStation> gsHash, JSatTrak app) {
 		this.satHash = satHashIn; // save sat Hash table reference
 		this.gsHash = gsHash;
@@ -389,7 +388,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 		String nameSelected = obj.toString();
 
 		if (satHash.containsKey(nameSelected)) {
-			AbstractSatellite prop = satHash.get(nameSelected);
+			CustomSatellite prop = satHash.get(nameSelected);
 
 			// create create Sat Settings panel
 			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp);
@@ -409,13 +408,11 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 			newPanel.setInternalFrame(iframe);
 
 			iframe.setContentPane(newPanel); // set contents pane
-			iframe.setSize(340, 380 + 80); // set size w,h (+80 for Nimbus)
 
-			if (prop instanceof CustomSatellite) {
 				// it needs a bigger panel!
 				iframe.setSize(340 + 35, 380 + 80); // set size w,h (+80 for
 													// Nimbus)
-			}
+
 
 			iframe.setVisible(true);
 			parentApp.addInternalFrame(iframe);
@@ -483,7 +480,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 	// End of variables declaration//GEN-END:variables
 
 	// requires sat Prop
-	public void addSat2List(AbstractSatellite prop) {
+	public void addSat2List(CustomSatellite prop) {
 		// add sat to hash
 		satHash.put(prop.getName(), prop);
 
@@ -496,18 +493,11 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 			treeModel.insertNodeInto(newNode, topSatTreeNode,
 					topSatTreeNode.getChildCount());
 
-			// if SGP4 sat
-			if (prop instanceof SatelliteTleSGP4) {
-				newNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit()
-						.getImage(
-								getClass().getResource(
-										"/icons/custom/sat_icon_tle.png"))));
-			} else if (prop instanceof CustomSatellite) {
+
 				newNode.setIcon(new ImageIcon(Toolkit.getDefaultToolkit()
 						.getImage(
 								getClass().getResource(
 										"/icons/custom/sat_icon_cst.png"))));
-			}
 
 			// System.out.println("node added: " + name);
 			objectTree.scrollPathToVisible(getPath(newNode));
@@ -555,7 +545,7 @@ public class JObjectListInternalFrame extends javax.swing.JInternalFrame {
 		}
 
 		// add satellites to tree
-		for (AbstractSatellite sat : satHash.values()) {
+		for (CustomSatellite sat : satHash.values()) {
 			addSat2List(sat);
 		}
 

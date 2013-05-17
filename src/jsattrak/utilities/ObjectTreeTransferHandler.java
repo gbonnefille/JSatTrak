@@ -38,10 +38,8 @@ import javax.swing.tree.TreePath;
 
 import jsattrak.customsat.SatOption;
 import jsattrak.gui.JSatTrak;
-import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import jsattrak.objects.SatelliteTleSGP4;
 
 /**
  *
@@ -54,7 +52,7 @@ public class ObjectTreeTransferHandler extends StringTransferHandler implements 
     private int addCount = 0;  //Number of items added.
         
     // hashtable reference -- used to keep track of all sats
-    Hashtable<String,AbstractSatellite> satHash;
+    Hashtable<String,CustomSatellite> satHash;
     
     Hashtable<String,GroundStation> gsHash;
     
@@ -66,7 +64,7 @@ public class ObjectTreeTransferHandler extends StringTransferHandler implements 
     IconTreeNode topGSTreeNode;
     
     // constructor
-    public ObjectTreeTransferHandler(Hashtable<String,AbstractSatellite> satHash, Hashtable<String,GroundStation> gsHash, JSatTrak app, IconTreeNode topSatTreeNode, IconTreeNode topGSTreeNode)
+    public ObjectTreeTransferHandler(Hashtable<String,CustomSatellite> satHash, Hashtable<String,GroundStation> gsHash, JSatTrak app, IconTreeNode topSatTreeNode, IconTreeNode topGSTreeNode)
     {
         this.satHash = satHash;
         this.gsHash = gsHash;
@@ -161,7 +159,7 @@ public class ObjectTreeTransferHandler extends StringTransferHandler implements 
                         try
                         {
                             // add to hashTable  -- this line is the one can can throw an exception if the data is bad
-                        	SatelliteTleSGP4 prop = new SatelliteTleSGP4(name, inLine1, inLine2,new SatOption());
+                        	CustomSatellite prop = new CustomSatellite(name, inLine1, inLine2,new SatOption());
                             satHash.put(name, prop);
 
                             // propogate satellite to current date

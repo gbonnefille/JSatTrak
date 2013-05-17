@@ -44,6 +44,7 @@ import jsattrak.coverage.CoverageAnalyzer;
 import jsattrak.coverage.GrayColorMap;
 import jsattrak.coverage.HotColorMap;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.UnoptimizedDeepCopy;
 import name.gano.astro.time.Time;
@@ -56,7 +57,9 @@ import org.orekit.errors.OrekitException;
  */
 public class JCoverageDialog extends javax.swing.JPanel
 {
-    Hashtable<String, AbstractSatellite> satHash;
+	private static final long serialVersionUID = 1L;
+	
+	Hashtable<String, CustomSatellite> satHash;
     CoverageAnalyzer ca;
     Vector<J2DEarthPanel> twoDWindowVec;
     Time currentJulianDate;
@@ -64,7 +67,7 @@ public class JCoverageDialog extends javax.swing.JPanel
     private JInternalFrame iframe;
 
     /** Creates new form JCoverageDialog */
-    public JCoverageDialog(CoverageAnalyzer ca, final Time currentJulianDate, JSatTrak app, Hashtable<String, AbstractSatellite> satHash, Vector<J2DEarthPanel> twoDWindowVec)
+    public JCoverageDialog(CoverageAnalyzer ca, final Time currentJulianDate, JSatTrak app, Hashtable<String, CustomSatellite> satHash, Vector<J2DEarthPanel> twoDWindowVec)
     {
         initComponents();
 
@@ -938,7 +941,7 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         return;
     }
     
-    final Hashtable<String, AbstractSatellite> tempSatHash = (Hashtable<String, AbstractSatellite>)UnoptimizedDeepCopy.copy(app.getSatHash());
+    final Hashtable<String, CustomSatellite> tempSatHash = (Hashtable<String, CustomSatellite>)UnoptimizedDeepCopy.copy(app.getSatHash());
 
     final double timeStep = app.getCurrentTimeStep(); // timestep to use in calculations SECONDS
 
@@ -966,7 +969,7 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             while(currentTime.getMJD() <= stopJulianDate.getMJD())
             {
                 // update position of satellites
-                for(AbstractSatellite sat : tempSatHash.values())
+                for(CustomSatellite sat : tempSatHash.values())
                 {
                     try {
 						sat.propogate2JulDate(currentTime.getJulianDate(),true);

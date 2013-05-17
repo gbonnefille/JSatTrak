@@ -31,7 +31,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 
-import jsattrak.objects.SatelliteTleSGP4;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.ListTransferHandler;
 
 import org.orekit.errors.OrekitException;
@@ -46,13 +46,13 @@ public class JSatListPanel extends javax.swing.JPanel {
 	DefaultListModel satListModel;
 
 	// hash table passed in
-	Hashtable<String, SatelliteTleSGP4> satHash;
+	Hashtable<String, CustomSatellite> satHash;
 
 	// calling JSatTrak program (used to send actions back)
 	JSatTrak parentApp;
 
 	/** Creates new form JSatListPanel */
-	public JSatListPanel(Hashtable<String, SatelliteTleSGP4> satHashIn,
+	public JSatListPanel(Hashtable<String, CustomSatellite> satHashIn,
 			JSatTrak app) {
 		satHash = satHashIn; // save sat Hash table reference
 		parentApp = app;
@@ -83,7 +83,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 			String nameSelected = satList.getSelectedValue().toString();
 
 			if (satHash.containsKey(nameSelected)) {
-				SatelliteTleSGP4 prop = satHash.get(nameSelected);
+				CustomSatellite prop = satHash.get(nameSelected);
 				double[] pos = prop.getJ2000Position().toArray();
 				// tleEpochText.setText( "" + prop.getSatTleEpochJulDate() +
 				// ", Pos= " + pos[0] +"," + pos[1] +"," + pos[2]);
@@ -198,7 +198,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 		String nameSelected = satList.getSelectedValue().toString();
 
 		if (satHash.containsKey(nameSelected)) {
-			SatelliteTleSGP4 prop = satHash.get(nameSelected);
+			CustomSatellite prop = satHash.get(nameSelected);
 
 			// create property Panel:
 			SatPropertyPanel newPanel = new SatPropertyPanel(prop);
@@ -231,7 +231,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 		String nameSelected = satList.getSelectedValue().toString();
 
 		if (satHash.containsKey(nameSelected)) {
-			SatelliteTleSGP4 prop = satHash.get(nameSelected);
+			CustomSatellite prop = satHash.get(nameSelected);
 
 			// create create Sat Settings panel
 			SatSettingsPanel newPanel = new SatSettingsPanel(prop, parentApp);
@@ -288,7 +288,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 	// End of variables declaration//GEN-END:variables
 
 	// requires sat Prop
-	public void addSat2List(SatelliteTleSGP4 prop) {
+	public void addSat2List(CustomSatellite prop) {
 		// add sat to hash
 		satHash.put(prop.getName(), prop);
 
@@ -308,7 +308,7 @@ public class JSatListPanel extends javax.swing.JPanel {
 	// clear list and refresh - (used in closing and opening scenario)
 	public void refreshSatList() {
 		satListModel.clear(); // clear list
-		for (SatelliteTleSGP4 sat : satHash.values()) {
+		for (CustomSatellite sat : satHash.values()) {
 			satListModel.addElement(sat.getName());
 		}
 

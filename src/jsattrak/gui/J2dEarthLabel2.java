@@ -43,6 +43,7 @@ import javax.swing.KeyStroke;
 
 import jsattrak.coverage.JSatTrakRenderable;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.AstroConst;
 import name.gano.astro.GeoFunctions;
@@ -64,7 +65,7 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 	public boolean showLatLong = true;
 
 	// hastable of all the satellites currently processing
-	private transient Hashtable<String, AbstractSatellite> satHash = new Hashtable<String, AbstractSatellite>();
+	private transient Hashtable<String, CustomSatellite> satHash = new Hashtable<String, CustomSatellite>();
 	private transient Hashtable<String, GroundStation> gsHash;
 
 	// rendering hints
@@ -110,7 +111,7 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 	private final DecimalFormat df = new DecimalFormat("#,##0.000");
 
 	public J2dEarthLabel2(ImageIcon image, double aspect,
-			Hashtable<String, AbstractSatellite> satHash,
+			Hashtable<String, CustomSatellite> satHash,
 			Hashtable<String, GroundStation> gsHash, Color backgroundColor,
 			Time currentTime, Sun sun, J2DEarthPanel earthPanel1) {
 		// super(image);
@@ -160,7 +161,7 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 	}
 
 	// used in case it needs to be updated
-	public void setSatHashTable(Hashtable<String, AbstractSatellite> satHash) {
+	public void setSatHashTable(Hashtable<String, CustomSatellite> satHash) {
 		this.satHash = satHash;
 	}
 

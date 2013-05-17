@@ -38,6 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.DefaultTableModel;
 
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import jsattrak.utilities.CustomFileFilter;
 import name.gano.astro.AER;
@@ -56,7 +57,9 @@ import org.orekit.errors.OrekitException;
  */
 public class JTrackingPanel extends javax.swing.JPanel {
 
-	Hashtable<String, AbstractSatellite> satHash;
+	private static final long serialVersionUID = -1423478751644863257L;
+	
+	Hashtable<String, CustomSatellite> satHash;
 	Hashtable<String, GroundStation> gsHash;
 
 	// data to tell if Lead/Lag data should be updated
@@ -89,7 +92,7 @@ public class JTrackingPanel extends javax.swing.JPanel {
 	 * @param currentJulianDate
 	 * @param app
 	 */
-	public JTrackingPanel(Hashtable<String, AbstractSatellite> satHash,
+	public JTrackingPanel(Hashtable<String, CustomSatellite> satHash,
 			Hashtable<String, GroundStation> gsHash, String timeAsStringIn,
 			Time currentJulianDate, JSatTrak app) {
 		this.satHash = satHash;

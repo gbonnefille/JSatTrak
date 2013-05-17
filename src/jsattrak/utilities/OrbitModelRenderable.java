@@ -44,6 +44,7 @@ import java.util.Hashtable;
 import javax.media.opengl.GL;
 
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import name.gano.astro.MathUtils;
 import name.gano.worldwind.geom.Cone;
 import name.gano.worldwind.geom.SphereObject;
@@ -54,7 +55,7 @@ import name.gano.worldwind.geom.SphereObject;
 public class OrbitModelRenderable implements Renderable {
 
 	// hash of sat props
-	Hashtable<String, AbstractSatellite> satHash;
+	Hashtable<String, CustomSatellite> satHash;
 
 	// Sphere Object
 	double sphereRadius = 100000;
@@ -76,7 +77,7 @@ public class OrbitModelRenderable implements Renderable {
 	 * @param satHash
 	 * @param globe
 	 */
-	public OrbitModelRenderable(Hashtable<String, AbstractSatellite> satHash,
+	public OrbitModelRenderable(Hashtable<String, CustomSatellite> satHash,
 			Globe globe) {
 		this.satHash = satHash;
 		this.globe = globe;

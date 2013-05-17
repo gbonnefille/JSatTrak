@@ -35,7 +35,6 @@ import javax.swing.event.InternalFrameListener;
 import jsattrak.customsat.MissionTableModel;
 import jsattrak.customsat.SatOption;
 import jsattrak.gui.JObjectListPanel.CloseListener;
-import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.RelativePath;
@@ -49,7 +48,7 @@ import org.orekit.errors.OrekitException;
 public class SatSettingsPanel extends javax.swing.JPanel implements
 		java.io.Serializable {
 
-	AbstractSatellite satProps;
+	CustomSatellite satProps;
 
 	private boolean okHit = false; // if okay was hit
 
@@ -80,7 +79,7 @@ public class SatSettingsPanel extends javax.swing.JPanel implements
 	 * @param satProps
 	 * @param app
 	 */
-	public SatSettingsPanel(AbstractSatellite satProps, JSatTrak app) {
+	public SatSettingsPanel(CustomSatellite satProps, JSatTrak app) {
 		initComponents();
 
 		this.satProps = satProps;

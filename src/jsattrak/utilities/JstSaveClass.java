@@ -41,6 +41,7 @@ import jsattrak.gui.J3DEarthPanel;
 import jsattrak.gui.JSatTrak;
 import jsattrak.gui.SatPropertyPanel;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.time.Time;
 
@@ -56,7 +57,7 @@ public class JstSaveClass implements Serializable
     private int appHeight;
 
     // main satHash to save
-    private Hashtable<String,AbstractSatellite> satHash;
+    private Hashtable<String,CustomSatellite> satHash;
     private Hashtable<String,GroundStation> gsHash;
     
     // vectors for the windows to save:
@@ -170,12 +171,12 @@ public class JstSaveClass implements Serializable
 
     } // JstSaveClass  constructor
 
-    public Hashtable<String, AbstractSatellite> getSatHash()
+    public Hashtable<String, CustomSatellite> getSatHash()
     {
         return satHash;
     }
 
-    public void setSatHash(Hashtable<String, AbstractSatellite> satHash)
+    public void setSatHash(Hashtable<String, CustomSatellite> satHash)
     {
         this.satHash = satHash;
     }

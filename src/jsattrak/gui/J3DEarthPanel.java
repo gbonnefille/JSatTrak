@@ -101,6 +101,7 @@ import javax.swing.event.ChangeListener;
 
 import jsattrak.coverage.CoverageAnalyzer;
 import jsattrak.objects.AbstractSatellite;
+import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import jsattrak.utilities.ECEFModelRenderable;
 import jsattrak.utilities.J3DEarthComponent;
@@ -160,7 +161,7 @@ public class J3DEarthPanel extends javax.swing.JPanel implements J3DEarthCompone
     private JSatTrak app; // used to force repaints
     // Star layer - for rotation if in ECI
     StarsLayer starsLayer;
-    Hashtable<String, AbstractSatellite> satHash;
+    Hashtable<String, CustomSatellite> satHash;
     Hashtable<String, GroundStation> gsHash;
         
     
@@ -197,7 +198,7 @@ public class J3DEarthPanel extends javax.swing.JPanel implements J3DEarthCompone
      * @param currentMJD
      * @param app 
      */
-    public J3DEarthPanel(JDialog parent, Hashtable<String, AbstractSatellite> satHash, Hashtable<String, GroundStation> gsHash, double currentMJD, JSatTrak app)
+    public J3DEarthPanel(JDialog parent, Hashtable<String, CustomSatellite> satHash, Hashtable<String, GroundStation> gsHash, double currentMJD, JSatTrak app)
     {
         this.parent = parent;
         this.app = app;
