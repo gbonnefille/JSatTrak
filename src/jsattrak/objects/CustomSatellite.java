@@ -191,17 +191,13 @@ public class CustomSatellite extends AbstractSatellite {
 	}
 
 	@Override
-	public void propogate2JulDate(double julDate, boolean eventDetector)
+	public void propogate2JulDate(AbsoluteDate orekitJulDate, boolean eventDetector)
 			throws OrekitException {
 		// save date
-		this.currentJulianDate = julDate; // UTC
+		this.currentJulianDate = orekitJulDate.durationFrom(AbsoluteDate.JULIAN_EPOCH)/86400;
 		AbsoluteDate maxTime;
 		AbsoluteDate minTime;
 		Collection<EventDetector> events = null;
-		
-		//UTC time
-		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
-				.shiftedBy(julDate * 86400);
 
 		// find the nodes closest to the current time
 		if (ephemeris != null) //
@@ -298,7 +294,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 					if ((satOptions.isGroundTrackIni() == false || oldLLA == null)
 							|| (oldLLA[0] < 0 && lla[0] >= 0)
-							|| (timeLead[timeLead.length - 1] < julDate || timeLag[0] > julDate)) {
+							|| (timeLead[timeLead.length - 1] < this.currentJulianDate || timeLag[0] > this.currentJulianDate)) {
 						initializeGroundTrack();
 						lastStepInitGroundTrack = true;
 					}
@@ -341,18 +337,11 @@ public class CustomSatellite extends AbstractSatellite {
 	 * @throws OrekitException
 	 */
 	@Override
-	public Vector3D calculatePositionFromUT(double julDate)
+	public Vector3D calculatePositionFromUT(AbsoluteDate orekitAbsoluteDate)
 			throws OrekitException {
 		Vector3D ptPos = Vector3D.ZERO;
 
 		AbsoluteDate maxTime, minTime;
-
-		AbsoluteDate orekitJulDate;
-		
-		//UTC time
-		orekitJulDate = AbsoluteDate.JULIAN_EPOCH
-				.shiftedBy(julDate * 86400);
-
 
 		// CAREFUL ON TIMES... TIME IN EPHMERIS IN TT NOT UTC!!
 
@@ -364,16 +353,16 @@ public class CustomSatellite extends AbstractSatellite {
 			maxTime = ephemeris.getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
-			if (orekitJulDate.compareTo(maxTime) <= 0
-					&& orekitJulDate.compareTo(minTime) >= 0) {
+			if (orekitAbsoluteDate.compareTo(maxTime) <= 0
+					&& orekitAbsoluteDate.compareTo(minTime) >= 0) {
 
 				if(!this.isTle){
-				ptPos = ephemeris.getPVCoordinates(orekitJulDate,
+				ptPos = ephemeris.getPVCoordinates(orekitAbsoluteDate,
 						this.missionTree.getInitNode().getFrame())
 						.getPosition();
 				}
 				else{
-					ptPos = ephemeris.getPVCoordinates(orekitJulDate,
+					ptPos = ephemeris.getPVCoordinates(orekitAbsoluteDate,
 							inertialFrame)
 							.getPosition();
 					
@@ -412,7 +401,6 @@ public class CustomSatellite extends AbstractSatellite {
 
 		// lastAscendingNodeTime = outJul;
 		// assume last ascending node is now
-		lastAscendingNodeTime = currentJulianDate;
 
 		double leadEndTime = lastAscendingNodeTime
 				+ satOptions.getGroundTrackLeadPeriodMultiplier() * periodMin
@@ -476,7 +464,7 @@ public class CustomSatellite extends AbstractSatellite {
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
 
 				// PUT HERE calculate lat lon
-				double[] ptLlaXyz = calculateLatLongAltXyz(ptTime);
+				double[] ptLlaXyz = calculateLatLongAltXyz(absPtTime);
 
 				latLongLead[i][0] = ptLlaXyz[0]; // save lat
 				latLongLead[i][1] = ptLlaXyz[1]; // save long
@@ -517,7 +505,7 @@ public class CustomSatellite extends AbstractSatellite {
 			if (absPtTime.compareTo(ephemeris.getMinDate()) >= 0
 					&& absPtTime.compareTo(ephemeris.getMaxDate()) <= 0) {
 
-				double[] ptLlaXyz = calculateLatLongAltXyz(ptTime);
+				double[] ptLlaXyz = calculateLatLongAltXyz(absPtTime);
 
 				latLongLag[i][0] = ptLlaXyz[0]; // save lat
 				latLongLag[i][1] = ptLlaXyz[1]; // save long
@@ -548,16 +536,11 @@ public class CustomSatellite extends AbstractSatellite {
 	} // fillGroundTrack
 
 	// takes in JulDate
-	private double[] calculateLatLongAltXyz(double julDate)
-			throws OrekitException {
-
-		Vector3D ptPos = calculatePositionFromUT(julDate);
-		
-		//UTC time
-		AbsoluteDate orekitJulDate = AbsoluteDate.JULIAN_EPOCH
-				.shiftedBy(julDate * 86400);
+	private double[] calculateLatLongAltXyz(AbsoluteDate absoluteDate)
+			throws OrekitException {		
 
 		Vector3D pos = Vector3D.ZERO;
+		Vector3D ptPos = Vector3D.ZERO;
 		if (ephemeris != null) //
 		{
 
@@ -565,17 +548,30 @@ public class CustomSatellite extends AbstractSatellite {
 			AbsoluteDate maxTime = ephemeris.getMaxDate();
 
 			// see if the current time in inside of the ephemeris range
-			if (orekitJulDate.compareTo(maxTime) <= 0
-					&& orekitJulDate.compareTo(minTime) >= 0) {
+			if (absoluteDate.compareTo(maxTime) <= 0
+					&& absoluteDate.compareTo(minTime) >= 0) {
 
-				pos = ephemeris.getPVCoordinates(orekitJulDate, this.ITRF2005)
+				ptPos = ephemeris.getPVCoordinates(absoluteDate, this.inertialFrame)
 						.getPosition();
+				
+				
+				if(!this.isTle){
+					pos = ephemeris.getPVCoordinates(absoluteDate,
+							this.missionTree.getInitNode().getFrame())
+							.getPosition();
+					}
+					else{
+						pos = ephemeris.getPVCoordinates(absoluteDate,
+								ITRF2005)
+								.getPosition();
+						
+					}
+				
 			}
 		}
 
-		GeodeticPoint geodeticPoint = null;
 
-		geodeticPoint = this.earth.transform(pos, this.ITRF2005, orekitJulDate);
+		GeodeticPoint geodeticPoint = this.earth.transform(pos, this.ITRF2005, absoluteDate);
 
 		double[] ptLlaXyz = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude(),

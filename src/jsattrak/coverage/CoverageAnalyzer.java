@@ -37,13 +37,14 @@ import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.GeoFunctions;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 /**
  *
  * @author Shawn
  */
-public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependent
+public class CoverageAnalyzer implements JSatTrakRenderable,
+		JSatTrakTimeDependent
 {
     // data arrays
     private  double[][] coverageCumTime;  // cumulative coverage time array [latPanels x longPanels] in days
@@ -56,8 +57,8 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
     private double minNotZeroVal = 1;  // current maximum and minimum (NOT ZERO) values 
     private double maxVal = 100;
     
-    private Time startTime = new Time(); // keep track of start time
-    
+    private TimeOrekit currentOrekitTime = null;
+
     // color map for data
     ColorMap colorMap = new ColorMap();
     
@@ -100,11 +101,12 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
      * Constructor with current time - this will allow coverage to start on next time step
      * @param currentJulianDate current Julian Date
      */
-    public CoverageAnalyzer(final Time currentJulianDate)
+    public CoverageAnalyzer(final TimeOrekit currentDateTime)
     {
+    	this.currentOrekitTime = currentDateTime;
         iniParamters();
-        lastMJD = currentJulianDate.getMJD();
-        startTime.set(currentJulianDate.getCurrentGregorianCalendar().getTimeInMillis());        
+        lastMJD = currentDateTime.getModifiedJulianDay();
+//        startTime.set(currentDateTime.durationFrom(AbsoluteDate.JAVA_EPOCH)*1000.0);        
     }
     
 //    /**
@@ -126,11 +128,12 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
      * Clear coverage data and initalizie update time for next simulation step
      * @param currentJulianDate
      */
-    public void clearCoverageData(final Time currentJulianDate)
+    public void clearCoverageData(final TimeOrekit currentDateTime)
     {
+    	this.currentOrekitTime = currentDateTime;
         iniParamters();
-        lastMJD = currentJulianDate.getMJD();
-        startTime.set(currentJulianDate.getCurrentGregorianCalendar().getTimeInMillis());
+        lastMJD = currentDateTime.getModifiedJulianDay();
+//        startTime.set(currentJulianDate.getCurrentGregorianCalendar().getTimeInMillis());
     }
     
     /**
@@ -190,7 +193,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
      * @param gsHash
      */
     @Override
-    public void updateTime(final Time currentJulianDate, final Hashtable<String,CustomSatellite> satHash, final Hashtable<String,GroundStation> gsHash)
+    public void updateTime(final TimeOrekit currentJulianDate, final Hashtable<String,CustomSatellite> satHash, final Hashtable<String,GroundStation> gsHash)
     {
         if(!dynamicUpdating)
         {
@@ -207,24 +210,27 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
      * @param currentJulianDate
      * @param satHash
      */
-    public void performCoverageAnalysis(final Time currentJulianDate, final Hashtable<String,CustomSatellite> satHash)
+    public void performCoverageAnalysis(final TimeOrekit currentDateTime, final Hashtable<String,CustomSatellite> satHash)
     {
         // if first time update, save time and quit (only start calc after first time step)
         if(lastMJD == -1)
         {
-            lastMJD = currentJulianDate.getMJD();
-            startTime.set(currentJulianDate.getCurrentGregorianCalendar().getTimeInMillis());
+        	this.currentOrekitTime = currentDateTime;
+        	lastMJD = currentDateTime.getModifiedJulianDay();
+//            startTime.set(currentJulianDate.getCurrentGregorianCalendar().getTimeInMillis());
             return;
         }
         
+        double mjd = currentDateTime.getModifiedJulianDay();
+        
         // check time make sure this time is past when the last time update was 
-        if(currentJulianDate.getMJD() <= lastMJD)
+        if(mjd <= lastMJD)
         {
             return; // do nothing as this time is later
         }
         // calc time diff, and save time
-        double timeDiffDays = currentJulianDate.getMJD() - lastMJD;
-        lastMJD = currentJulianDate.getMJD();
+        double timeDiffDays = mjd - lastMJD;
+        lastMJD = mjd;
         
         // create temp array for time cumlation (so we don't double count sat coverage)
         // each panel either has access or it doesn't for the current time step -- boolean 
@@ -270,7 +276,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                 {
                     // take care of when i >= latPanels (reflection for longitude index and make lat go down instead of up (and stay at top one iter)
                     
-                    aer = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(), 
+                    aer = GeoFunctions.calculate_AER(currentDateTime.getJulianDay(), 
                         new double[]{getLatPanelMidPoints()[i],getLonPanelMidPoints()[longIndex],0},  // sea level
                         currentSat.getJ2000Position().toArray());
                     
@@ -297,7 +303,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                                 jWrappedIndex = j;
                             }
                             
-                            tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(), 
+                            tempElevation2 = GeoFunctions.calculate_AER(currentDateTime.getJulianDay(), 
                                 new double[]{getLatPanelMidPoints()[i],getLonPanelMidPoints()[jWrappedIndex],0},  // sea level
                                 currentSat.getJ2000Position().toArray())[1];
                             if(tempElevation2 >= elevationLimit)
@@ -329,7 +335,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                                 jWrappedIndex = j;
                             }
                             
-                            tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(), 
+                            tempElevation2 = GeoFunctions.calculate_AER(currentDateTime.getJulianDay(), 
                                 new double[]{getLatPanelMidPoints()[i],getLonPanelMidPoints()[jWrappedIndex],0},  // sea level
                                 currentSat.getJ2000Position().toArray())[1];
                             if(tempElevation2 >= elevationLimit)
@@ -356,7 +362,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                     do
                     {
                         // take care of when i >= latPanels (reflection for longitude index and make lat go down instead of up (and stay at top one iter)
-                        aer = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(),
+                        aer = GeoFunctions.calculate_AER(currentDateTime.getJulianDay(),
                                 new double[]
                                 {
                                     getLatPanelMidPoints()[i], getLonPanelMidPoints()[longIndex], 0
@@ -388,7 +394,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                                     jWrappedIndex = j;
                                 }
 
-                                tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(),
+                                tempElevation2 = GeoFunctions.calculate_AER(currentDateTime.getJulianDay(),
                                         new double[] {getLatPanelMidPoints()[i], getLonPanelMidPoints()[jWrappedIndex], 0}, // sea level
                                         currentSat.getJ2000Position().toArray())[1];
                                 if (tempElevation2 >= elevationLimit)
@@ -420,7 +426,7 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
                                     jWrappedIndex = j;
                                 }
                                 
-                                tempElevation2 = GeoFunctions.calculate_AER(currentJulianDate.getJulianDate(),
+                                tempElevation2 = GeoFunctions.calculate_AER(currentDateTime.getJulianDay(),
                                         new double[]{getLatPanelMidPoints()[i], getLonPanelMidPoints()[jWrappedIndex], 0}, // sea level
                                         currentSat.getJ2000Position().toArray())[1];
                                 if (tempElevation2 >= elevationLimit)
@@ -856,8 +862,8 @@ public class CoverageAnalyzer implements JSatTrakRenderable,JSatTrakTimeDependen
         return colorBarNumberFormat.format(maxVal*24*60*60);
     }
 
-    public Time getStartTime() {
-        return startTime;
+    public TimeOrekit getStartTime() {
+        return this.currentOrekitTime;
     }
 
     public double getLastMJD() {

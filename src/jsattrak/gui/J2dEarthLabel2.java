@@ -48,7 +48,7 @@ import jsattrak.objects.GroundStation;
 import name.gano.astro.AstroConst;
 import name.gano.astro.GeoFunctions;
 import name.gano.astro.bodies.Sun;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 	// options -------- (look in Panel too)
@@ -100,7 +100,7 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 	private double earthLightsLastUpdateMJD = 0; // last time the earth lights
 													// mask was update
 
-	private transient Time currentTime; // object storing the current time
+	private transient TimeOrekit currentTime; // object storing the current time
 
 	// need a copy of the parent J2DEarthPanel -- just for Earth lights function
 	private transient J2DEarthPanel earthPanel;
@@ -113,7 +113,7 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 	public J2dEarthLabel2(ImageIcon image, double aspect,
 			Hashtable<String, CustomSatellite> satHash,
 			Hashtable<String, GroundStation> gsHash, Color backgroundColor,
-			Time currentTime, Sun sun, J2DEarthPanel earthPanel1) {
+			TimeOrekit currentTime, Sun sun, J2DEarthPanel earthPanel1) {
 		// super(image);
 		aspectRatio = aspect;
 		this.satHash = satHash;
@@ -171,11 +171,13 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 		// use Scaling Options from J2DEarthPath
 		if (showEarthLightsMask) {
 			// check here if the time has been advanced
-			if (earthLightsLastUpdateMJD != this.currentTime.getMJD()) {
+			if (earthLightsLastUpdateMJD != this.currentTime
+					.getModifiedJulianDay()) {
 				// MUST UPDATE WHEN TIME UPDATES... but only darkness mask and
 				// recombine!
 				earthPanel.updateEarthLightMaskAndRecombineImage();
-				earthLightsLastUpdateMJD = this.currentTime.getMJD();
+				earthLightsLastUpdateMJD = this.currentTime
+						.getModifiedJulianDay();
 			}
 		} // if showEarthLightsMask
 
@@ -1940,7 +1942,7 @@ public class J2dEarthLabel2 extends JLabel implements java.io.Serializable {
 
 		if (showEarthLightsMask) {
 			// set intial time
-			earthLightsLastUpdateMJD = this.currentTime.getMJD();
+			earthLightsLastUpdateMJD = this.currentTime.getModifiedJulianDay();
 		}
 	}
 }

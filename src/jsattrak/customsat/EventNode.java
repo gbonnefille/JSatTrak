@@ -67,8 +67,8 @@ import org.orekit.bodies.CelestialBodyFactory;
 import org.orekit.bodies.OneAxisEllipsoid;
 import org.orekit.errors.OrekitException;
 import org.orekit.forces.gravity.potential.GravityFieldFactory;
-import org.orekit.forces.gravity.potential.PotentialCoefficientsProvider;
-import org.orekit.frames.FramesFactory;
+import org.orekit.forces.gravity.potential.UnnormalizedSphericalHarmonicsProvider;
+import org.orekit.frames.Frame;
 import org.orekit.frames.TopocentricFrame;
 import org.orekit.propagation.events.AbstractDetector;
 import org.orekit.time.AbsoluteDate;
@@ -89,6 +89,11 @@ public class EventNode extends CustomTreeTableNode {
 	public static final int VTHRUST = 0;
 	public static final int NTHRUST = 0;
 	public static final int CTHRUST = 0;
+	
+	//Parameters for potential provider
+	private int n_max = 20; // degree
+	private int m_max = 20; // order
+	
 
 	// variables that can be set data ----------
 	String[] varNames = new String[] { "V-Thrust [m/s]", "N-Thrust [m/s]",
@@ -182,12 +187,16 @@ public class EventNode extends CustomTreeTableNode {
 			throws OrekitException, IOException, ParseException {
 		
 
+		//Earth frame
+		Frame earthFrame = CelestialBodyFactory.getEarth()
+				.getBodyOrientedFrame();
+		
 		// Compute the event
 		AbstractDetector eventDetector = null;
 
 		GroundStation groundStation = null;
 
-		PotentialCoefficientsProvider provider = null;
+		UnnormalizedSphericalHarmonicsProvider provider = null;
 
 		OneAxisEllipsoid earth = null;
 
@@ -221,12 +230,12 @@ public class EventNode extends CustomTreeTableNode {
 					// Factory used to read gravity field files in several
 					// supported
 					// formats
-					provider = GravityFieldFactory.getPotentialProvider();
+					provider = GravityFieldFactory.getUnnormalizedProvider(n_max, m_max);
 					
 					// Earth central body reference radius
 					earth = new OneAxisEllipsoid(provider.getAe(),
 							Constants.WGS84_EARTH_FLATTENING,
-							FramesFactory.getITRF2005());
+							earthFrame);
 
 					pvTarget = new TopocentricFrame(earth,
 							groundStation.getLatLongAlt(),
@@ -258,12 +267,12 @@ public class EventNode extends CustomTreeTableNode {
 				// Factory used to read gravity field files in several
 				// supported
 				// formats
-				provider = GravityFieldFactory.getPotentialProvider();
+				provider = GravityFieldFactory.getUnnormalizedProvider(n_max, m_max);
 				// Earth central body reference radius
 
 				earth = new OneAxisEllipsoid(provider.getAe(),
 						Constants.WGS84_EARTH_FLATTENING,
-						FramesFactory.getITRF2005());
+						earthFrame);
 
 				eventDetector = new AltitudeDetectorJsat(this.currentSat,
 						eventsParams[0], earth);
@@ -277,12 +286,12 @@ public class EventNode extends CustomTreeTableNode {
 
 				// Factory used to read gravity field files in several supported
 				// formats
-				provider = GravityFieldFactory.getPotentialProvider();
+				provider = GravityFieldFactory.getUnnormalizedProvider(n_max, m_max);
 				
 				// Earth central body reference radius
 				earth = new OneAxisEllipsoid(provider.getAe(),
 						Constants.WGS84_EARTH_FLATTENING,
-						FramesFactory.getITRF2005());
+						earthFrame);
 
 				topo = new TopocentricFrame(earth,
 						groundStation.getLatLongAlt(),
@@ -319,12 +328,12 @@ public class EventNode extends CustomTreeTableNode {
 					// Factory used to read gravity field files in several
 					// supported
 					// formats
-					provider = GravityFieldFactory.getPotentialProvider();
+					provider = GravityFieldFactory.getUnnormalizedProvider(n_max, m_max);
 					
 					// Earth central body reference radius
 					earth = new OneAxisEllipsoid(provider.getAe(),
 							Constants.WGS84_EARTH_FLATTENING,
-							FramesFactory.getITRF2005());
+							earthFrame);
 
 					topo = new TopocentricFrame(earth,
 							groundStation.getLatLongAlt(),
@@ -382,12 +391,12 @@ public class EventNode extends CustomTreeTableNode {
 					// Factory used to read gravity field files in several
 					// supported
 					// formats
-					provider = GravityFieldFactory.getPotentialProvider();
+					provider = GravityFieldFactory.getUnnormalizedProvider(n_max, m_max);
 					
 					// Earth central body reference radius
 					earth = new OneAxisEllipsoid(provider.getAe(),
 							Constants.WGS84_EARTH_FLATTENING,
-							FramesFactory.getITRF2005());
+							earthFrame);
 
 					topo = new TopocentricFrame(earth,
 							groundStation.getLatLongAlt(),
@@ -437,13 +446,14 @@ public class EventNode extends CustomTreeTableNode {
 						.get(targetBodyObjectName);
 
 				// Factory used to read gravity field files in several supported
-				// formats
-				provider = GravityFieldFactory.getPotentialProvider();
+				// formats				 
+				
+				provider = GravityFieldFactory.getUnnormalizedProvider(n_max, m_max);
 				
 				// Earth central body reference radius
 				earth = new OneAxisEllipsoid(provider.getAe(),
 						Constants.WGS84_EARTH_FLATTENING,
-						FramesFactory.getITRF2005());
+						earthFrame);
 
 				topo = new TopocentricFrame(earth,
 						groundStation.getLatLongAlt(),

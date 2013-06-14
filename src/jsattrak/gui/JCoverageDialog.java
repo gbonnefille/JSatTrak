@@ -47,7 +47,7 @@ import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.utilities.CustomFileFilter;
 import jsattrak.utilities.UnoptimizedDeepCopy;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 import org.orekit.errors.OrekitException;
 
@@ -62,12 +62,12 @@ public class JCoverageDialog extends javax.swing.JPanel
 	Hashtable<String, CustomSatellite> satHash;
     CoverageAnalyzer ca;
     Vector<J2DEarthPanel> twoDWindowVec;
-    Time currentJulianDate;
+    TimeOrekit currentJulianDate;
     JSatTrak app;
     private JInternalFrame iframe;
 
     /** Creates new form JCoverageDialog */
-    public JCoverageDialog(CoverageAnalyzer ca, final Time currentJulianDate, JSatTrak app, Hashtable<String, CustomSatellite> satHash, Vector<J2DEarthPanel> twoDWindowVec)
+    public JCoverageDialog(CoverageAnalyzer ca, final TimeOrekit currentJulianDate, JSatTrak app, Hashtable<String, CustomSatellite> satHash, Vector<J2DEarthPanel> twoDWindowVec)
     {
         initComponents();
 
@@ -916,26 +916,41 @@ private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 
 private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_runButtonActionPerformed
     // first get dates from text fields
-    GregorianCalendar startCal = getDateFromText(startTextField.getText());
+    final GregorianCalendar startCal = getDateFromText(startTextField.getText());
     if(startCal == null)
     {
         JOptionPane.showMessageDialog(app, "Start Date is invalid", "Invalid Date", JOptionPane.WARNING_MESSAGE);
         return;
     }
-    final Time startJulianDate = new Time();
-    startJulianDate.set(startCal.getTimeInMillis());
+    
+ // create the starting absoluteDate
 
-    GregorianCalendar stopCal = getDateFromText(stopTextField.getText());
+
+ 		TimeOrekit startAbsoluteDate = new TimeOrekit(startCal);
+
+    
+//    final Time startJulianDate = new Time();
+//    startJulianDate.set(startCal.getTimeInMillis());
+
+    final GregorianCalendar stopCal = getDateFromText(stopTextField.getText());
     if(stopCal == null)
     {
         JOptionPane.showMessageDialog(app, "Stop Date is invalid", "Invalid Date", JOptionPane.WARNING_MESSAGE);
         return;
     }
-    final Time stopJulianDate = new Time();
-    stopJulianDate.set(stopCal.getTimeInMillis());
+    
+ // create the starting absoluteDate
+
+
+  		TimeOrekit stopAbsoluteDate = new TimeOrekit(stopCal);
+  		
+
+    
+//    final Time stopJulianDate = new Time();
+//    stopJulianDate.set(stopCal.getTimeInMillis());
 
     // make sure stop is after start
-    if(stopJulianDate.getMJD() <= startJulianDate.getMJD())
+    if(stopAbsoluteDate.getCurrentOrekitTime().compareTo(startAbsoluteDate.getCurrentOrekitTime())<=0)
     {
         JOptionPane.showMessageDialog(app, "Stop Date must be after Start Date", "Invalid Date", JOptionPane.WARNING_MESSAGE);
         return;
@@ -949,7 +964,7 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     dyanmicUpdateCheckBox.setSelected(false);
     this.saveSettings();
     ca.setDynamicUpdating(false); // in sure false
-    ca.clearCoverageData(startJulianDate);
+    ca.clearCoverageData(startAbsoluteDate);
 
     // create a thread to do calulations in background
     SwingWorker<Object, Integer> worker = new SwingWorker<Object, Integer>()
@@ -962,17 +977,23 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             // what happens when sat isn't propogated as far as date?
             // make a new Time object - to track progress
 
-            Time currentTime = new Time();
-            currentTime.set(startJulianDate.getCurrentGregorianCalendar().getTimeInMillis());
+//            Time currentTime = new Time();
+//            currentTime.set(startJulianDate.getCurrentGregorianCalendar().getTimeInMillis());
 
-            currentTime.addSeconds(timeStep);// add first time step (inital time already included in clear data)
-            while(currentTime.getMJD() <= stopJulianDate.getMJD())
+
+    		TimeOrekit currentTime = new TimeOrekit(startCal);
+    		TimeOrekit startAbsoluteDate = new TimeOrekit(startCal);
+    		TimeOrekit stopAbsoluteDate = new TimeOrekit(stopCal);
+
+    		currentTime.addSeconds(timeStep);
+//            currentTime.addSeconds(timeStep);// add first time step (inital time already included in clear data)
+            while(currentTime.getCurrentOrekitTime().compareTo(stopAbsoluteDate.getCurrentOrekitTime())<=0)
             {
                 // update position of satellites
                 for(CustomSatellite sat : tempSatHash.values())
                 {
                     try {
-						sat.propogate2JulDate(currentTime.getJulianDate(),true);
+						sat.propogate2JulDate(currentTime.getCurrentOrekitTime(),true);
 					} catch (OrekitException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -983,7 +1004,8 @@ private void runButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 ca.performCoverageAnalysis(currentTime, tempSatHash);
                 
                 //Update progress bar
-                publish( (int)Math.round(100*(1.0-(stopJulianDate.getMJD()-currentTime.getMJD())/(stopJulianDate.getMJD()-startJulianDate.getMJD()))) );
+                publish( (int)Math.round(100*(1.0-(stopAbsoluteDate.getModifiedJulianDay()-currentTime.getModifiedJulianDay()
+                		)/(stopAbsoluteDate.getModifiedJulianDay()-startAbsoluteDate.getModifiedJulianDay()))) );
                 //runProgressBar.setValue( (int)Math.round(100*(1.0-(stopJulianDate.getMJD()-currentTime.getMJD())/(stopJulianDate.getMJD()-startJulianDate.getMJD()))) );
                 
                 // increment time
@@ -1037,9 +1059,9 @@ private void refreshButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN
     summaryText += "Min. Elevation Constraint [deg]: " + ca.getElevationLimit() +"\n";
     
     summaryText += "\n";
-    summaryText += "Coverage Start Time: " + ca.getStartTime().getDateTimeStr() +"\n";
+    summaryText += "Coverage Start Time: " + ca.getStartTime().toString() +"\n";
     summaryText += "Coverage Stop Time [MJD]: " + ca.getLastMJD() +"\n";
-    summaryText += "Coverage Time Span [days]: " + (ca.getLastMJD()-ca.getStartTime().getMJD()) +"\n";
+    summaryText += "Coverage Time Span [days]: " + (ca.getLastMJD()-ca.getStartTime().getModifiedJulianDay()) +"\n";
     
     summaryText += "\nSatellite List:\n";
     summaryText += "-------------------\n";

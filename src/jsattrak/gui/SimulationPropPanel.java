@@ -342,7 +342,7 @@ public class SimulationPropPanel extends javax.swing.JPanel implements Serializa
         {
             // save time
             // save old time
-            double prevJulDate = app.getScenarioEpochDate().getJulianDate();
+            double prevJulDate = app.getScenarioEpochDate().getJulianDay();
 
             // enter hit in date/time box...
             //System.out.println("Date Time Changed");
@@ -381,13 +381,8 @@ public class SimulationPropPanel extends javax.swing.JPanel implements Serializa
                 // System.out.println(" -- Accepted");
 
                 // save
-                app.getScenarioEpochDate().set(currentTimeDate.getTimeInMillis());
-//            currentJulianDate.set(currentTimeDate.get(Calendar.YEAR),
-//                                  currentTimeDate.get(Calendar.MONTH),
-//                                  currentTimeDate.get(Calendar.DATE),
-//                                  currentTimeDate.get(Calendar.HOUR_OF_DAY),
-//                                  currentTimeDate.get(Calendar.MINUTE),
-//                                  currentTimeDate.get(Calendar.SECOND));
+                app.getScenarioEpochDate().setCurentOrekitTime(currentTimeDate);
+
 
 
 

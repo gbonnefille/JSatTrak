@@ -9,6 +9,7 @@ import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.errors.OrekitException;
 
 import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
 public class MissionTableModel {
@@ -24,13 +25,13 @@ public class MissionTableModel {
 
 		private PropagatorNode propNode = null;
 
-	public MissionTableModel(Time scenarioEpochDate) throws OrekitException {
+	public MissionTableModel(TimeOrekit scenarioEpochDate) throws OrekitException {
 
 		iniMissionTableModel(scenarioEpochDate);
 	}
 	
 	
-	private void iniMissionTableModel(Time scenarioEpochDate) throws OrekitException{
+	private void iniMissionTableModel(TimeOrekit scenarioEpochDate) throws OrekitException{
 		// set names of columns
 		Vector<String> tableHeaders = new Vector<String>();
 		tableHeaders.add("Mission Objects");

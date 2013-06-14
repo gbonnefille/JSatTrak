@@ -21,23 +21,17 @@
 
 package jsattrak.objects;
 
-import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import jsattrak.customsat.InitialConditionsNode;
 import jsattrak.customsat.MissionTableModel;
-import jsattrak.customsat.PropagatorNode;
 import jsattrak.customsat.SatOption;
 import jsattrak.utilities.TLElements;
-import name.gano.worldwind.modelloader.WWModel3D_new;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
-import org.jdesktop.swingx.treetable.DefaultTreeTableModel;
 import org.orekit.errors.OrekitException;
-import org.orekit.propagation.AbstractPropagator;
 import org.orekit.propagation.BoundedPropagator;
-import org.orekit.propagation.analytical.tle.TLEPropagator;
+import org.orekit.time.AbsoluteDate;
 
 /**
  * 
@@ -54,7 +48,7 @@ public abstract class AbstractSatellite implements Serializable {
 	 * @return j2k position of satellite in meters
 	 * @throws OrekitException
 	 */
-	public abstract Vector3D calculatePositionFromUT(double julDate)
+	public abstract Vector3D calculatePositionFromUT(AbsoluteDate date)
 			throws OrekitException;
 
 	public abstract double getAltitude();
@@ -99,7 +93,7 @@ public abstract class AbstractSatellite implements Serializable {
 
 	public abstract double getTleAgeDays();
 
-	public abstract void propogate2JulDate(double julDate, boolean eventDetector)
+	public abstract void propogate2JulDate(AbsoluteDate julDate, boolean eventDetector)
 			throws OrekitException;
 
 	public abstract void setShowGroundTrack(boolean showGrndTrk)

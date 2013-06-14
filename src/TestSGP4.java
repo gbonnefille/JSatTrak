@@ -16,6 +16,7 @@ import jsattrak.utilities.TLElements;
 import org.orekit.data.DataProvidersManager;
 import org.orekit.data.ZipJarCrawler;
 import org.orekit.errors.OrekitException;
+import org.orekit.time.AbsoluteDate;
 
 
 /**
@@ -52,6 +53,8 @@ public class TestSGP4
 
         // Julian Date we are interested in
         double julianDate = 2454992.0; // 09 Jun 2009 12:00:00.000 UTC
+        AbsoluteDate absoluteJulianDate = AbsoluteDate.JULIAN_EPOCH
+				.shiftedBy(julianDate * 86400);
 
         // Create SGP4 satelite propogator
         CustomSatellite prop = null;
@@ -68,7 +71,7 @@ public class TestSGP4
 
         // prop to the desired time
         try {
-			prop.propogate2JulDate(julianDate,true);
+			prop.propogate2JulDate(absoluteJulianDate,true);
 		} catch (OrekitException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

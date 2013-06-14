@@ -41,6 +41,8 @@ import jsattrak.gui.JSatTrak;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 
+import org.orekit.time.AbsoluteDate;
+
 /**
  *
  * @author sgano
@@ -197,7 +199,9 @@ public class ObjectTreeTransferHandler extends StringTransferHandler implements 
                 {
                     // is not already in list
                     // add to hashTable
-                    GroundStation gs = new GroundStation(name, new double[] {Double.parseDouble(inLine1), Double.parseDouble(inLine2), Double.parseDouble(inLine3)},parentApp.getCurrentJulTime());
+                	double julianDate = parentApp.getCurrentJulTime().durationFrom(AbsoluteDate.JULIAN_EPOCH)/86400;
+                    GroundStation gs = new GroundStation(name, new double[] {Double.parseDouble(inLine1), Double.parseDouble(inLine2), Double.parseDouble(inLine3)},
+                    		julianDate);
                     gsHash.put(name, gs);
                     
                     // add item to the tree

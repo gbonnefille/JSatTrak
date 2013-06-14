@@ -33,6 +33,7 @@ import jsattrak.gui.JCustomSatConfigPanel;
 import jsattrak.gui.JSatTrak;
 import jsattrak.utilities.TLElements;
 import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 import name.gano.swingx.treetable.CustomTreeTableNode;
 
 import org.orekit.errors.OrekitException;
@@ -86,7 +87,7 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	// Central attraction coefficient
 	private double mu = Constants.EIGEN5C_EARTH_MU;
 
-	private Time scenarioEpochDate;
+	private TimeOrekit scenarioEpochDate;
 
 	private AbsoluteDate absoluteDate;
 
@@ -100,12 +101,12 @@ public class InitialConditionsNode extends CustomTreeTableNode {
 	private JCustomSatConfigPanel jSatConfigPanel = null;
 
 	public InitialConditionsNode(CustomTreeTableNode parentNode,
-			Time scenarioEpochDate) throws OrekitException {
+			TimeOrekit scenarioEpochDate) throws OrekitException {
 		super(new String[] { "Initial Conditions", "", "" }); // initialize
 																// node, default
 																// values
 		this.scenarioEpochDate = scenarioEpochDate;
-		iniJulDate = scenarioEpochDate.getJulianDate();
+		iniJulDate = scenarioEpochDate.getJulianDay();
 
 		// set icon for this type
 		setIcon(new ImageIcon(Toolkit.getDefaultToolkit().getImage(

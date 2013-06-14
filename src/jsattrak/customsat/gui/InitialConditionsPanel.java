@@ -52,6 +52,7 @@ import jsattrak.utilities.TLEDownloader;
 import jsattrak.utilities.TLElements;
 import jsattrak.utilities.TreeTransferHandler;
 import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.errors.OrekitException;
@@ -74,7 +75,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 	// used for diaplying settings panel
 	private JInternalFrame iframe; // used to know what its parent frame is - to
 	// close window
-	final Time scenarioEpochDate; // used for date string functions
+	final TimeOrekit scenarioEpochDate; // used for date string functions
 	// hashtable with tle's
 	private Hashtable<String, TLElements> tleHash;
 	// TLE sat database
@@ -90,7 +91,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 	 *            scenario epoch date
 	 */
 	public InitialConditionsPanel(JSatTrak app, InitialConditionsNode icNode,
-			final Time scenarioEpochDate) {
+			final TimeOrekit scenarioEpochDate) {
 		this.icNode = icNode;
 		this.scenarioEpochDate = scenarioEpochDate;
 		this.app = app;
@@ -237,8 +238,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 		}
 
 		// fill in epoch
-		epochTextField.setText(scenarioEpochDate.convertJD2String(icNode
-				.getIniJulDate()));
+		epochTextField.setText(scenarioEpochDate.getDateTimeStr());
 
 		componentsIni = true;
 	}
@@ -2136,8 +2136,7 @@ public class InitialConditionsPanel extends javax.swing.JPanel {
 						.getTime()));
 			} catch (Exception e3) {
 				// bad date input put back the old date string
-				epochTextField.setText(scenarioEpochDate
-						.convertJD2String(icNode.getIniJulDate()));
+				epochTextField.setText(scenarioEpochDate.getDateTimeStr());
 				dateAccepted = false;
 				// System.out.println(" -- Rejected");
 			} // catch 2

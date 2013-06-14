@@ -45,11 +45,12 @@ import name.gano.astro.AER;
 import name.gano.astro.AstroConst;
 import name.gano.astro.bodies.Sun;
 import name.gano.astro.coordinates.CoordinateConversion;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 import name.gano.file.FileUtilities;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.orekit.errors.OrekitException;
+import org.orekit.time.AbsoluteDate;
 
 /**
  * 
@@ -58,7 +59,7 @@ import org.orekit.errors.OrekitException;
 public class JTrackingPanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = -1423478751644863257L;
-	
+
 	Hashtable<String, CustomSatellite> satHash;
 	Hashtable<String, GroundStation> gsHash;
 
@@ -69,7 +70,7 @@ public class JTrackingPanel extends javax.swing.JPanel {
 	String timeAsString;
 
 	// current time object - passed for use in pass predictions
-	Time currentJulianDate;
+	TimeOrekit currentJulianDate;
 
 	// table
 	DefaultTableModel passTableModel;
@@ -94,7 +95,7 @@ public class JTrackingPanel extends javax.swing.JPanel {
 	 */
 	public JTrackingPanel(Hashtable<String, CustomSatellite> satHash,
 			Hashtable<String, GroundStation> gsHash, String timeAsStringIn,
-			Time currentJulianDate, JSatTrak app) {
+			TimeOrekit currentJulianDate, JSatTrak app) {
 		this.satHash = satHash;
 		this.gsHash = gsHash;
 
@@ -961,7 +962,7 @@ public class JTrackingPanel extends javax.swing.JPanel {
 				.toString());
 
 		// start time Jul Date
-		double jdStart = currentJulianDate.getJulianDate();
+		double jdStart = currentJulianDate.getJulianDay();
 
 		// clear hash
 		passHash.clear();
@@ -1033,8 +1034,11 @@ public class JTrackingPanel extends javax.swing.JPanel {
 		// linear search
 		double time0, h0;
 		double time1 = jdStart;
+		
+		AbsoluteDate absoluteTime1 = AbsoluteDate.JULIAN_EPOCH
+				.shiftedBy(time1 * 86400);
 		double h1 = AER.calculate_AER(gs.getLla_deg_m(),
-				sat.calculatePositionFromUT(time1), time1)[1]
+				sat.calculatePositionFromUT(absoluteTime1), time1)[1]
 				- gs.getElevationConst();
 
 		int passCount = 0;
@@ -1050,18 +1054,21 @@ public class JTrackingPanel extends javax.swing.JPanel {
 				/ (60.0 * 60.0 * 24.0)) {
 			time0 = time1;
 			time1 = jd + timeStepSec / (60.0 * 60.0 * 24.0);
-
+			absoluteTime1 = AbsoluteDate.JULIAN_EPOCH
+					.shiftedBy(time1 * 86400);
 			// calculate elevations at each time step (if needed)
 			h0 = h1;
 			// calculate the elevation at this newly visited point
 			h1 = AER.calculate_AER(gs.getLla_deg_m(),
-					sat.calculatePositionFromUT(time1), time1)[1]
+					sat.calculatePositionFromUT(absoluteTime1), time1)[1]
 					- gs.getElevationConst();
 
 			// rise
 			if (h0 <= 0 && h1 > 0) {
 				double riseTime = findSatRiseSetRoot(sat, gs, time0, time1, h0,
 						h1);
+				AbsoluteDate absoluteRiseTime = AbsoluteDate.JULIAN_EPOCH
+						.shiftedBy(riseTime * 86400);
 				// System.out.println("Rise at " + riseTime + " (" + time0 + ","
 				// + time1 + ")");
 
@@ -1071,15 +1078,20 @@ public class JTrackingPanel extends javax.swing.JPanel {
 				passCount++;
 				// use Time object to convert Julian date to string using
 				// program settings (i.e. time zone)
-				String crossTimeStr = currentJulianDate
-						.convertJD2String(riseTime);
+
+				String crossTimeStr = new AbsoluteDate(
+						AbsoluteDate.JULIAN_EPOCH, riseTime * 86400,
+						this.currentJulianDate.getTimeScale()).toString();
+
+				// String crossTimeStr = currentJulianDate
+				// .convertJD2String(riseTime);
 
 				passTableModel.addRow(new Object[] { passCount, crossTimeStr,
 						"", "", "", "", "" });
 
 				// calculate using the rise time - the Azimuth
 				double az = AER.calculate_AER(gs.getLla_deg_m(),
-						sat.calculatePositionFromUT(riseTime), riseTime)[0];
+						sat.calculatePositionFromUT(absoluteRiseTime), riseTime)[0];
 				if (azComboBox.getSelectedIndex() == 0) {
 					passTableModel.setValueAt("" + String.format("%.1f", az),
 							passTableModel.getRowCount() - 1, 2);
@@ -1095,19 +1107,22 @@ public class JTrackingPanel extends javax.swing.JPanel {
 			if (h1 <= 0 && h0 > 0) {
 				double setTime = findSatRiseSetRoot(sat, gs, time0, time1, h0,
 						h1);
+				AbsoluteDate absoluteSetTime = AbsoluteDate.JULIAN_EPOCH
+						.shiftedBy(setTime * 86400);
 				// System.out.println("Set at " + setTime + " (" + time0 + "," +
 				// time1 + ")");
 
 				// add to table
-				String crossTimeStr = currentJulianDate
-						.convertJD2String(setTime);
+				String crossTimeStr =  new AbsoluteDate(
+						AbsoluteDate.JULIAN_EPOCH, setTime * 86400,
+						this.currentJulianDate.getTimeScale()).toString();
 				passTableModel.setValueAt(crossTimeStr,
 						passTableModel.getRowCount() - 1, 3); // last row, 3rd
 																// column (2)
 
 				// calculate using the set time - the Azimuth
 				double az = AER.calculate_AER(gs.getLla_deg_m(),
-						sat.calculatePositionFromUT(setTime), setTime)[0];
+						sat.calculatePositionFromUT(absoluteSetTime), setTime)[0];
 				if (azComboBox.getSelectedIndex() == 0) {
 					passTableModel.setValueAt("" + String.format("%.1f", az),
 							passTableModel.getRowCount() - 1, 4);
@@ -1143,6 +1158,9 @@ public class JTrackingPanel extends javax.swing.JPanel {
 					double julDateVizCalc = (setTime - lastRise) / 2.0
 							+ lastRise;
 
+					AbsoluteDate absoluteJulDateVizCalc = AbsoluteDate.JULIAN_EPOCH
+							.shiftedBy(julDateVizCalc * 86400);
+					
 					// SAVE to hash - for use later
 					passHash.put(new Integer(passCount), new Double(
 							julDateVizCalc));
@@ -1188,7 +1206,7 @@ public class JTrackingPanel extends javax.swing.JPanel {
 						// out if the satelite is in light
 						// use predict algorithm from Vallado 2nd ed.
 						Vector3D satMOD = sat
-								.calculatePositionFromUT(julDateVizCalc);
+								.calculatePositionFromUT(absoluteJulDateVizCalc);
 						double sinFinalSigma = internalSun
 								.getCurrentPositionTEME().crossProduct(satMOD)
 								.getNorm()
@@ -1396,12 +1414,11 @@ public class JTrackingPanel extends javax.swing.JPanel {
 			if (passHash.containsKey(passNum)) {
 				double jdMidPoint = passHash.get(passNum).doubleValue();
 
-				// get milliseconds from Julian Date
-				long millis = currentJulianDate.convertJD2Calendar(jdMidPoint)
-						.getTimeInMillis();
+				// get milliseconds from Absolute Date
+				double millis = currentJulianDate.getCurrentOrekitTime().durationFrom(AbsoluteDate.JAVA_EPOCH)*1000;
 
 				// get current app time
-				double daysDiff = Math.abs(currentJulianDate.getJulianDate()
+				double daysDiff = Math.abs(currentJulianDate.getJulianDay()
 						- jdMidPoint);
 
 				// check to see if lead/lag data needs updating
@@ -1425,8 +1442,10 @@ public class JTrackingPanel extends javax.swing.JPanel {
 		while (Math.abs(time1 - time0) > 2 * tol) {
 			// Calculate midpoint of domain
 			double timeMid = (time1 + time0) / 2.0;
+			AbsoluteDate absoluteTimeMid = AbsoluteDate.JULIAN_EPOCH
+					.shiftedBy(timeMid * 86400);
 			double fmid = AER.calculate_AER(gs.getLla_deg_m(),
-					sat.calculatePositionFromUT(timeMid), timeMid)[1]
+					sat.calculatePositionFromUT(absoluteTimeMid), timeMid)[1]
 					- gs.getElevationConst();
 
 			if (f0 * fmid > 0) // same sign

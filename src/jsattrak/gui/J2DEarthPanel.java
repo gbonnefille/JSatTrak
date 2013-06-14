@@ -63,12 +63,11 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import jsattrak.coverage.JSatTrakRenderable;
-import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import jsattrak.utilities.LandMassRegions;
 import name.gano.astro.bodies.Sun;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 public class J2DEarthPanel extends JPanel implements ComponentListener , java.io.Serializable
 {
@@ -101,7 +100,7 @@ public class J2DEarthPanel extends JPanel implements ComponentListener , java.io
     private transient JToggleButton recenterToggleButton;
     
     // current time
-    private transient Time currentTime;
+    private transient TimeOrekit currentTime;
     
     // hastable of all the satellites currently processing
     //Hashtable<String,SatelliteProps> satHash = new Hashtable();
@@ -136,7 +135,7 @@ public class J2DEarthPanel extends JPanel implements ComponentListener , java.io
                
     }
     
-    public J2DEarthPanel(Hashtable<String,CustomSatellite> satHash, Hashtable<String,GroundStation> gsHash, JToggleButton zoomInToggleButton, JToggleButton zoomOutToggleButton, JToggleButton recenterToggleButton, Time currentTime, Sun sun, JSatTrak app)
+    public J2DEarthPanel(Hashtable<String,CustomSatellite> satHash, Hashtable<String,GroundStation> gsHash, JToggleButton zoomInToggleButton, JToggleButton zoomOutToggleButton, JToggleButton recenterToggleButton, 	TimeOrekit currentTime, Sun sun, JSatTrak app)
     {
         super(false);//not double buffered
        
@@ -176,7 +175,7 @@ public class J2DEarthPanel extends JPanel implements ComponentListener , java.io
         bimage = getBufferedImage(planetImage);
         
         //imageMap = new JLabel(planetImage);
-        imageMap = new J2dEarthLabel2(planetImage,aspectRatio, satHash, gsHash, backgroundColor, currentTime, sun, this);
+		imageMap = new J2dEarthLabel2(planetImage,aspectRatio, satHash, gsHash, backgroundColor, currentTime, sun, this);
         imageMap.setHorizontalAlignment(JLabel.CENTER);
         //JScrollPane tableScrollPane = new JScrollPane(imageMap);
         

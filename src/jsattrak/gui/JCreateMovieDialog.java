@@ -47,7 +47,7 @@ import javax.swing.SwingWorker;
 
 import jsattrak.utilities.J3DEarthComponent;
 import jsattrak.utilities.JpegImagesToMovie;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 import name.gano.file.SaveImageFile;
 
 /**
@@ -56,7 +56,7 @@ import name.gano.file.SaveImageFile;
  */
 public class JCreateMovieDialog extends javax.swing.JDialog
 {
-    Time startTime, endTime;
+    TimeOrekit startTime, endTime;
     
     double timeStep = 1.0;
     int playbackFPS = 16; 
@@ -144,15 +144,13 @@ public class JCreateMovieDialog extends javax.swing.JDialog
         
         // get current date
         // Start time
-        startTime = new Time();
+        startTime = app.getCurrentJulianDay();
         
         startTime.setDateFormat( (SimpleDateFormat)app.getCurrentJulianDay().getDateFormat());//threeDpanel.getApp().getCurrentJulianDay().getDateFormat() ); 
-        startTime.set( app.getCurrentJulianDay().getCurrentGregorianCalendar().getTimeInMillis()  );
         // End time
-        endTime = new Time();
-        endTime.setDateFormat( (SimpleDateFormat)app.getCurrentJulianDay().getDateFormat() ); 
-        endTime.set( app.getCurrentJulianDay().getCurrentGregorianCalendar().getTimeInMillis()  );
-        endTime.addSeconds( 60.0*60.0*3.0 ); // default 3 hours + 
+        endTime = app.getCurrentJulianDay();
+        endTime.addSeconds(60.0*60.0*3.0);
+        endTime.setDateFormat( (SimpleDateFormat)app.getCurrentJulianDay().getDateFormat() );  
         
         startTimeField.setText( startTime.getDateTimeStr());
         endTimeField.setText(endTime.getDateTimeStr());
@@ -462,7 +460,7 @@ public class JCreateMovieDialog extends javax.swing.JDialog
         // create temp directory
         boolean success = (new File(tempDirStr)).mkdir();
         
-        double deltaTsec = (endTime.getMJD() - startTime.getMJD())*24*60*60.0;
+        double deltaTsec = (endTime.getModifiedJulianDay() - startTime.getModifiedJulianDay())*24*60*60.0;
         final int numFrames = (int)Math.ceil( deltaTsec/timeStep );
         
         // do the long work in a thread so progress bar can be updated
@@ -476,7 +474,7 @@ public class JCreateMovieDialog extends javax.swing.JDialog
                                                 
                         for (int i = 0; i < numFrames; i++)
                         {
-                            app.setTime(startTime.getCurrentGregorianCalendar().getTimeInMillis());
+                            app.setTime(startTime);
 
                             // force component to update
                             if(movieMode == 0)
@@ -704,7 +702,7 @@ public class JCreateMovieDialog extends javax.swing.JDialog
     
     public void updateDisplayData()
     {
-         double deltaTsec = (endTime.getMJD() - startTime.getMJD())*24*60*60.0;
+         double deltaTsec = (endTime.getModifiedJulianDay() - startTime.getModifiedJulianDay())*24*60*60.0;
          
          int numFrames = (int)Math.ceil( deltaTsec/timeStep );
          
@@ -716,10 +714,10 @@ public class JCreateMovieDialog extends javax.swing.JDialog
     } // updateDisplayData
     
     
-    private void updateTime(Time time, JTextField timeTextField)
+    private void updateTime(TimeOrekit time, JTextField timeTextField)
     {
         // save old time
-        double prevJulDate = time.getJulianDate();
+        double prevJulDate = time.getJulianDay();
 
         // enter hit in date/time box...
         //System.out.println("Date Time Changed");
@@ -758,7 +756,7 @@ public class JCreateMovieDialog extends javax.swing.JDialog
             //System.out.println(" -- Accepted");
 
             // save
-            time.set(currentTimeDate.getTimeInMillis());
+            time = new TimeOrekit(currentTimeDate);
         //            currentJulianDate.set(currentTimeDate.get(Calendar.YEAR),
 //                                  currentTimeDate.get(Calendar.MONTH),
 //                                  currentTimeDate.get(Calendar.DATE),

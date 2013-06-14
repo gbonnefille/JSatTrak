@@ -34,381 +34,355 @@ import java.util.Vector;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.UIManager;
+
 import jsattrak.coverage.CoverageAnalyzer;
 import jsattrak.gui.J2DEarthPanel;
 import jsattrak.gui.J3DEarthInternalPanel;
 import jsattrak.gui.J3DEarthPanel;
 import jsattrak.gui.JSatTrak;
 import jsattrak.gui.SatPropertyPanel;
-import jsattrak.objects.AbstractSatellite;
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
 import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 /**
- *
+ * 
  * @author sgano
  */
-public class JstSaveClass implements Serializable
-{
-    private // app loacation and size
-    Point screenLoc;
-    private int appWidth;
-    private int appHeight;
+public class JstSaveClass implements Serializable {
+	private// app loacation and size
+	Point screenLoc;
+	private int appWidth;
+	private int appHeight;
 
-    // main satHash to save
-    private Hashtable<String,CustomSatellite> satHash;
-    private Hashtable<String,GroundStation> gsHash;
-    
-    // vectors for the windows to save:
-    private Vector<J2DEarthPanelSave> twoDWindowSaveVec = new Vector<J2DEarthPanelSave>(); // 2D Panels
-    private Vector<SatPropertyPanelSave> satPropWindowSaveVec = new Vector<SatPropertyPanelSave>(); // Property Panels
-    private Vector<J3DEarthlPanelSave> threeDWindowSaveVec = new Vector<J3DEarthlPanelSave>(); // 3D Windows (internal)
-    private Vector<J3DEarthlPanelSave> threeDExtWindowSaveVec = new Vector<J3DEarthlPanelSave>(); // 3d Windows (external)
-    
-    // other data to save and options to save
-    private Time currentJulianDate;
-    private String versionString;
-    private int realTimeAnimationRefreshRateMs; // refresh rate for real time animation
-    private int nonRealTimeAnimationRefreshRateMs; // refresh rate for non-real time animation
-    private int currentTimeStepSpeedIndex;
-    private boolean realTimeMode;
-    private boolean localTimeZoneSelected;
-    
-    private int satListWidth;
-    private int satListHeight;
-    private int satListX;
-    private int satListY;
-    
-    // scenario epoch
-    private boolean epochTimeEqualsCurrentTime; // uses current time for scenario epoch (reset button)
-    private Time scenarioEpochDate;
-    
-    // wwj offline mode
-    private boolean wwjOfflineMode;
-    
-    // coverage data
-    private CoverageAnalyzer ca;
+	// main satHash to save
+	private Hashtable<String, CustomSatellite> satHash;
+	private Hashtable<String, GroundStation> gsHash;
 
-    // string for the look and feel used
-    private String lookFeelString = "";
-            
-    /** Creates a new instance of JstSaveClass */
-    public JstSaveClass(JSatTrak app)
-    {
-        // save hash  -- LARGE SAVE FILE due to saving of SDP4 classes, only TLE text really needed!
-        satHash = app.getSatHash();
-        gsHash = app.getGsHash();
-        
-        // get and save app data
-        currentJulianDate = app.getCurrentJulianDay();
-        versionString = app.getVersionString();
-        realTimeAnimationRefreshRateMs = app.getRealTimeAnimationRefreshRateMs();
-        nonRealTimeAnimationRefreshRateMs = app.getNonRealTimeAnimationRefreshRateMs();
-        currentTimeStepSpeedIndex = app.getCurrentTimeStepSpeedIndex(); 
-        realTimeMode = app.isRealTimeMode();
-        localTimeZoneSelected = app.isLoalTimeModeSelected();
-        
-        // save data for sat list location
-        int whxy[] = app.getSatListWHXY();
-        satListWidth = whxy[0];
-        satListHeight = whxy[1];
-        satListX = whxy[2];
-        satListY = whxy[3];
-        
-        // save scenario epoch data
-        epochTimeEqualsCurrentTime = app.isEpochTimeEqualsCurrentTime();
-        scenarioEpochDate = app.getScenarioEpochDate();
-        
-        // offline mode
-        wwjOfflineMode = app.isWwjOfflineMode();
-        
-        
-        // save data for window minimize state?
+	// vectors for the windows to save:
+	private Vector<J2DEarthPanelSave> twoDWindowSaveVec = new Vector<J2DEarthPanelSave>(); // 2D
+																							// Panels
+	private Vector<SatPropertyPanelSave> satPropWindowSaveVec = new Vector<SatPropertyPanelSave>(); // Property
+																									// Panels
+	private Vector<J3DEarthlPanelSave> threeDWindowSaveVec = new Vector<J3DEarthlPanelSave>(); // 3D
+																								// Windows
+																								// (internal)
+	private Vector<J3DEarthlPanelSave> threeDExtWindowSaveVec = new Vector<J3DEarthlPanelSave>(); // 3d
+																									// Windows
+																									// (external)
 
-        // get and save data about each window that is open
-        JDesktopPane jdp = app.getJDesktopPane(); 
-        
-        for(JInternalFrame jif : jdp.getAllFrames())
-        {
-            if( jif.getContentPane() instanceof J2DEarthPanel  )
-            {
-                // 2d panel
-                twoDWindowSaveVec.add( new J2DEarthPanelSave( (J2DEarthPanel)jif.getContentPane(), jif.getX(), jif.getY(), jif.getSize() ));
-            }
-            else if( jif.getContentPane() instanceof SatPropertyPanel)
-            {
-                // property panel
-                satPropWindowSaveVec.add( new SatPropertyPanelSave((SatPropertyPanel)jif.getContentPane(), jif.getX(), jif.getY(), jif.getSize() ));
-            }
-            else if( jif.getContentPane() instanceof J3DEarthInternalPanel)
-            {
-                // property panel
-                threeDWindowSaveVec.add( new J3DEarthlPanelSave((J3DEarthInternalPanel)jif.getContentPane(), jif.getX(), jif.getY(), jif.getSize() ));
-            }
-            
-        } // all frames
-        
-        // all 3D external frames
-        for(J3DEarthPanel pan : app.getThreeDWindowVec())
-        {
-            Point p = pan.getParentDialog().getLocationOnScreen(); // get size/shape of entire dialog
-            threeDExtWindowSaveVec.add( new J3DEarthlPanelSave(pan, p.x, p.y, pan.getParentDialog().getSize() )  );
-        }
-        
-        
-        // coverage anaylzer
-        ca = app.getCoverageAnalyzer();
+	// other data to save and options to save
+	private TimeOrekit currentJulianDate;
+	private String versionString;
+	private int realTimeAnimationRefreshRateMs; // refresh rate for real time
+												// animation
+	private int nonRealTimeAnimationRefreshRateMs; // refresh rate for non-real
+													// time animation
+	private int currentTimeStepSpeedIndex;
+	private boolean realTimeMode;
+	private boolean localTimeZoneSelected;
 
-        // screen location and size of entire app  -- NEW 20 March 2009
-        screenLoc = app.getLocationOnScreen();
-        appWidth = app.getWidth();
-        appHeight = app.getHeight();
+	private int satListWidth;
+	private int satListHeight;
+	private int satListX;
+	private int satListY;
 
-        // save look and feel
-        //LookAndFeel lf = UIManager.getLookAndFeel();
-        lookFeelString = UIManager.getLookAndFeel().getClass().toString().substring(6); // remove the 'class ' at begining of string
+	// scenario epoch
+	private boolean epochTimeEqualsCurrentTime; // uses current time for
+												// scenario epoch (reset button)
+	private TimeOrekit scenarioEpochDate;
 
-    } // JstSaveClass  constructor
+	// wwj offline mode
+	private boolean wwjOfflineMode;
 
-    public Hashtable<String, CustomSatellite> getSatHash()
-    {
-        return satHash;
-    }
+	// coverage data
+	private CoverageAnalyzer ca;
 
-    public void setSatHash(Hashtable<String, CustomSatellite> satHash)
-    {
-        this.satHash = satHash;
-    }
+	// string for the look and feel used
+	private String lookFeelString = "";
 
-    public Vector<J2DEarthPanelSave> getTwoDWindowSaveVec()
-    {
-        return twoDWindowSaveVec;
-    }
+	/** Creates a new instance of JstSaveClass */
+	public JstSaveClass(JSatTrak app) {
+		// save hash -- LARGE SAVE FILE due to saving of SDP4 classes, only TLE
+		// text really needed!
+		satHash = app.getSatHash();
+		gsHash = app.getGsHash();
 
-    public void setTwoDWindowSaveVec(Vector<J2DEarthPanelSave> twoDWindowSaveVec)
-    {
-        this.twoDWindowSaveVec = twoDWindowSaveVec;
-    }
+		// get and save app data
+		currentJulianDate = app.getCurrentJulianDay();
+		versionString = app.getVersionString();
+		realTimeAnimationRefreshRateMs = app
+				.getRealTimeAnimationRefreshRateMs();
+		nonRealTimeAnimationRefreshRateMs = app
+				.getNonRealTimeAnimationRefreshRateMs();
+		currentTimeStepSpeedIndex = app.getCurrentTimeStepSpeedIndex();
+		realTimeMode = app.isRealTimeMode();
+		localTimeZoneSelected = app.isLoalTimeModeSelected();
 
-    public Vector<SatPropertyPanelSave> getSatPropWindowSaveVec()
-    {
-        return satPropWindowSaveVec;
-    }
+		// save data for sat list location
+		int whxy[] = app.getSatListWHXY();
+		satListWidth = whxy[0];
+		satListHeight = whxy[1];
+		satListX = whxy[2];
+		satListY = whxy[3];
 
-    public void setSatPropWindowSaveVec(Vector<SatPropertyPanelSave> satPropWindowSaveVec)
-    {
-        this.satPropWindowSaveVec = satPropWindowSaveVec;
-    }
+		// save scenario epoch data
+		epochTimeEqualsCurrentTime = app.isEpochTimeEqualsCurrentTime();
+		scenarioEpochDate = app.getScenarioEpochDate();
 
-    public Time getCurrentJulianDate()
-    {
-        return currentJulianDate;
-    }
+		// offline mode
+		wwjOfflineMode = app.isWwjOfflineMode();
 
-    public void setCurrentJulianDate(Time currentJulianDate)
-    {
-        this.currentJulianDate = currentJulianDate;
-    }
+		// save data for window minimize state?
 
-    public String getVersionString()
-    {
-        return versionString;
-    }
+		// get and save data about each window that is open
+		JDesktopPane jdp = app.getJDesktopPane();
 
-    public void setVersionString(String versionString)
-    {
-        this.versionString = versionString;
-    }
+		for (JInternalFrame jif : jdp.getAllFrames()) {
+			if (jif.getContentPane() instanceof J2DEarthPanel) {
+				// 2d panel
+				twoDWindowSaveVec.add(new J2DEarthPanelSave((J2DEarthPanel) jif
+						.getContentPane(), jif.getX(), jif.getY(), jif
+						.getSize()));
+			} else if (jif.getContentPane() instanceof SatPropertyPanel) {
+				// property panel
+				satPropWindowSaveVec.add(new SatPropertyPanelSave(
+						(SatPropertyPanel) jif.getContentPane(), jif.getX(),
+						jif.getY(), jif.getSize()));
+			} else if (jif.getContentPane() instanceof J3DEarthInternalPanel) {
+				// property panel
+				threeDWindowSaveVec.add(new J3DEarthlPanelSave(
+						(J3DEarthInternalPanel) jif.getContentPane(), jif
+								.getX(), jif.getY(), jif.getSize()));
+			}
 
-    public int getRealTimeAnimationRefreshRateMs()
-    {
-        return realTimeAnimationRefreshRateMs;
-    }
+		} // all frames
 
-    public void setRealTimeAnimationRefreshRateMs(int realTimeAnimationRefreshRateMs)
-    {
-        this.realTimeAnimationRefreshRateMs = realTimeAnimationRefreshRateMs;
-    }
+		// all 3D external frames
+		for (J3DEarthPanel pan : app.getThreeDWindowVec()) {
+			Point p = pan.getParentDialog().getLocationOnScreen(); // get
+																	// size/shape
+																	// of entire
+																	// dialog
+			threeDExtWindowSaveVec.add(new J3DEarthlPanelSave(pan, p.x, p.y,
+					pan.getParentDialog().getSize()));
+		}
 
-    public int getNonRealTimeAnimationRefreshRateMs()
-    {
-        return nonRealTimeAnimationRefreshRateMs;
-    }
+		// coverage anaylzer
+		ca = app.getCoverageAnalyzer();
 
-    public void setNonRealTimeAnimationRefreshRateMs(int nonRealTimeAnimationRefreshRateMs)
-    {
-        this.nonRealTimeAnimationRefreshRateMs = nonRealTimeAnimationRefreshRateMs;
-    }
+		// screen location and size of entire app -- NEW 20 March 2009
+		screenLoc = app.getLocationOnScreen();
+		appWidth = app.getWidth();
+		appHeight = app.getHeight();
 
-    public int getCurrentTimeStepSpeedIndex()
-    {
-        return currentTimeStepSpeedIndex;
-    }
+		// save look and feel
+		// LookAndFeel lf = UIManager.getLookAndFeel();
+		lookFeelString = UIManager.getLookAndFeel().getClass().toString()
+				.substring(6); // remove the 'class ' at begining of string
 
-    public void setCurrentTimeStepSpeedIndex(int currentTimeStepSpeedIndex)
-    {
-        this.currentTimeStepSpeedIndex = currentTimeStepSpeedIndex;
-    }
+	} // JstSaveClass constructor
 
-    public int getSatListWidth()
-    {
-        return satListWidth;
-    }
+	public Hashtable<String, CustomSatellite> getSatHash() {
+		return satHash;
+	}
 
-    public void setSatListWidth(int satListWidth)
-    {
-        this.satListWidth = satListWidth;
-    }
+	public void setSatHash(Hashtable<String, CustomSatellite> satHash) {
+		this.satHash = satHash;
+	}
 
-    public int getSatListHeight()
-    {
-        return satListHeight;
-    }
+	public Vector<J2DEarthPanelSave> getTwoDWindowSaveVec() {
+		return twoDWindowSaveVec;
+	}
 
-    public void setSatListHeight(int satListHeight)
-    {
-        this.satListHeight = satListHeight;
-    }
+	public void setTwoDWindowSaveVec(Vector<J2DEarthPanelSave> twoDWindowSaveVec) {
+		this.twoDWindowSaveVec = twoDWindowSaveVec;
+	}
 
-    public int getSatListX()
-    {
-        return satListX;
-    }
+	public Vector<SatPropertyPanelSave> getSatPropWindowSaveVec() {
+		return satPropWindowSaveVec;
+	}
 
-    public void setSatListX(int satListX)
-    {
-        this.satListX = satListX;
-    }
+	public void setSatPropWindowSaveVec(
+			Vector<SatPropertyPanelSave> satPropWindowSaveVec) {
+		this.satPropWindowSaveVec = satPropWindowSaveVec;
+	}
 
-    public int getSatListY()
-    {
-        return satListY;
-    }
+	public TimeOrekit getCurrentJulianDate() {
+		return currentJulianDate;
+	}
 
-    public void setSatListY(int satListY)
-    {
-        this.satListY = satListY;
-    }
+	public void setCurrentJulianDate(TimeOrekit currentJulianDate) {
+		this.currentJulianDate = currentJulianDate;
+	}
 
-    public boolean isRealTimeMode()
-    {
-        return realTimeMode;
-    }
+	public String getVersionString() {
+		return versionString;
+	}
 
-    public void setRealTimeMode(boolean realTimeMode)
-    {
-        this.realTimeMode = realTimeMode;
-    }
+	public void setVersionString(String versionString) {
+		this.versionString = versionString;
+	}
 
-    public boolean isLocalTimeZoneSelected()
-    {
-        return localTimeZoneSelected;
-    }
+	public int getRealTimeAnimationRefreshRateMs() {
+		return realTimeAnimationRefreshRateMs;
+	}
 
-    public void setLocalTimeZoneSelected(boolean localTimeZoneSelected)
-    {
-        this.localTimeZoneSelected = localTimeZoneSelected;
-    }
+	public void setRealTimeAnimationRefreshRateMs(
+			int realTimeAnimationRefreshRateMs) {
+		this.realTimeAnimationRefreshRateMs = realTimeAnimationRefreshRateMs;
+	}
 
-    public Vector<J3DEarthlPanelSave> getThreeDWindowSaveVec()
-    {
-        return threeDWindowSaveVec;
-    }
+	public int getNonRealTimeAnimationRefreshRateMs() {
+		return nonRealTimeAnimationRefreshRateMs;
+	}
 
-    public void setThreeDWindowSaveVec(Vector<J3DEarthlPanelSave> threeDWindowSaveVec)
-    {
-        this.threeDWindowSaveVec = threeDWindowSaveVec;
-    }
+	public void setNonRealTimeAnimationRefreshRateMs(
+			int nonRealTimeAnimationRefreshRateMs) {
+		this.nonRealTimeAnimationRefreshRateMs = nonRealTimeAnimationRefreshRateMs;
+	}
 
-    public Hashtable<String, GroundStation> getGsHash()
-    {
-        return gsHash;
-    }
+	public int getCurrentTimeStepSpeedIndex() {
+		return currentTimeStepSpeedIndex;
+	}
 
-    public void setGsHash(Hashtable<String, GroundStation> gsHash)
-    {
-        this.gsHash = gsHash;
-    }
+	public void setCurrentTimeStepSpeedIndex(int currentTimeStepSpeedIndex) {
+		this.currentTimeStepSpeedIndex = currentTimeStepSpeedIndex;
+	}
 
-    public Vector<J3DEarthlPanelSave> getThreeDExtWindowSaveVec()
-    {
-        return threeDExtWindowSaveVec;
-    }
+	public int getSatListWidth() {
+		return satListWidth;
+	}
 
-    public void setThreeDExtWindowSaveVec(Vector<J3DEarthlPanelSave> threeDExtWindowSaveVec)
-    {
-        this.threeDExtWindowSaveVec = threeDExtWindowSaveVec;
-    }
+	public void setSatListWidth(int satListWidth) {
+		this.satListWidth = satListWidth;
+	}
 
-    public boolean isEpochTimeEqualsCurrentTime()
-    {
-        return epochTimeEqualsCurrentTime;
-    }
+	public int getSatListHeight() {
+		return satListHeight;
+	}
 
-    public void setEpochTimeEqualsCurrentTime(boolean epochTimeEqualsCurrentTime)
-    {
-        this.epochTimeEqualsCurrentTime = epochTimeEqualsCurrentTime;
-    }
+	public void setSatListHeight(int satListHeight) {
+		this.satListHeight = satListHeight;
+	}
 
-    public Time getScenarioEpochDate()
-    {
-        return scenarioEpochDate;
-    }
+	public int getSatListX() {
+		return satListX;
+	}
 
-    public void setScenarioEpochDate(Time scenarioEpochDate)
-    {
-        this.scenarioEpochDate = scenarioEpochDate;
-    }
+	public void setSatListX(int satListX) {
+		this.satListX = satListX;
+	}
 
-    public boolean isWwjOfflineMode() {
-        return wwjOfflineMode;
-    }
+	public int getSatListY() {
+		return satListY;
+	}
 
-    public void setWwjOfflineMode(boolean wwjOfflineMode) {
-        this.wwjOfflineMode = wwjOfflineMode;
-    }
+	public void setSatListY(int satListY) {
+		this.satListY = satListY;
+	}
 
-    public CoverageAnalyzer getCa()
-    {
-        return ca;
-    }
+	public boolean isRealTimeMode() {
+		return realTimeMode;
+	}
 
-    public void setCa(CoverageAnalyzer ca)
-    {
-        this.ca = ca;
-    }
+	public void setRealTimeMode(boolean realTimeMode) {
+		this.realTimeMode = realTimeMode;
+	}
 
-    /**
-     * @return the screenLoc
-     */
-    public Point getScreenLoc()
-    {
-        return screenLoc;
-    }
+	public boolean isLocalTimeZoneSelected() {
+		return localTimeZoneSelected;
+	}
 
-    /**
-     * @return the appWidth
-     */
-    public int getAppWidth()
-    {
-        return appWidth;
-    }
+	public void setLocalTimeZoneSelected(boolean localTimeZoneSelected) {
+		this.localTimeZoneSelected = localTimeZoneSelected;
+	}
 
-    /**
-     * @return the appHeight
-     */
-    public int getAppHeight()
-    {
-        return appHeight;
-    }
+	public Vector<J3DEarthlPanelSave> getThreeDWindowSaveVec() {
+		return threeDWindowSaveVec;
+	}
 
-    /**
-     * @return the lookFeelString
-     */
-    public String getLookFeelString()
-    {
-        return lookFeelString;
-    }
-    
+	public void setThreeDWindowSaveVec(
+			Vector<J3DEarthlPanelSave> threeDWindowSaveVec) {
+		this.threeDWindowSaveVec = threeDWindowSaveVec;
+	}
+
+	public Hashtable<String, GroundStation> getGsHash() {
+		return gsHash;
+	}
+
+	public void setGsHash(Hashtable<String, GroundStation> gsHash) {
+		this.gsHash = gsHash;
+	}
+
+	public Vector<J3DEarthlPanelSave> getThreeDExtWindowSaveVec() {
+		return threeDExtWindowSaveVec;
+	}
+
+	public void setThreeDExtWindowSaveVec(
+			Vector<J3DEarthlPanelSave> threeDExtWindowSaveVec) {
+		this.threeDExtWindowSaveVec = threeDExtWindowSaveVec;
+	}
+
+	public boolean isEpochTimeEqualsCurrentTime() {
+		return epochTimeEqualsCurrentTime;
+	}
+
+	public void setEpochTimeEqualsCurrentTime(boolean epochTimeEqualsCurrentTime) {
+		this.epochTimeEqualsCurrentTime = epochTimeEqualsCurrentTime;
+	}
+
+	public TimeOrekit getScenarioEpochDate() {
+		return scenarioEpochDate;
+	}
+
+	public void setScenarioEpochDate(TimeOrekit scenarioEpochDate) {
+		this.scenarioEpochDate = scenarioEpochDate;
+	}
+
+	public boolean isWwjOfflineMode() {
+		return wwjOfflineMode;
+	}
+
+	public void setWwjOfflineMode(boolean wwjOfflineMode) {
+		this.wwjOfflineMode = wwjOfflineMode;
+	}
+
+	public CoverageAnalyzer getCa() {
+		return ca;
+	}
+
+	public void setCa(CoverageAnalyzer ca) {
+		this.ca = ca;
+	}
+
+	/**
+	 * @return the screenLoc
+	 */
+	public Point getScreenLoc() {
+		return screenLoc;
+	}
+
+	/**
+	 * @return the appWidth
+	 */
+	public int getAppWidth() {
+		return appWidth;
+	}
+
+	/**
+	 * @return the appHeight
+	 */
+	public int getAppHeight() {
+		return appHeight;
+	}
+
+	/**
+	 * @return the lookFeelString
+	 */
+	public String getLookFeelString() {
+		return lookFeelString;
+	}
+
 } // JstSaveClass

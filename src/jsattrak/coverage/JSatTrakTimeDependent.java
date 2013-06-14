@@ -29,7 +29,7 @@ import java.util.Hashtable;
 
 import jsattrak.objects.CustomSatellite;
 import jsattrak.objects.GroundStation;
-import name.gano.astro.time.Time;
+import name.gano.astro.time.TimeOrekit;
 
 /**
  *
@@ -38,6 +38,6 @@ import name.gano.astro.time.Time;
 public interface JSatTrakTimeDependent 
 {
     
-    public void updateTime(final Time currentJulianDate, final Hashtable<String,CustomSatellite> satHash, final Hashtable<String,GroundStation> gsHash);
+    public void updateTime(final TimeOrekit currentJulianDate, final Hashtable<String,CustomSatellite> satHash, final Hashtable<String,GroundStation> gsHash);
 
 }
