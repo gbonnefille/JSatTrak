@@ -537,7 +537,7 @@ public class CustomSatellite extends AbstractSatellite {
 
 	// takes in JulDate
 	private double[] calculateLatLongAltXyz(AbsoluteDate absoluteDate)
-			throws OrekitException {		
+			throws OrekitException {
 
 		Vector3D pos = Vector3D.ZERO;
 		Vector3D ptPos = Vector3D.ZERO;
@@ -551,27 +551,25 @@ public class CustomSatellite extends AbstractSatellite {
 			if (absoluteDate.compareTo(maxTime) <= 0
 					&& absoluteDate.compareTo(minTime) >= 0) {
 
-				ptPos = ephemeris.getPVCoordinates(absoluteDate, this.inertialFrame)
+				pos = ephemeris.getPVCoordinates(absoluteDate, ITRF2005)
 						.getPosition();
-				
-				
-				if(!this.isTle){
-					pos = ephemeris.getPVCoordinates(absoluteDate,
+
+				if (!this.isTle) {
+
+					ptPos = ephemeris.getPVCoordinates(absoluteDate,
 							this.missionTree.getInitNode().getFrame())
 							.getPosition();
-					}
-					else{
-						pos = ephemeris.getPVCoordinates(absoluteDate,
-								ITRF2005)
-								.getPosition();
-						
-					}
-				
+				} else {
+					ptPos = ephemeris.getPVCoordinates(absoluteDate,
+							this.inertialFrame).getPosition();
+
+				}
+
 			}
 		}
 
-
-		GeodeticPoint geodeticPoint = this.earth.transform(pos, this.ITRF2005, absoluteDate);
+		GeodeticPoint geodeticPoint = this.earth.transform(pos, this.ITRF2005,
+				absoluteDate);
 
 		double[] ptLlaXyz = new double[] { geodeticPoint.getLatitude(),
 				geodeticPoint.getLongitude(), geodeticPoint.getAltitude(),
